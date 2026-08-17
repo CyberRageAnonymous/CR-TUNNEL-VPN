@@ -1,0 +1,13 @@
+
+# Build outputs
+app/build/
+build/
+
+# Local machine config
+local.properties
+.idea/
+.gradle/
+.kotlin/
+
+# libv2ray.aar is downloaded by GitHub Actions workflow
+app/libs/libv2ray.aar

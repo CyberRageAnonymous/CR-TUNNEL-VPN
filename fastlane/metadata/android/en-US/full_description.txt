@@ -1,0 +1,37 @@
+<p>CR TUNNEL is a free and open-source Android VPN client built on the <a href="https://github.com/XTLS/Xray-core">Xray-core</a> engine — with a neon Cyber-Rage design, no ads, and no tracking.</p>
+
+<h3>Telegram Channel</h3>
+
+<p><a href="https://t.me/R4G3_2024">t.me/R4G3_2024</a></p>
+
+<h3>Features</h3>
+
+<ul>
+<li><b>Auto Optimize</b> — real-ping-tests every saved config and auto-connects to the fastest</li>
+<li>Supports VLESS (XHTTP, WebSocket, TCP, Reality, gRPC), VMess, Trojan, Shadowsocks, SOCKS, Hysteria2</li>
+<li>Import configs via subscription link or QR code</li>
+<li>Real latency testing per config</li>
+<li>Per-app proxy with 400+ apps pre-listed</li>
+<li>Auto subscription updates</li>
+<li>VpnService mode and standalone Root mode</li>
+</ul>
+
+<h3>Usage</h3>
+
+<h4>Geoip and Geosite</h4>
+
+<ul>
+<li>geoip.dat, geosite.dat and geoip-only-cn-private.dat are bundled in the app and extracted to the app's asset folder automatically</li>
+<li>latest official <a href="https://github.com/v2fly/domain-list-community">domain list</a> and <a href="https://github.com/v2fly/geoip">ip list</a> can be imported manually</li>
+<li>possible to use third party dat file in the same folder</li>
+</ul>
+
+<h3>More in our <a href="https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN">repository</a></h3>
+
+<h3>Development guide</h3>
+
+<p>The Android project under the <code>CR-TUNNEL/</code> folder can be compiled directly in Android Studio, or using the Gradle wrapper:
+<code>cd CR-TUNNEL && ./gradlew assembleRelease</code></p>
+
+<p>CR TUNNEL can run on Android Emulators. For WSA, VPN permission need to be granted via
+<code>appops set [package name] ACTIVATE_VPN allow</code></p>

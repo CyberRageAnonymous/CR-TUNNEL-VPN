@@ -1,0 +1,402 @@
+package com.cr.tunnel.ui.main
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.cr.tunnel.R
+import com.cr.tunnel.dto.entities.ProfileItem
+import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.QRCodeDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
+
+@Composable
+fun MainScreen(
+    mainViewModel: MainViewModel,
+    onAction: (MainAction) -> Unit,
+    onNavigate: (MainDestination) -> Unit,
+) {
+    val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+    val groups = uiState.groups
+    val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
+    val isRunning = uiState.isRunning
+    val displayText = uiState.statusText
+    val selectedGuid = uiState.selectedGuid
+    val doubleColumnDisplay = uiState.doubleColumnDisplay
+    val confirmRemove = uiState.confirmRemove
+    val shareQRCodeBitmap = uiState.shareQRCodeBitmap
+
+    val isDarkTheme = LocalDarkTheme.current
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    var showSearch by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    var showDelAllConfirm by remember { mutableStateOf(false) }
+    var showDelDuplicateConfirm by remember { mutableStateOf(false) }
+    var showDelInvalidConfirm by remember { mutableStateOf(false) }
+    var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
+
+    var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
+    val removeServer: (String) -> Unit = { guid ->
+        if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
+    }
+
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { groups.size.coerceAtLeast(1) }
+    )
+
+    val lazyListStates = remember { mutableStateMapOf<String, LazyListState>() }
+    val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
+
+    var locateInProgress by remember { mutableStateOf(false) }
+
+    LaunchedEffect(groups) {
+        val validGroupIds = groups.map { it.id }.toSet()
+        lazyListStates.keys.retainAll(validGroupIds)
+        lazyGridStates.keys.retainAll(validGroupIds)
+    }
+
+    val latestDoubleColumnDisplay by rememberUpdatedState(doubleColumnDisplay)
+
+    LaunchedEffect(groups, uiState.selectedGroupId) {
+        if (groups.isEmpty()) return@LaunchedEffect
+        val selectedIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }
+            .takeIf { it >= 0 } ?: 0
+        if (!pagerState.isScrollInProgress && pagerState.settledPage != selectedIndex) {
+            pagerState.scrollToPage(selectedIndex)
+        }
+    }
+
+    val latestGroups by rememberUpdatedState(groups)
+    val latestLocateInProgress by rememberUpdatedState(locateInProgress)
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                val currentGroups = latestGroups
+                if (!latestLocateInProgress && page in currentGroups.indices) {
+                    onAction(MainAction.SelectGroup(currentGroups[page].id))
+                }
+            }
+    }
+
+    LaunchedEffect(uiState.locateTarget) {
+        val target = uiState.locateTarget ?: return@LaunchedEffect
+        if (target.groupIndex !in 0 until pagerState.pageCount) {
+            mainViewModel.onAction(MainAction.LocateHandled(target))
+            return@LaunchedEffect
+        }
+
+        locateInProgress = true
+        try {
+            if (pagerState.settledPage != target.groupIndex) {
+                pagerState.navigateToPageOptimized(
+                    targetPage = target.groupIndex,
+                    animateAdjacentPage = false
+                )
+            }
+            onAction(MainAction.SelectGroup(target.groupId))
+
+            repeat(10) {
+                val ready = if (latestDoubleColumnDisplay) {
+                    lazyGridStates[target.groupId] != null
+                } else {
+                    lazyListStates[target.groupId] != null
+                }
+                if (ready) return@repeat
+                delay(16L)
+            }
+
+            if (latestDoubleColumnDisplay) {
+                lazyGridStates[target.groupId]?.let { gridState ->
+                    gridState.scrollToItem(
+                        index = target.itemPosition,
+                        scrollOffset = -gridState.layoutInfo.viewportSize.height / 3
+                    )
+                }
+            } else {
+                lazyListStates[target.groupId]?.let { listState ->
+                    listState.scrollToItem(
+                        index = target.itemPosition,
+                        scrollOffset = -listState.layoutInfo.viewportSize.height / 3
+                    )
+                }
+            }
+        } finally {
+            delay(32L)
+            locateInProgress = false
+            mainViewModel.onAction(MainAction.LocateHandled(target))
+        }
+    }
+
+    MainDialogs(
+        showDelAllConfirm = showDelAllConfirm,
+        onDismissDelAll = { showDelAllConfirm = false },
+        onConfirmDelAll = { showDelAllConfirm = false; onAction(MainAction.RemoveAllServers) },
+        showDelDuplicateConfirm = showDelDuplicateConfirm,
+        onDismissDelDuplicate = { showDelDuplicateConfirm = false },
+        onConfirmDelDuplicate = { showDelDuplicateConfirm = false; onAction(MainAction.RemoveDuplicateServers) },
+        showDelInvalidConfirm = showDelInvalidConfirm,
+        onDismissDelInvalid = { showDelInvalidConfirm = false },
+        onConfirmDelInvalid = { showDelInvalidConfirm = false; onAction(MainAction.RemoveInvalidServers) },
+        showRemoveConfirm = showRemoveConfirm,
+        onDismissRemove = { showRemoveConfirm = null },
+        onConfirmRemove = { guid -> showRemoveConfirm = null; onAction(MainAction.RemoveServer(guid)) }
+    )
+
+    if (shareTarget != null) {
+        val (guid, profile, more) = shareTarget!!
+        ShareMethodDialog(
+            guid = guid,
+            profile = profile,
+            more = more,
+            onDismiss = { shareTarget = null },
+            onAction = onAction,
+            onRemove = removeServer,
+        )
+    }
+    if (shareQRCodeBitmap != null) {
+        QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            MainDrawerContent(
+                drawerState = drawerState,
+                onNavigate = { route ->
+                    scope.launch { drawerState.close() }
+                    onNavigate(route)
+                }
+            )
+        }
+    ) {
+        Scaffold(
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+            topBar = {
+                MainTopBar(
+                    isLoading = isLoading,
+                    showSearch = showSearch,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { query: String ->
+                        searchQuery = query
+                        onAction(MainAction.Search(query))
+                    },
+                    onSearchClose = {
+                        searchQuery = ""
+                        onAction(MainAction.Search(""))
+                        showSearch = false
+                    },
+                    onSearchToggle = { show: Boolean -> showSearch = show },
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onAction = onAction,
+                    onMoreMenuAction = { action ->
+                        when (action) {
+                            MainMoreMenuAction.AutoOptimize -> onAction(MainAction.AutoOptimize)
+                            MainMoreMenuAction.RestartService -> onAction(MainAction.RestartService)
+                            MainMoreMenuAction.DeleteAll -> showDelAllConfirm = true
+                            MainMoreMenuAction.DeleteDuplicate -> showDelDuplicateConfirm = true
+                            MainMoreMenuAction.DeleteInvalid -> showDelInvalidConfirm = true
+                            MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
+                            MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
+                            MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
+                            MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
+                            MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
+                            MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
+                        }
+                    }
+                )
+            },
+            bottomBar = {},
+            floatingActionButton = {},
+        ) { innerPadding ->
+            val layoutDirection = LocalLayoutDirection.current
+
+            if (groups.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    if (uiState.isAutoOptimizing) {
+                        OptimizeBanner(onCancel = { onAction(MainAction.CancelAutoOptimize) })
+                    }
+                    ConnectionSection(
+                        displayText = displayText,
+                        isRunning = isRunning,
+                        isAutoOptimizing = uiState.isAutoOptimizing,
+                        isDarkTheme = isDarkTheme,
+                        onToggle = { onAction(MainAction.ToggleService) },
+                        onTest = { onAction(MainAction.TestCurrentServer) },
+                        onAutoOptimize = { onAction(MainAction.AutoOptimize) },
+                        onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) }
+                    )
+                    if (groups.size > 1) {
+                        GroupTabBar(
+                            groups = groups,
+                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
+                            mainViewModel = mainViewModel,
+                            onTabClick = { targetIndex ->
+                                scope.launch {
+                                    pagerState.navigateToPageOptimized(
+                                        targetPage = targetIndex,
+                                        animateAdjacentPage = true
+                                    )
+                                }
+                            }
+                        )
+                    }
+
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize(),
+                        userScrollEnabled = true,
+                        beyondViewportPageCount = 1,
+                        key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
+                    ) { page ->
+                        val group = groups.getOrNull(page) ?: return@HorizontalPager
+
+                        GroupPagerPage(
+                            groupId = group.id,
+                            mainViewModel = mainViewModel,
+                            selectedGuid = selectedGuid,
+                            doubleColumnDisplay = doubleColumnDisplay,
+                            confirmRemove = confirmRemove,
+                            searchQuery = searchQuery,
+                            lazyListStates = lazyListStates,
+                            lazyGridStates = lazyGridStates,
+                            onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
+                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                            onShareServer = { guid, profile ->
+                                shareTarget = Triple(guid, profile, false)
+                            },
+                            onMoreServer = { guid, profile ->
+                                shareTarget = Triple(guid, profile, true)
+                            },
+                            onRemoveServer = removeServer,
+                            contentPadding = PaddingValues(
+                                start = 0.dp,
+                                top = 0.dp,
+                                end = 0.dp,
+                                bottom = 8.dp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OptimizeBanner(onCancel: () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "optimize")
+    val glow by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow"
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        Color(0x3323E5FF),
+                        Color(0x33A855F7)
+                    )
+                )
+            )
+            .border(1.dp, Color(0x6600E5FF), RoundedCornerShape(16.dp))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .background(
+                        Color(0xFF00E5FF).copy(alpha = glow),
+                        CircleShape
+                    )
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.menu_auto_optimize),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color(0xFF00E5FF)
+                )
+                Text(
+                    text = stringResource(R.string.optimizing_status),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFFA8B8D0)
+                )
+            }
+        }
+        Text(
+            text = stringResource(R.string.menu_auto_optimize_cancel),
+            style = MaterialTheme.typography.labelMedium,
+            color = Color(0xFFA855F7),
+            modifier = Modifier.clickable(onClick = onCancel)
+        )
+    }
+}
