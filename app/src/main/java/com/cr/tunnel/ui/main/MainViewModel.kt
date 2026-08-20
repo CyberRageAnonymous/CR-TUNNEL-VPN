@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.cr.tunnel.AppConfig
 import com.cr.tunnel.R
+import com.cr.tunnel.core.CoreServiceManager
 import com.cr.tunnel.dto.GroupMapItem
 import com.cr.tunnel.dto.LocateTarget
 import com.cr.tunnel.dto.TestServiceMessage
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -47,6 +49,11 @@ class MainViewModel(
 
     private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
     private val connectedText: String = dataSource.getString(R.string.connection_connected)
+
+    private var trafficPollJob: Job? = null
+    private var lastTrafficUplink = 0L
+    private var lastTrafficDownlink = 0L
+    private var lastTrafficQueryTime = 0L
 
     private var autoOptimizePending = false
     private var autoConnectBestServers = false
@@ -811,9 +818,86 @@ init {
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
+                connectedAtMs = if (running) System.currentTimeMillis() else null,
                 statusText = if (!clearTestingText && state.isTesting) state.statusText
                 else if (running) connectedText else disconnectedText
             )
+        }
+        if (running) startTrafficPolling() else stopTrafficPolling()
+    }
+
+    private fun startTrafficPolling() {
+        stopTrafficPolling()
+        lastTrafficUplink = 0L
+        lastTrafficDownlink = 0L
+        lastTrafficQueryTime = 0L
+        trafficPollJob = viewModelScope.launch(ioDispatcher) {
+            while (isActive) {
+                updateTrafficStats()
+                delay(1000)
+            }
+        }
+    }
+
+    private fun stopTrafficPolling() {
+        trafficPollJob?.cancel()
+        trafficPollJob = null
+        _uiState.update { it.copy(uplinkSpeed = "0 B/s", downlinkSpeed = "0 B/s") }
+    }
+
+    private fun updateTrafficStats() {
+        if (!CoreServiceManager.isRunning()) {
+            _uiState.update { it.copy(uplinkSpeed = "0 B/s", downlinkSpeed = "0 B/s") }
+            return
+        }
+        val now = System.currentTimeMillis()
+        var uplink = 0L
+        var downlink = 0L
+        CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
+            when (stat.direction) {
+                AppConfig.UPLINK -> uplink += stat.value
+                AppConfig.DOWNLINK -> downlink += stat.value
+            }
+        }
+        if (lastTrafficQueryTime > 0) {
+            val elapsedSec = (now - lastTrafficQueryTime) / 1000.0
+            if (elapsedSec > 0) {
+                val upSpeed = ((uplink - lastTrafficUplink) / elapsedSec).toLong()
+                val downSpeed = ((downlink - lastTrafficDownlink) / elapsedSec).toLong()
+                _uiState.update {
+                    it.copy(
+                        uplinkSpeed = formatSpeed(upSpeed),
+                        downlinkSpeed = formatSpeed(downSpeed),
+                        totalUplink = formatBytes(uplink),
+                        totalDownlink = formatBytes(downlink)
+                    )
+                }
+            }
+        }
+        lastTrafficUplink = uplink
+        lastTrafficDownlink = downlink
+        lastTrafficQueryTime = now
+    }
+
+    private fun formatSpeed(bytesPerSec: Long): String {
+        val kb = bytesPerSec / 1024.0
+        val mb = bytesPerSec / (1024.0 * 1024.0)
+        return when {
+            mb >= 1.0 -> String.format("%.2f MB/s", mb)
+            kb >= 1.0 -> String.format("%.1f KB/s", kb)
+            else -> "$bytesPerSec B/s"
+        }
+    }
+
+    private fun formatBytes(bytes: Long): String {
+        val kb = bytes / 1024.0
+        val mb = bytes / (1024.0 * 1024.0)
+        val gb = bytes / (1024.0 * 1024.0 * 1024.0)
+        return when {
+            gb >= 1.0 -> String.format("%.2f GB", gb)
+            mb >= 1.0 -> String.format("%.2f MB", mb)
+            kb >= 1.0 -> String.format("%.1f KB", kb)
+            else -> "$bytes B"
         }
     }
 

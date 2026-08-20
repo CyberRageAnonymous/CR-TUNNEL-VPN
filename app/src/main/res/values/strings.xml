@@ -394,6 +394,11 @@
     <string name="connection_connected">Connected. Tap to check connection.</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
+    <string name="protected_title">You are protected</string>
+    <string name="protected_subtitle">Your connection is secure</string>
+    <string name="auto_connect_label">Auto Connect</string>
+    <string name="connection_quality_excellent">Excellent Connection</string>
+    <string name="connected_status">CONNECTED</string>
 
     <string name="import_subscription_success">Subscription imported successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>

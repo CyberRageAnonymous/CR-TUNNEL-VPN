@@ -34,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -57,11 +59,13 @@ import com.cr.tunnel.dto.entities.ProfileItem
 import com.cr.tunnel.dto.entities.ServersCache
 import com.cr.tunnel.extension.isComplexType
 import com.cr.tunnel.extension.nullIfBlank
+import com.cr.tunnel.handler.CountryResolver
 import com.cr.tunnel.handler.AngConfigManager
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.ui.compose.ItemDivider
 import com.cr.tunnel.ui.compose.ReorderableGridItem
 import com.cr.tunnel.ui.compose.ReorderableListItem
+import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.colorConfigType
 import com.cr.tunnel.ui.compose.colorPing
 import com.cr.tunnel.ui.compose.colorPingRed
@@ -254,6 +258,17 @@ private fun ServerItemRow(
             ?.toString() ?: ""
     } else ""
 
+    var countryFlag by remember(serverCache.guid) {
+        mutableStateOf(CountryResolver.getCountryCode(serverCache.guid).let { CountryResolver.flagEmoji(it) })
+    }
+    LaunchedEffect(serverCache.guid, countryFlag) {
+        if (countryFlag.isBlank()) {
+            CountryResolver.resolve(serverCache.guid, profile) { code ->
+                countryFlag = CountryResolver.flagEmoji(code)
+            }
+        }
+    }
+
     ServerListItem(
         remarks = profile.remarks,
         statistics = profile.description.nullIfBlank()
@@ -263,6 +278,7 @@ private fun ServerItemRow(
         testDelayMillis = serverCache.testDelayMillis,
         isSelected = serverCache.guid == selectedGuid,
         subscriptionRemarks = subRemarks,
+        countryFlag = countryFlag,
         doubleColumnDisplay = false,
         onClick = { onSelectServer(serverCache.guid) },
         onShare = { onShareServer(serverCache.guid, profile) },
@@ -288,6 +304,16 @@ private fun ServerItemColumn(
     val subRemarks = if (subscriptionId.isEmpty()) {
         MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks?.firstOrNull()?.toString() ?: ""
     } else ""
+    var countryFlag by remember(serverCache.guid) {
+        mutableStateOf(CountryResolver.getCountryCode(serverCache.guid).let { CountryResolver.flagEmoji(it) })
+    }
+    LaunchedEffect(serverCache.guid, countryFlag) {
+        if (countryFlag.isBlank()) {
+            CountryResolver.resolve(serverCache.guid, profile) { code ->
+                countryFlag = CountryResolver.flagEmoji(code)
+            }
+        }
+    }
     Column {
         ServerListItem(
             remarks = profile.remarks,
@@ -297,6 +323,7 @@ private fun ServerItemColumn(
             testDelayMillis = serverCache.testDelayMillis,
             isSelected = serverCache.guid == selectedGuid,
             subscriptionRemarks = subRemarks,
+            countryFlag = countryFlag,
             doubleColumnDisplay = doubleColumnDisplay,
             onClick = { onSelectServer(serverCache.guid) },
             onEdit = { onEditServer(serverCache.guid, profile) },
@@ -317,6 +344,7 @@ fun ServerListItem(
     testDelayMillis: Long,
     isSelected: Boolean,
     subscriptionRemarks: String,
+    countryFlag: String = "",
     doubleColumnDisplay: Boolean,
     onClick: () -> Unit,
     onEdit: () -> Unit,
@@ -343,6 +371,7 @@ fun ServerListItem(
         targetValue = if (pressed) 0.97f else 1f,
         label = "pressScale"
     )
+    val isDarkTheme = LocalDarkTheme.current
 
     Row(
         modifier = modifier
@@ -351,6 +380,24 @@ fun ServerListItem(
             .scale(pressScale)
             .clip(RoundedCornerShape(20.dp))
             .background(glassBg)
+            .drawWithCache {
+                val topBrush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = if (isDarkTheme) 0.07f else 0.22f),
+                        Color.Transparent
+                    ),
+                    startY = 0f,
+                    endY = size.height * 0.45f
+                )
+                onDrawBehind {
+                    if (isSelected) {
+                        drawRoundRect(
+                            brush = topBrush,
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx(), 20.dp.toPx())
+                        )
+                    }
+                }
+            }
             .border(1.dp, borderBrush, RoundedCornerShape(20.dp))
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -389,6 +436,14 @@ fun ServerListItem(
                 .padding(start = 8.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (countryFlag.isNotBlank()) {
+                    Text(
+                        text = countryFlag,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
                 Text(
                     remarks,
                     Modifier.weight(1f),

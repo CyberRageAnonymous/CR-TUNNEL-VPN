@@ -45,11 +45,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.R
 import com.cr.tunnel.dto.entities.ProfileItem
@@ -277,6 +272,11 @@ fun MainScreen(
                         isRunning = isRunning,
                         isAutoOptimizing = uiState.isAutoOptimizing,
                         isDarkTheme = isDarkTheme,
+                        connectedAtMs = uiState.connectedAtMs,
+                        uplinkSpeed = uiState.uplinkSpeed,
+                        downlinkSpeed = uiState.downlinkSpeed,
+                        totalUplink = uiState.totalUplink,
+                        totalDownlink = uiState.totalDownlink,
                         onToggle = { onAction(MainAction.ToggleService) },
                         onTest = { onAction(MainAction.TestCurrentServer) },
                         onAutoOptimize = { onAction(MainAction.AutoOptimize) },
@@ -341,16 +341,6 @@ fun MainScreen(
 
 @Composable
 fun OptimizeBanner(onCancel: () -> Unit) {
-    val infiniteTransition = rememberInfiniteTransition(label = "optimize")
-    val glow by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "glow"
-    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -374,7 +364,7 @@ fun OptimizeBanner(onCancel: () -> Unit) {
                 modifier = Modifier
                     .size(10.dp)
                     .background(
-                        Color(0xFF00E5FF).copy(alpha = glow),
+                        Color(0xFF00E5FF),
                         CircleShape
                     )
             )

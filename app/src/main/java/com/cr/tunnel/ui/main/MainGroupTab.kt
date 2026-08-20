@@ -1,11 +1,6 @@
 package com.cr.tunnel.ui.main
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,20 +36,11 @@ fun GroupTabBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f),
         contentColor = MaterialTheme.colorScheme.onSurface,
         edgePadding = 16.dp,
         minTabWidth = 56.dp,
         indicator = {
-            val glow by rememberInfiniteTransition(label = "tabGlow").animateFloat(
-                initialValue = 0.7f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1200),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "tabGlow"
-            )
             TabRowDefaults.PrimaryIndicator(
                 modifier = Modifier
                     .tabIndicatorOffset(
@@ -63,7 +49,7 @@ fun GroupTabBar(
                     )
                     .clip(RoundedCornerShape(10.dp)),
                 width = Dp.Unspecified,
-                color = colorFabActive.copy(alpha = glow)
+                color = colorFabActive
             )
         },
         divider = {}

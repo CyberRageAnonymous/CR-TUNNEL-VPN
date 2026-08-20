@@ -17,7 +17,12 @@ data class MainUiState(
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
-    val shareQRCodeBitmap: android.graphics.Bitmap? = null
+    val shareQRCodeBitmap: android.graphics.Bitmap? = null,
+    val connectedAtMs: Long? = null,
+    val uplinkSpeed: String = "0 B/s",
+    val downlinkSpeed: String = "0 B/s",
+    val totalUplink: String = "0 B",
+    val totalDownlink: String = "0 B"
 )
 
 /**

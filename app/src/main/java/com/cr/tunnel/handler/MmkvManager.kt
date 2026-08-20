@@ -40,6 +40,7 @@ object MmkvManager {
     private const val KEY_SUB_SERVER_PREFIX = "SUB_SERVERS_"
     private const val KEY_SUB_IDS = "SUB_IDS"
     private const val KEY_WEBDAV_CONFIG = "WEBDAV_CONFIG"
+    private const val KEY_SERVER_COUNTRY_PREFIX = "SERVER_COUNTRY_"
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val profileFullStorage by lazy { MMKV.mmkvWithID(ID_PROFILE_FULL_CONFIG, MMKV.MULTI_PROCESS_MODE) }
@@ -71,6 +72,14 @@ object MmkvManager {
      */
     fun getSelectServer(): String? {
         return mainStorage.decodeString(KEY_SELECTED_SERVER)
+    }
+
+    fun getServerCountry(guid: String): String? {
+        return mainStorage.decodeString("$KEY_SERVER_COUNTRY_PREFIX$guid")
+    }
+
+    fun setServerCountry(guid: String, countryCode: String?) {
+        mainStorage.encode("$KEY_SERVER_COUNTRY_PREFIX$guid", countryCode ?: "")
     }
 
     /**

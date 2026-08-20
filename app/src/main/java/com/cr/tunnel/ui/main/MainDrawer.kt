@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -37,8 +38,8 @@ import androidx.compose.ui.unit.sp
 import com.cr.tunnel.ui.compose.AppDivider
 import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.colorConfigType
+import com.cr.tunnel.ui.compose.glassCyan
 import com.cr.tunnel.R
-import com.cr.tunnel.ui.compose.AppDivider
 import com.cr.tunnel.ui.compose.verticalScrollbar
 
 enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
@@ -73,11 +74,12 @@ private val drawerItems = primaryDrawerItems + listOf(
 @Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
     val drawerScrollState = rememberScrollState()
+    val isDarkTheme = LocalDarkTheme.current
 
     ModalDrawerSheet(
         drawerState = drawerState,
         modifier = Modifier.fillMaxWidth(0.75f),
-        drawerContainerColor = if (LocalDarkTheme.current) Color(0xE60F1530) else Color(0xE6FFFFFF)
+        drawerContainerColor = if (isDarkTheme) Color(0xE60F1530) else Color(0xE6FFFFFF)
     ) {
         Column(
             modifier = Modifier.verticalScroll(drawerScrollState).verticalScrollbar(drawerScrollState)
@@ -95,6 +97,34 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                                 listOf(Color(0x3300E5FF), Color(0x33A855F7))
                             )
                         )
+                        .drawWithCache {
+                            val headerBrush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = if (isDarkTheme) 0.10f else 0.25f),
+                                    Color.Transparent
+                                ),
+                                startY = 0f,
+                                endY = size.height * 0.45f
+                            )
+                            val headerEdge = Brush.linearGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.15f),
+                                    glassCyan.copy(alpha = 0.10f),
+                                    Color.White.copy(alpha = 0.05f)
+                                )
+                            )
+                            onDrawBehind {
+                                drawRoundRect(
+                                    brush = headerBrush,
+                                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(0f, 0f)
+                                )
+                                drawRoundRect(
+                                    brush = headerEdge,
+                                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(0f, 0f),
+                                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
+                                )
+                            }
+                        }
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
