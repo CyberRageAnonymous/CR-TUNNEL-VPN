@@ -52,6 +52,8 @@ object AppConfig {
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
     const val SUBSCRIPTION_MIN_INTERVAL_MINUTES = 15L
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
+    const val PREF_SESSION_UPLINK = "pref_session_uplink_bytes"
+    const val PREF_SESSION_DOWNLINK = "pref_session_downlink_bytes"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
     const val PREF_DOUBLE_COLUMN_DISPLAY = "pref_double_column_display"
     const val PREF_GROUP_ALL_DISPLAY = "pref_group_all_display"
@@ -132,6 +134,13 @@ object AppConfig {
     const val APP_WIKI_MODE = "$GITHUB_RAW_URL/CyebRageAnonymuos/CR-TUNNEL-VPN/main/docs/mode.md"
     const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/CyebRageAnonymuos/CR-TUNNEL-VPN/main/CR.md"
     const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+
+    const val COMMUNITY_REPO = "CyebRageAnonymuos/CR-TUNNEL-VPN"
+    const val COMMUNITY_BRANCH = "main"
+    const val COMMUNITY_CONFIGS_PATH = "community/configs.json"
+    const val COMMUNITY_RAW_URL = "$GITHUB_RAW_URL/$COMMUNITY_REPO/$COMMUNITY_BRANCH/$COMMUNITY_CONFIGS_PATH"
+    const val COMMUNITY_API_URL = "https://api.github.com/repos/$COMMUNITY_REPO/contents/$COMMUNITY_CONFIGS_PATH"
+    const val COMMUNITY_TOKEN = ""
     const val TG_CHANNEL_URL = "https://t.me/R4G3_2024"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
@@ -188,6 +197,7 @@ object AppConfig {
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
+    const val MSG_TRAFFIC_STATS = 76
 
     /** Notification channel IDs and names. */
     // Use a new ID because Android does not let an app raise an existing channel's importance.

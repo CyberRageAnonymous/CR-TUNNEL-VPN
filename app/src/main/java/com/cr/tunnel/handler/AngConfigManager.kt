@@ -468,6 +468,10 @@ object AngConfigManager {
      * @param subItem The subscription item.
      * @return The parsed ProfileItem or null if parsing fails or filtered out.
      */
+    fun parseSingleLink(str: String?): ProfileItem? {
+        return parseConfig(str, "", null)
+    }
+
     private fun parseConfig(
         str: String?,
         subid: String,

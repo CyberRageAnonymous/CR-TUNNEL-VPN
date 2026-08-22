@@ -1,5 +1,12 @@
 package com.cr.tunnel.ui.main
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -55,6 +63,7 @@ private val NeonPurple = Color(0xFFA855F7)
 fun ConnectionSection(
     displayText: String,
     isRunning: Boolean,
+    isConnecting: Boolean,
     isAutoOptimizing: Boolean,
     isDarkTheme: Boolean,
     connectedAtMs: Long?,
@@ -87,18 +96,18 @@ fun ConnectionSection(
             .padding(horizontal = 20.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isRunning) {
-            ProtectedBanner(
-                isDarkTheme = isDarkTheme,
-                isAutoOptimizing = isAutoOptimizing,
-                onAutoOptimize = onAutoOptimize,
-                onCancelAutoOptimize = onCancelAutoOptimize
-            )
-            Spacer(modifier = Modifier.height(14.dp))
-        }
+        ProtectedBanner(
+            isDarkTheme = isDarkTheme,
+            isRunning = isRunning,
+            isAutoOptimizing = isAutoOptimizing,
+            onAutoOptimize = onAutoOptimize,
+            onCancelAutoOptimize = onCancelAutoOptimize
+        )
+        Spacer(modifier = Modifier.height(14.dp))
 
         ConnectionCircle(
             isRunning = isRunning,
+            isConnecting = isConnecting,
             isDarkTheme = isDarkTheme,
             elapsedSeconds = elapsedSeconds,
             onClick = onToggle
@@ -132,56 +141,13 @@ fun ConnectionSection(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    if (isDarkTheme) Color(0x2200E5FF) else Color(0x0F00A8C4)
-                )
-                .border(
-                    1.dp,
-                    if (isAutoOptimizing) Brush.linearGradient(
-                        listOf(
-                            NeonCyan,
-                            NeonPurple
-                        )
-                    )
-                    else Brush.linearGradient(listOf(Color(0x3300E5FF), Color(0x33A855F7))),
-                    RoundedCornerShape(18.dp)
-                )
-                .clickable(onClick = {
-                    if (isAutoOptimizing) onCancelAutoOptimize() else onAutoOptimize()
-                })
-                .clip(RoundedCornerShape(18.dp))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = if (isAutoOptimizing) painterResource(R.drawable.ic_flash_off_24dp)
-                else painterResource(R.drawable.ic_flash_on_24dp),
-                contentDescription = null,
-                tint = if (isAutoOptimizing) NeonPurple else NeonCyan,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(
-                    if (isAutoOptimizing) R.string.menu_auto_optimize_cancel
-                    else R.string.menu_auto_optimize
-                ),
-                style = MaterialTheme.typography.labelLarge,
-                color = if (isAutoOptimizing) NeonPurple else NeonCyan,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
     }
 }
 
 @Composable
 private fun ProtectedBanner(
     isDarkTheme: Boolean,
+    isRunning: Boolean,
     isAutoOptimizing: Boolean,
     onAutoOptimize: () -> Unit,
     onCancelAutoOptimize: () -> Unit
@@ -216,13 +182,17 @@ private fun ProtectedBanner(
             Spacer(modifier = Modifier.width(10.dp))
             Column {
                 Text(
-                    text = stringResource(R.string.protected_title),
+                    text = stringResource(
+                        if (isRunning) R.string.protected_title else R.string.status_not_protected
+                    ),
                     style = MaterialTheme.typography.titleSmall,
-                    color = colorPing,
+                    color = if (isRunning) colorPing else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = stringResource(R.string.protected_subtitle),
+                    text = stringResource(
+                        if (isRunning) R.string.protected_subtitle else R.string.status_tap_connect
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
@@ -299,139 +269,232 @@ private fun ConnectionStatsBar(
 @Composable
 private fun ConnectionCircle(
     isRunning: Boolean,
+    isConnecting: Boolean,
     isDarkTheme: Boolean,
     elapsedSeconds: Long,
     onClick: () -> Unit
 ) {
-    val ringColors = if (isRunning) {
-        listOf(colorPing, NeonCyan, colorPing)
-    } else {
-        listOf(NeonCyan, NeonPurple, NeonCyan)
+    val glowColor = when {
+        isRunning -> colorPing
+        isConnecting -> Color(0xFFFFC107)
+        else -> NeonCyan
     }
-    val glowColor = if (isRunning) colorPing else NeonCyan
+    val ringColors = when {
+        isRunning -> listOf(colorPing, NeonCyan, colorPing)
+        isConnecting -> listOf(Color(0xFFFFC107), NeonPurple, Color(0xFFFFC107))
+        else -> listOf(NeonCyan, NeonPurple, NeonCyan)
+    }
+
+    val transition = rememberInfiniteTransition(label = "connectionCircle")
+
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = 6000, easing = LinearEasing)),
+        label = "rotation"
+    )
+    val pulse by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = 2600, easing = FastOutSlowInEasing)),
+        label = "pulse"
+    )
+    val breath by transition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "breath"
+    )
 
     Box(
         modifier = Modifier
-            .size(170.dp)
-            .drawWithCache {
-                val stroke = 8.dp.toPx()
-                val arcInset = stroke / 2
-                val arcSize = Size(size.width - stroke, size.height - stroke)
-                val arcTopLeft = Offset(arcInset, arcInset)
-                val centerOffset = Offset(size.width / 2f, size.height / 2f)
-                val ringBrush = Brush.sweepGradient(
-                    colors = ringColors,
-                    center = centerOffset
-                )
-                val glowBrush = Brush.sweepGradient(
-                    colors = listOf(Color.Transparent, glowColor.copy(alpha = 0.35f), Color.Transparent),
-                    center = centerOffset
-                )
-                onDrawBehind {
-                    drawArc(
-                        brush = ringBrush,
-                        startAngle = 0f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        topLeft = arcTopLeft,
-                        size = arcSize,
-                        style = Stroke(width = stroke, cap = StrokeCap.Round)
-                    )
-                    drawArc(
-                        brush = glowBrush,
-                        startAngle = 0f,
-                        sweepAngle = 120f,
-                        useCenter = false,
-                        topLeft = arcTopLeft,
-                        size = arcSize,
-                        style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
-                    )
-                }
-            }
-            .padding(22.dp)
+            .size(190.dp)
             .clip(CircleShape)
-            .background(
-                if (isDarkTheme) {
-                    Brush.linearGradient(
-                        listOf(
-                            Color(0xFF2A3A6E).copy(alpha = 0.45f),
-                            Color(0xFF101830).copy(alpha = 0.85f)
-                        )
-                    )
-                } else {
-                    Brush.linearGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.85f),
-                            Color(0xFFDFF2FF).copy(alpha = 0.75f)
-                        )
-                    )
-                }
-            )
-            .drawWithCache {
-                val highlightBrush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = if (isDarkTheme) 0.08f else 0.30f),
-                        Color.Transparent
-                    ),
-                    startY = 0f,
-                    endY = size.height * 0.45f
-                )
-                val edgeBrush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = if (isRunning) 0.55f else 0.30f),
-                        glassCyan.copy(alpha = 0.35f),
-                        Color.White.copy(alpha = 0.15f)
-                    )
-                )
-                onDrawBehind {
-                    drawRoundRect(
-                        brush = highlightBrush,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(85.dp.toPx(), 85.dp.toPx())
-                    )
-                    drawRoundRect(
-                        brush = edgeBrush,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(85.dp.toPx(), 85.dp.toPx()),
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
-                    )
-                }
-            }
-            .border(
-                1.dp,
-                Brush.linearGradient(
-                    listOf(glowColor.copy(alpha = if (isRunning) 0.8f else 0.4f), NeonPurple.copy(alpha = 0.3f))
-                ),
-                CircleShape
-            )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
+        // Static base ring
+        Box(
+            modifier = Modifier
+                .size(190.dp)
+                .drawWithCache {
+                    val stroke = 8.dp.toPx()
+                    val arcInset = stroke / 2
+                    val arcSize = Size(size.width - stroke, size.height - stroke)
+                    val arcTopLeft = Offset(arcInset, arcInset)
+                    val centerOffset = Offset(size.width / 2f, size.height / 2f)
+                    val brush = Brush.sweepGradient(
+                        colors = ringColors.map { it.copy(alpha = 0.35f) },
+                        center = centerOffset
+                    )
+                    onDrawBehind {
+                        drawArc(
+                            brush = brush,
+                            startAngle = 0f,
+                            sweepAngle = 360f,
+                            useCenter = false,
+                            topLeft = arcTopLeft,
+                            size = arcSize,
+                            style = Stroke(width = stroke, cap = StrokeCap.Round)
+                        )
+                    }
+                }
+        )
+
+        // Rotating comet ring (only this layer rotates)
+        Box(
+            modifier = Modifier
+                .size(190.dp)
+                .graphicsLayer { rotationZ = rotation }
+                .drawWithCache {
+                    val stroke = 3.dp.toPx()
+                    val inset = 1.dp.toPx()
+                    val arcSize = Size(size.width - inset * 2, size.height - inset * 2)
+                    val arcTopLeft = Offset(inset, inset)
+                    val centerOffset = Offset(size.width / 2f, size.height / 2f)
+                    val brush = Brush.sweepGradient(
+                        colors = if (isRunning) {
+                            listOf(Color.Transparent, glowColor.copy(alpha = 0.9f), Color.Transparent)
+                        } else {
+                            listOf(Color.Transparent, NeonCyan.copy(alpha = 0.6f), NeonPurple.copy(alpha = 0.7f), Color.Transparent)
+                        },
+                        center = centerOffset
+                    )
+                    onDrawBehind {
+                        drawArc(
+                            brush = brush,
+                            startAngle = 0f,
+                            sweepAngle = if (isRunning) 320f else 230f,
+                            useCenter = false,
+                            topLeft = arcTopLeft,
+                            size = arcSize,
+                            style = Stroke(width = stroke, cap = StrokeCap.Round)
+                        )
+                    }
+                }
+        )
+
+        // Expanding pulse rings while running
         if (isRunning) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.connected_status),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorPing,
-                    fontFamily = FontFamily.Serif,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    letterSpacing = 2.sp
+            val pulseScale = 1f + pulse * 0.4f
+            val pulseAlpha = (1f - pulse) * 0.45f
+            Box(
+                modifier = Modifier
+                    .size(190.dp)
+                    .graphicsLayer {
+                        scaleX = pulseScale
+                        scaleY = pulseScale
+                        alpha = pulseAlpha
+                    }
+                    .border(2.dp, glowColor.copy(alpha = 0.6f), CircleShape)
+            )
+            Box(
+                modifier = Modifier
+                    .size(190.dp)
+                    .graphicsLayer {
+                        scaleX = pulseScale + 0.15f
+                        scaleY = pulseScale + 0.15f
+                        alpha = pulseAlpha * 0.5f
+                    }
+                    .border(1.5.dp, NeonPurple.copy(alpha = 0.5f), CircleShape)
+            )
+        }
+
+        // Main glass body
+        Box(
+            modifier = Modifier
+                .size(170.dp)
+                .graphicsLayer {
+                    scaleX = breath
+                    scaleY = breath
+                }
+                .padding(22.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isDarkTheme) {
+                        Brush.linearGradient(
+                            listOf(
+                                Color(0xFF2A3A6E).copy(alpha = 0.45f),
+                                Color(0xFF101830).copy(alpha = 0.85f)
+                            )
+                        )
+                    } else {
+                        Brush.linearGradient(
+                            listOf(
+                                Color.White.copy(alpha = 0.85f),
+                                Color(0xFFDFF2FF).copy(alpha = 0.75f)
+                            )
+                        )
+                    }
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatElapsed(elapsedSeconds),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
+                .drawWithCache {
+                    val highlightBrush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = if (isDarkTheme) 0.08f else 0.30f),
+                            Color.Transparent
+                        ),
+                        startY = 0f,
+                        endY = size.height * 0.45f
+                    )
+                    val edgeBrush = Brush.linearGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = if (isRunning) 0.55f else 0.30f),
+                            glassCyan.copy(alpha = 0.35f),
+                            Color.White.copy(alpha = 0.15f)
+                        )
+                    )
+                    onDrawBehind {
+                        drawRoundRect(
+                            brush = highlightBrush,
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(85.dp.toPx(), 85.dp.toPx())
+                        )
+                        drawRoundRect(
+                            brush = edgeBrush,
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(85.dp.toPx(), 85.dp.toPx()),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
+                        )
+                    }
+                }
+                .border(
+                    1.dp,
+                    Brush.linearGradient(
+                        listOf(glowColor.copy(alpha = if (isRunning) 0.8f else 0.4f), NeonPurple.copy(alpha = 0.3f))
+                    ),
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isRunning) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.connected_status),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = colorPing,
+                        fontFamily = FontFamily.Serif,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        letterSpacing = 1.5.sp
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        text = formatElapsed(elapsedSeconds),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 11.sp
+                    )
+                }
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_play_24dp),
+                    contentDescription = stringResource(R.string.acc_start),
+                    tint = NeonCyan,
+                    modifier = Modifier.size(48.dp)
                 )
             }
-        } else {
-            Icon(
-                painter = painterResource(R.drawable.ic_play_24dp),
-                contentDescription = stringResource(R.string.acc_start),
-                tint = NeonCyan,
-                modifier = Modifier.size(48.dp)
-            )
         }
     }
 }

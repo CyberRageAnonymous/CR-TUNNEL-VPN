@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.cr.tunnel.AppConfig
 import com.cr.tunnel.R
-import com.cr.tunnel.core.CoreServiceManager
+import com.cr.tunnel.dto.CheckUpdateResult
 import com.cr.tunnel.dto.GroupMapItem
 import com.cr.tunnel.dto.LocateTarget
 import com.cr.tunnel.dto.TestServiceMessage
@@ -16,6 +16,8 @@ import com.cr.tunnel.dto.entities.SubscriptionCache
 import com.cr.tunnel.extension.isComplexType
 import com.cr.tunnel.extension.matchesPattern
 import com.cr.tunnel.extension.moveItem
+import com.cr.tunnel.handler.MmkvManager
+import com.cr.tunnel.handler.UpdateCheckerManager
 import com.cr.tunnel.ui.base.BaseViewModel
 import com.cr.tunnel.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -30,7 +32,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -51,14 +52,18 @@ class MainViewModel(
     private val connectedText: String = dataSource.getString(R.string.connection_connected)
 
     private var trafficPollJob: Job? = null
-    private var lastTrafficUplink = 0L
-    private var lastTrafficDownlink = 0L
     private var lastTrafficQueryTime = 0L
+    private var prevTrafficUplink = 0L
+    private var prevTrafficDownlink = 0L
+    private var hasPrevTraffic = false
 
     private var autoOptimizePending = false
     private var autoConnectBestServers = false
     private val _autoConnectRequest = MutableStateFlow(0L)
     val autoConnectRequest: StateFlow<Long> = _autoConnectRequest.asStateFlow()
+
+    private val _updatePrompt = MutableStateFlow<CheckUpdateResult?>(null)
+    val updatePrompt: StateFlow<CheckUpdateResult?> = _updatePrompt.asStateFlow()
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
@@ -98,6 +103,25 @@ class MainViewModel(
 init {
         collectServiceEvents()
         setupGroupTab()
+        autoCheckForUpdate()
+    }
+
+    private fun autoCheckForUpdate() {
+        viewModelScope.launch(ioDispatcher) {
+            runCatching {
+                val includePreRelease =
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
+                UpdateCheckerManager.checkForUpdate(includePreRelease)
+            }.onSuccess { result ->
+                if (result.hasUpdate) _updatePrompt.value = result
+            }.onFailure {
+                LogUtil.e(AppConfig.TAG, "Auto update check failed: ${it.message}")
+            }
+        }
+    }
+
+    fun dismissUpdatePrompt() {
+        _updatePrompt.value = null
     }
 
     private fun collectServiceEvents() {
@@ -153,6 +177,27 @@ init {
 
             is MainServiceEvent.MeasureConfigFinish -> {
                 onTestsFinished()
+            }
+
+            is MainServiceEvent.TrafficStats -> {
+                val now = System.currentTimeMillis()
+                val elapsedSec = ((now - lastTrafficQueryTime).coerceAtLeast(1L)) / 1000.0
+                lastTrafficQueryTime = now
+                // The service sends absolute session totals; mirror them and derive
+                // speed from the difference between consecutive updates.
+                val upDelta = if (hasPrevTraffic) (event.uplink - prevTrafficUplink).takeIf { it > 0 } ?: 0L else 0L
+                val downDelta = if (hasPrevTraffic) (event.downlink - prevTrafficDownlink).takeIf { it > 0 } ?: 0L else 0L
+                prevTrafficUplink = event.uplink
+                prevTrafficDownlink = event.downlink
+                hasPrevTraffic = true
+                _uiState.update { state ->
+                    state.copy(
+                        uplinkSpeed = formatSpeed((upDelta / elapsedSec).toLong()),
+                        downlinkSpeed = formatSpeed((downDelta / elapsedSec).toLong()),
+                        totalUplink = formatBytes(event.uplink),
+                        totalDownlink = formatBytes(event.downlink)
+                    )
+                }
             }
         }
     }
@@ -814,69 +859,32 @@ init {
     }
 
     // ---------- Running state ----------
+    fun markConnecting() {
+        if (_uiState.value.isRunning || _uiState.value.isConnecting) return
+        _uiState.update {
+            it.copy(
+                isConnecting = true,
+                statusText = dataSource.getString(R.string.connection_connecting)
+            )
+        }
+    }
+
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
+                isConnecting = false,
                 connectedAtMs = if (running) System.currentTimeMillis() else null,
                 statusText = if (!clearTestingText && state.isTesting) state.statusText
                 else if (running) connectedText else disconnectedText
             )
         }
-        if (running) startTrafficPolling() else stopTrafficPolling()
-    }
-
-    private fun startTrafficPolling() {
-        stopTrafficPolling()
-        lastTrafficUplink = 0L
-        lastTrafficDownlink = 0L
-        lastTrafficQueryTime = 0L
-        trafficPollJob = viewModelScope.launch(ioDispatcher) {
-            while (isActive) {
-                updateTrafficStats()
-                delay(1000)
-            }
+        if (running) {
+            prevTrafficUplink = 0L
+            prevTrafficDownlink = 0L
+            hasPrevTraffic = false
+            lastTrafficQueryTime = System.currentTimeMillis()
         }
-    }
-
-    private fun stopTrafficPolling() {
-        trafficPollJob?.cancel()
-        trafficPollJob = null
-        _uiState.update { it.copy(uplinkSpeed = "0 B/s", downlinkSpeed = "0 B/s") }
-    }
-
-    private fun updateTrafficStats() {
-        if (!CoreServiceManager.isRunning()) {
-            _uiState.update { it.copy(uplinkSpeed = "0 B/s", downlinkSpeed = "0 B/s") }
-            return
-        }
-        val now = System.currentTimeMillis()
-        var uplink = 0L
-        var downlink = 0L
-        CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
-            when (stat.direction) {
-                AppConfig.UPLINK -> uplink += stat.value
-                AppConfig.DOWNLINK -> downlink += stat.value
-            }
-        }
-        if (lastTrafficQueryTime > 0) {
-            val elapsedSec = (now - lastTrafficQueryTime) / 1000.0
-            if (elapsedSec > 0) {
-                val upSpeed = ((uplink - lastTrafficUplink) / elapsedSec).toLong()
-                val downSpeed = ((downlink - lastTrafficDownlink) / elapsedSec).toLong()
-                _uiState.update {
-                    it.copy(
-                        uplinkSpeed = formatSpeed(upSpeed),
-                        downlinkSpeed = formatSpeed(downSpeed),
-                        totalUplink = formatBytes(uplink),
-                        totalDownlink = formatBytes(downlink)
-                    )
-                }
-            }
-        }
-        lastTrafficUplink = uplink
-        lastTrafficDownlink = downlink
-        lastTrafficQueryTime = now
     }
 
     private fun formatSpeed(bytesPerSec: Long): String {

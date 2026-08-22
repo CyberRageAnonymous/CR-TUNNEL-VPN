@@ -205,6 +205,9 @@
             android:name=".ui.checkupdate.CheckUpdateActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.community.CommunityConfigActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.backup.BackupActivity"
             android:exported="false" />
         <activity

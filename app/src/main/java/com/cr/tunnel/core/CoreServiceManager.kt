@@ -26,6 +26,7 @@ import com.cr.tunnel.helper.MessageHelper
 import com.cr.tunnel.service.DialerNativeService
 import com.cr.tunnel.service.DialerWebviewService
 import com.cr.tunnel.service.NetworkMonitor
+import com.cr.tunnel.util.JsonUtil
 import com.cr.tunnel.util.LogUtil
 import com.cr.tunnel.util.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +47,7 @@ object CoreServiceManager {
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
+    private var currentOutboundTags: List<String> = emptyList()
 
     @Volatile
     private var isReloading = false
@@ -131,6 +133,7 @@ object CoreServiceManager {
         }
 
         currentConfig = config
+        currentOutboundTags = extractOutboundTags(result.content)
         var tunFd = vpnInterface?.fd ?: 0
         val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
         val dialerAddr = if (dialerMode != null) {
@@ -173,7 +176,7 @@ object CoreServiceManager {
         if (!isReload) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         }
-        NotificationManager.startSpeedNotification()
+        NotificationManager.startUiTrafficStatsBroadcast()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
     }
 
@@ -207,7 +210,9 @@ object CoreServiceManager {
         }
 
         MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        NotificationManager.stopUiTrafficStatsBroadcast()
         NotificationManager.cancelNotification()
+        currentOutboundTags = emptyList()
 
         try {
             service.unregisterReceiver(mMsgReceive)
@@ -271,35 +276,69 @@ object CoreServiceManager {
     }
 
     /**
-     * Queries and resets all outbound traffic counters in one core call.
-     * Go side format: tag,direction,value;tag,direction,value;
+     * Queries all outbound traffic counters.
+     * Uses the Go-side bulk query (known to work) and supplements any tags it
+     * misses by reading them individually with queryStats.
      */
     fun queryAllOutboundTrafficStats(): List<OutboundTrafficStat> {
         // The stats manager is gone once the core stops, querying it then reaches into freed state.
         if (!isRunning()) return emptyList()
 
-        val payload = coreController.queryAllOutboundTrafficStats()
-
         val result = ArrayList<OutboundTrafficStat>()
 
-        payload.split(';').forEach { entry ->
-            if (entry.isBlank()) return@forEach
-
-            val parts = entry.split(',', limit = 3)
-            if (parts.size != 3) return@forEach
-
-            val value = parts[2].toLongOrNull() ?: return@forEach
-
-            result.add(
-                OutboundTrafficStat(
-                    tag = parts[0],
-                    direction = parts[1],
-                    value = value,
-                )
-            )
+        // 1) Bulk query from the core (Go side format: tag,direction,value;tag,direction,value;)
+        runCatching {
+            coreController.queryAllOutboundTrafficStats().split(';').forEach { entry ->
+                if (entry.isBlank()) return@forEach
+                val parts = entry.split(',', limit = 3)
+                if (parts.size != 3) return@forEach
+                val value = parts[2].toLongOrNull() ?: return@forEach
+                result.add(OutboundTrafficStat(tag = parts[0], direction = parts[1], value = value))
+            }
         }
-//        LogUtil.d(AppConfig.TAG, "Queried outbound traffic stats: $result")
+
+        // 2) Fill any tags the bulk query did not cover, using the direct per-tag query.
+        val coveredTags = result.mapTo(mutableSetOf()) { it.tag }
+        for (tag in currentOutboundTags) {
+            if (tag in coveredTags) continue
+            val uplink = queryOutboundTraffic(tag, AppConfig.UPLINK)
+            val downlink = queryOutboundTraffic(tag, AppConfig.DOWNLINK)
+            if (uplink > 0) {
+                result.add(OutboundTrafficStat(tag = tag, direction = AppConfig.UPLINK, value = uplink))
+            }
+            if (downlink > 0) {
+                result.add(OutboundTrafficStat(tag = tag, direction = AppConfig.DOWNLINK, value = downlink))
+            }
+        }
+
         return result
+    }
+
+    /**
+     * Reads the cumulative traffic counter for a single outbound tag and direction.
+     * Returns 0 when the counter does not exist instead of logging an error.
+     */
+    private fun queryOutboundTraffic(tag: String, direction: String): Long {
+        return try {
+            coreController.queryStats("outbound>>>$tag>>>traffic>>>$direction", "value")
+                .takeIf { it > 0 }
+                ?: 0L
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to query traffic stats for $tag/$direction", e)
+            0L
+        }
+    }
+
+    /**
+     * Extracts all outbound tags from the built runtime config JSON.
+     */
+    private fun extractOutboundTags(content: String): List<String> {
+        val json = JsonUtil.parseString(content) ?: return emptyList()
+        val outbounds = json.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray ?: return emptyList()
+        return outbounds.mapNotNull { element ->
+            element.takeIf { it.isJsonObject }?.asJsonObject
+                ?.get("tag")?.takeIf { it.isJsonPrimitive }?.asString
+        }
     }
 
     /**
@@ -449,6 +488,7 @@ object CoreServiceManager {
                 AppConfig.MSG_REGISTER_CLIENT -> {
                     if (isRunning()) {
                         MessageHelper.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_RUNNING, "")
+                        NotificationManager.pushSessionTotalsToUi(serviceControl.getService())
                     } else {
                         MessageHelper.sendMsg2UI(serviceControl.getService(), AppConfig.MSG_STATE_NOT_RUNNING, "")
                     }
@@ -487,7 +527,6 @@ object CoreServiceManager {
 
                 Intent.ACTION_SCREEN_ON -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen on")
-                    NotificationManager.startSpeedNotification()
                 }
             }
         }

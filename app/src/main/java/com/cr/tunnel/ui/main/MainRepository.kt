@@ -70,6 +70,22 @@ class MainRepository(
                     safeIntent.getStringExtra("content")
                 )
 
+                AppConfig.MSG_TRAFFIC_STATS -> {
+                    val content = safeIntent.getStringExtra("content")
+                    val parts = content?.split(',')
+                    if (parts != null && parts.size == 2) {
+                        val up = parts[0].toLongOrNull()
+                        val down = parts[1].toLongOrNull()
+                        if (up != null && down != null) {
+                            MainServiceEvent.TrafficStats(up, down)
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                }
+
                 else -> null
             }
             event?.let { _mainServiceEvent.tryEmit(it) }

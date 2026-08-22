@@ -17,6 +17,7 @@ import com.cr.tunnel.core.CoreServiceManager
 import com.cr.tunnel.dto.entities.ProfileItem
 import com.cr.tunnel.extension.toSpeedString
 import com.cr.tunnel.ui.main.MainActivity
+import com.cr.tunnel.helper.MessageHelper
 import com.cr.tunnel.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,30 +32,133 @@ object NotificationManager {
     private const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
     private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
-    private const val NOTIFICATION_ICON_THRESHOLD = 3000
-    private const val QUERY_INTERVAL_MS = 3000L
+    private const val NOTIFICATION_ICON_THRESHOLD = 3000L
 
     private var lastQueryTime = 0L
-    private var mBuilder: NotificationCompat.Builder? = null
-    private var speedNotificationJob: Job? = null
-    private var mNotificationManager: NotificationManager? = null
 
     /**
-     * Starts the speed notification.
-     * @param currentConfig The current profile configuration.
+     * Authoritative session totals, accumulated inside the always-alive service
+     * process and mirrored to the UI as absolute values. Broadcasts may be
+     * dropped while the UI is backgrounded; absolute values make that lossless.
      */
-    fun startSpeedNotification() {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED, true) == false) return
-        if (speedNotificationJob != null || CoreServiceManager.isRunning() == false) return
+    @Volatile
+    var sessionUplink = 0L
+        private set
 
-        var lastZeroSpeed = false
+    @Volatile
+    var sessionDownlink = 0L
+        private set
 
-        speedNotificationJob = CoroutineScope(Dispatchers.IO).launch {
+    private var mBuilder: NotificationCompat.Builder? = null
+    private var mNotificationManager: NotificationManager? = null
+    private var uiTrafficStatsJob: Job? = null
+
+    /**
+     * Starts the unified traffic loop: the single reader of the core counters.
+     * Computes per-tag deltas (safe for both cumulative and reset-on-read
+     * counter semantics), broadcasts them to the UI and updates the speed
+     * notification from the very same numbers, so no traffic is ever split
+     * between competing pollers.
+     */
+    fun startUiTrafficStatsBroadcast() {
+        if (uiTrafficStatsJob != null) return
+        val service = getService() ?: return
+        lastQueryTime = System.currentTimeMillis()
+        sessionUplink = MmkvManager.decodeSettingsLong(AppConfig.PREF_SESSION_UPLINK, 0L)
+        sessionDownlink = MmkvManager.decodeSettingsLong(AppConfig.PREF_SESSION_DOWNLINK, 0L)
+        uiTrafficStatsJob = CoroutineScope(Dispatchers.IO).launch {
+            var lastZeroSpeed = false
             while (isActive) {
-                lastZeroSpeed = updateSpeedNotificationOnce(lastZeroSpeed)
-                delay(QUERY_INTERVAL_MS)
+                delay(1000)
+                val queryTime = System.currentTimeMillis()
+                val elapsedSec = ((queryTime - lastQueryTime).coerceAtLeast(1L)) / 1000.0
+                lastQueryTime = queryTime
+
+                var upDelta = 0L
+                var downDelta = 0L
+                var proxyUp = 0L
+                var proxyDown = 0L
+                var directUp = 0L
+                var directDown = 0L
+
+                // Every reading from the core CONSUMES its counters (Go side does
+                // counter.Set(0)), so each returned value is already the exact
+                // amount accumulated since the previous poll. Sum it directly.
+                CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
+                    if (stat.tag == AppConfig.TAG_BLOCKED) return@forEach
+                    val value = stat.value
+
+                    when (stat.direction) {
+                        AppConfig.UPLINK -> upDelta += value
+                        AppConfig.DOWNLINK -> downDelta += value
+                    }
+                    when {
+                        stat.tag == AppConfig.TAG_DIRECT -> when (stat.direction) {
+                            AppConfig.UPLINK -> directUp += value
+                            AppConfig.DOWNLINK -> directDown += value
+                        }
+
+                        else -> when (stat.direction) {
+                            AppConfig.UPLINK -> proxyUp += value
+                            AppConfig.DOWNLINK -> proxyDown += value
+                        }
+                    }
+                }
+
+                // Accumulate in the service process and broadcast ABSOLUTE session
+                // totals, so dropped messages while the UI is backgrounded never
+                // lose traffic.
+                sessionUplink += upDelta
+                sessionDownlink += downDelta
+                MmkvManager.encodeSettings(AppConfig.PREF_SESSION_UPLINK, sessionUplink)
+                MmkvManager.encodeSettings(AppConfig.PREF_SESSION_DOWNLINK, sessionDownlink)
+                MessageHelper.sendMsg2UI(service, AppConfig.MSG_TRAFFIC_STATS, "$sessionUplink,$sessionDownlink")
+
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED, true)) {
+                    val proxyTotal = proxyUp + proxyDown
+                    val directTotal = directUp + directDown
+                    val zeroSpeed = proxyTotal + directTotal == 0L
+                    if (!zeroSpeed || !lastZeroSpeed) {
+                        val text = StringBuilder()
+                        appendSpeedString(
+                            text, AppConfig.TAG_PROXY,
+                            proxyUp / elapsedSec,
+                            proxyDown / elapsedSec
+                        )
+                        appendSpeedString(
+                            text, AppConfig.TAG_DIRECT,
+                            directUp / elapsedSec,
+                            directDown / elapsedSec
+                        )
+                        updateNotification(text.toString(), proxyTotal, directTotal)
+                    }
+                    lastZeroSpeed = zeroSpeed
+                }
             }
         }
+    }
+
+    /**
+     * Stops the UI traffic stats broadcast and ends the traffic session.
+     */
+    fun stopUiTrafficStatsBroadcast() {
+        uiTrafficStatsJob?.cancel()
+        uiTrafficStatsJob = null
+        sessionUplink = 0L
+        sessionDownlink = 0L
+        MmkvManager.encodeSettings(AppConfig.PREF_SESSION_UPLINK, 0L)
+        MmkvManager.encodeSettings(AppConfig.PREF_SESSION_DOWNLINK, 0L)
+    }
+
+    /**
+     * Pushes the current absolute session totals to the UI. Used when a UI
+     * process (re)attaches so it immediately mirrors the service numbers.
+     */
+    fun pushSessionTotalsToUi(service: Service) {
+        MessageHelper.sendMsg2UI(
+            service, AppConfig.MSG_TRAFFIC_STATS,
+            "$sessionUplink,$sessionDownlink"
+        )
     }
 
     /**
@@ -63,9 +167,6 @@ object NotificationManager {
      */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
-
-        // Reset last query time to avoid querying stats too soon after showing the notification
-        lastQueryTime = System.currentTimeMillis()
 
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
@@ -134,20 +235,15 @@ object NotificationManager {
         service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
         mBuilder = null
-        speedNotificationJob?.cancel()
-        speedNotificationJob = null
         mNotificationManager = null
     }
 
     /**
-     * Stops the speed notification.
+     * Resets the speed section of the notification. The unified traffic loop in
+     * startUiTrafficStatsBroadcast keeps it updated afterwards.
      */
     fun stopSpeedNotification() {
-        speedNotificationJob?.let {
-            it.cancel()
-            speedNotificationJob = null
-            updateNotification("", 0, 0)
-        }
+        updateNotification("", 0, 0)
     }
 
     /**
@@ -214,70 +310,6 @@ object NotificationManager {
             text.append("\t")
         }
         text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
-    }
-
-    /**
-     * Updates the speed notification once.
-     * Queries traffic stats, separates proxy and direct, and updates the notification.
-     * @param lastZeroSpeed The previous zero speed state.
-     * @return The current zero speed state.
-     */
-    private fun updateSpeedNotificationOnce(lastZeroSpeed: Boolean): Boolean {
-        val queryTime = System.currentTimeMillis()
-        val sinceLastQueryIn = (queryTime - lastQueryTime)
-
-        // If the query interval is too short, skip this round to avoid excessive CPU usage
-        if (sinceLastQueryIn < QUERY_INTERVAL_MS) {
-            LogUtil.w(AppConfig.TAG, "Query interval too short: ${sinceLastQueryIn}ms, skipping")
-            lastQueryTime = queryTime
-            return lastZeroSpeed
-        }
-        val sinceLastQueryInSeconds = sinceLastQueryIn / 1000.0
-
-        var proxyUplink = 0L
-        var proxyDownlink = 0L
-        var directUplink = 0L
-        var directDownlink = 0L
-
-        CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
-            when {
-                stat.tag == AppConfig.TAG_DIRECT -> {
-                    when (stat.direction) {
-                        AppConfig.UPLINK -> directUplink += stat.value
-                        AppConfig.DOWNLINK -> directDownlink += stat.value
-                    }
-                }
-
-                // Accumulate stats for all proxy outbounds (including custom subscription tags)
-                stat.tag != AppConfig.TAG_BLOCKED -> {
-                    when (stat.direction) {
-                        AppConfig.UPLINK -> proxyUplink += stat.value
-                        AppConfig.DOWNLINK -> proxyDownlink += stat.value
-                    }
-                }
-            }
-        }
-
-        val proxyTotal = proxyUplink + proxyDownlink
-        val directTotal = directUplink + directDownlink
-        val zeroSpeed = proxyTotal + directTotal == 0L
-        if (!zeroSpeed || !lastZeroSpeed) {
-            val text = StringBuilder()
-            appendSpeedString(
-                text, AppConfig.TAG_PROXY,
-                proxyUplink / sinceLastQueryInSeconds,
-                proxyDownlink / sinceLastQueryInSeconds
-            )
-
-            appendSpeedString(
-                text, AppConfig.TAG_DIRECT,
-                directUplink / sinceLastQueryInSeconds,
-                directDownlink / sinceLastQueryInSeconds
-            )
-            updateNotification(text.toString(), proxyTotal, directTotal)
-        }
-        lastQueryTime = queryTime
-        return zeroSpeed
     }
 
     /**

@@ -11,6 +11,7 @@ data class MainUiState(
     val selectedGroupId: String = "",
     val selectedGuid: String? = null,
     val isRunning: Boolean = false,
+    val isConnecting: Boolean = false,
     val isTesting: Boolean = false,
     val isAutoOptimizing: Boolean = false,
     val statusText: String = "",

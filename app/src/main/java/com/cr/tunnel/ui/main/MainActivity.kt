@@ -29,6 +29,7 @@ import com.cr.tunnel.ui.AboutActivity
 import com.cr.tunnel.ui.backup.BackupActivity
 import com.cr.tunnel.ui.base.HelperBaseComponentActivity
 import com.cr.tunnel.ui.checkupdate.CheckUpdateActivity
+import com.cr.tunnel.ui.community.CommunityConfigActivity
 import com.cr.tunnel.ui.logcat.LogcatActivity
 import com.cr.tunnel.ui.perappproxy.PerAppProxyActivity
 import com.cr.tunnel.ui.routing.RoutingSettingActivity
@@ -152,6 +153,7 @@ class MainActivity : HelperBaseComponentActivity() {
             MainDestination.Routing -> Intent(this, RoutingSettingActivity::class.java)
             MainDestination.UserAssets -> Intent(this, UserAssetActivity::class.java)
             MainDestination.Settings -> Intent(this, SettingsActivity::class.java)
+            MainDestination.Community -> Intent(this, CommunityConfigActivity::class.java)
             MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
             MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
             MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
@@ -189,6 +191,7 @@ class MainActivity : HelperBaseComponentActivity() {
             toast(R.string.title_file_chooser)
             return
         }
+        mainViewModel.markConnecting()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
             MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)
         ) {
