@@ -8,6 +8,7 @@ import com.cr.tunnel.dto.GitHubContentResponse
 import com.cr.tunnel.dto.UrlContentRequest
 import com.cr.tunnel.util.HttpUtil
 import com.cr.tunnel.util.JsonUtil
+import com.cr.tunnel.util.Utils
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,7 +21,7 @@ object CommunityConfigManager {
     private const val MAX_ENTRIES = 200
     private const val MAX_LINK_LENGTH = 8000
 
-    fun isSharingEnabled(): Boolean = AppConfig.COMMUNITY_TOKEN.isNotBlank()
+    fun isSharingEnabled(): Boolean = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed()).isNotBlank()
 
     fun fetchConfigs(): List<CommunityConfigItem> {
         val body = HttpUtil.getUrlContent(
@@ -47,7 +48,7 @@ object CommunityConfigManager {
         users: String,
         name: String
     ) {
-        val token = AppConfig.COMMUNITY_TOKEN
+        val token = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed())
         require(token.isNotBlank()) { "Sharing token not configured" }
         require(link.contains("://")) { "Invalid config link" }
         require(link.length <= MAX_LINK_LENGTH) { "Link too long" }
