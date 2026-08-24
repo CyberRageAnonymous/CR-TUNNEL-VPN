@@ -74,7 +74,12 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
         load()
     }
 
+    private var lastLoadAt = 0L
+
     fun load() {
+        val now = System.currentTimeMillis()
+        if (now - lastLoadAt < LOAD_THROTTLE_MS && _uiState.value.rows.isNotEmpty()) return
+        lastLoadAt = now
         launchLoading {
             _uiState.update { it.copy(loading = true) }
             try {
@@ -268,5 +273,6 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
     companion object {
         private const val PING_POLL_ATTEMPTS = 30
         private const val PING_POLL_INTERVAL_MS = 500L
+        private const val LOAD_THROTTLE_MS = 3000L
     }
 }

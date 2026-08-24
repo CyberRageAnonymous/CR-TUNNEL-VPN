@@ -24,21 +24,59 @@ object CommunityConfigManager {
     fun isSharingEnabled(): Boolean = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed()).isNotBlank()
 
     fun fetchConfigs(): List<CommunityConfigItem> {
+        parseConfigList(fetchViaApi())?.let { return it }
+        return parseConfigList(fetchViaRaw()).orEmpty()
+    }
+
+    private fun fetchViaApi(): String? {
+        val token = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed())
+        if (token.isBlank()) return null
+        return try {
+            val client = OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .build()
+            val request = Request.Builder()
+                .url(AppConfig.COMMUNITY_API_URL)
+                .header("Authorization", "Bearer $token")
+                .header("Accept", "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .header("User-Agent", "CR-TUNNEL-VPN")
+                .get()
+                .build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return null
+                val content = JsonUtil.fromJsonSafe(
+                    response.body?.string().orEmpty(),
+                    GitHubContentResponse::class.java
+                ) ?: return null
+                decodeContent(content.content)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun fetchViaRaw(): String? {
         val url = AppConfig.COMMUNITY_RAW_URL + "?t=" + System.currentTimeMillis()
-        val body = HttpUtil.getUrlContent(
+        return HttpUtil.getUrlContent(
             UrlContentRequest(
                 url = url,
                 timeout = 10000,
                 userAgent = "CR-TUNNEL-VPN/${BuildConfig.VERSION_NAME}"
             )
-        ) ?: return emptyList()
+        )
+    }
+
+    private fun parseConfigList(body: String?): List<CommunityConfigItem>? {
+        if (body.isNullOrBlank()) return null
         return try {
             JsonUtil.fromJsonSafe(body, Array<CommunityConfigItem>::class.java)
                 ?.toList()
                 .orEmpty()
                 .filter { it.link.isNotBlank() }
         } catch (e: Exception) {
-            emptyList()
+            null
         }
     }
 
