@@ -141,6 +141,7 @@ object AppConfig {
     const val COMMUNITY_RAW_URL = "https://raw.githubusercontent.com/$COMMUNITY_REPO/$COMMUNITY_BRANCH/$COMMUNITY_CONFIGS_PATH"
     const val COMMUNITY_API_URL = "https://api.github.com/repos/$COMMUNITY_REPO/contents/$COMMUNITY_CONFIGS_PATH"
     const val COMMUNITY_TOKEN = "yhGeSlWV4QnQVNlR0gkQyQleRZ3QOVTUZBlcyUkVpRUaVl1d1dVbSVXW5sEbSxEWqVjR3IDamZXTlx0Xwlme21kQnVmUwcFZwklMYN1UINUMx8FdhB3XiVHa0l2Z"
+    const val PREF_COMMUNITY_DEVICE_ID = "pref_community_device_id"
     const val TG_CHANNEL_URL = "https://t.me/R4G3_2024"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"

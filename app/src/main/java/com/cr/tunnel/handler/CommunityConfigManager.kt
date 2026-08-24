@@ -24,9 +24,10 @@ object CommunityConfigManager {
     fun isSharingEnabled(): Boolean = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed()).isNotBlank()
 
     fun fetchConfigs(): List<CommunityConfigItem> {
+        val url = AppConfig.COMMUNITY_RAW_URL + "?t=" + System.currentTimeMillis()
         val body = HttpUtil.getUrlContent(
             UrlContentRequest(
-                url = AppConfig.COMMUNITY_RAW_URL,
+                url = url,
                 timeout = 10000,
                 userAgent = "CR-TUNNEL-VPN/${BuildConfig.VERSION_NAME}"
             )
@@ -46,12 +47,43 @@ object CommunityConfigManager {
         volume: String,
         duration: String,
         users: String,
-        name: String
+        name: String,
+        ownerId: String
+    ) {
+        require(ownerId.isNotBlank()) { "Device id missing" }
+        require(link.contains("://")) { "Invalid config link" }
+        require(link.length <= MAX_LINK_LENGTH) { "Link too long" }
+        updateConfigs { current ->
+            (current + CommunityConfigItem(
+                id = UUID.randomUUID().toString(),
+                name = name.ifBlank { "Config" },
+                link = link.trim(),
+                volume = volume.trim(),
+                duration = duration.trim(),
+                users = users.trim(),
+                createdAt = System.currentTimeMillis(),
+                ownerId = ownerId
+            )).takeLast(MAX_ENTRIES)
+        }
+    }
+
+    fun removeConfig(id: String, ownerId: String) {
+        require(id.isNotBlank() && ownerId.isNotBlank()) { "Invalid delete request" }
+        updateConfigs { current ->
+            val target = current.firstOrNull { it.id == id }
+                ?: throw RuntimeException("Entry not found")
+            if (target.ownerId != ownerId) {
+                throw RuntimeException("Not your config")
+            }
+            current.filter { it.id != id }
+        }
+    }
+
+    private inline fun updateConfigs(
+        crossinline transform: (List<CommunityConfigItem>) -> List<CommunityConfigItem>
     ) {
         val token = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed())
         require(token.isNotBlank()) { "Sharing token not configured" }
-        require(link.contains("://")) { "Invalid config link" }
-        require(link.length <= MAX_LINK_LENGTH) { "Link too long" }
 
         val client = OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
@@ -65,11 +97,11 @@ object CommunityConfigManager {
             "User-Agent" to "CR-TUNNEL-VPN"
         )
 
-        val builder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
-        headers.forEach { (k, v) -> builder.header(k, v) }
-
         var sha: String? = null
         var existingJson = "[]"
+
+        val builder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
+        headers.forEach { (k, v) -> builder.header(k, v) }
 
         client.newCall(builder.get().build()).execute().use { response ->
             if (response.isSuccessful) {
@@ -90,17 +122,8 @@ object CommunityConfigManager {
             emptyList()
         }
 
-        val entry = CommunityConfigItem(
-            id = UUID.randomUUID().toString(),
-            name = name.ifBlank { "Config" },
-            link = link.trim(),
-            volume = volume.trim(),
-            duration = duration.trim(),
-            users = users.trim(),
-            createdAt = System.currentTimeMillis()
-        )
+        val updated = transform(current)
 
-        val updated = (current + entry).takeLast(MAX_ENTRIES)
         val newJson = JsonUtil.toJson(updated.toTypedArray())
         val encoded = Base64.encodeToString(newJson.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
 

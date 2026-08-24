@@ -603,4 +603,8 @@
     <string name="community_invalid_link">অবৈধ কনফিগ লিংক</string>
     <string name="community_share_success">কনফিগ সফলভাবে প্রকাশিত হয়েছে</string>
     <string name="community_share_failed">কনফিগ প্রকাশ করতে ব্যর্থ</string>
+    <string name="community_delete">মুছুন</string>
+    <string name="community_delete_confirm">কমিউনিটি তালিকা থেকে এই শেয়ার করা কনফিগটি মুছে ফেলবেন?</string>
+    <string name="community_deleted">শেয়ার করা কনফিগ মুছে ফেলা হয়েছে</string>
+    <string name="community_delete_failed">কনফিগ মুছতে ব্যর্থ</string>
 </resources>

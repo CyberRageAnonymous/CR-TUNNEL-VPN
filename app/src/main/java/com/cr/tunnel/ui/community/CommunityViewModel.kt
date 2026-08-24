@@ -28,7 +28,8 @@ data class CommunityRow(
     val config: CommunityConfigItem,
     val pingText: String = "",
     val isPinging: Boolean = false,
-    val isInvalid: Boolean = false
+    val isInvalid: Boolean = false,
+    val isMine: Boolean = false
 )
 
 enum class ShareStep {
@@ -60,6 +61,15 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
 
     private val pingJobs = mutableMapOf<String, Job>()
 
+    private val deviceId: String by lazy {
+        var id = MmkvManager.decodeSettingsString(AppConfig.PREF_COMMUNITY_DEVICE_ID)
+        if (id.isNullOrBlank()) {
+            id = Utils.getUuid()
+            MmkvManager.encodeSettings(AppConfig.PREF_COMMUNITY_DEVICE_ID, id)
+        }
+        id
+    }
+
     init {
         load()
     }
@@ -73,7 +83,7 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                 }
                 val previous = _uiState.value.rows.associateBy { it.config.id }
                 val rows = configs.map { config ->
-                    previous[config.id] ?: CommunityRow(config)
+                    previous[config.id] ?: CommunityRow(config, isMine = config.ownerId == deviceId)
                 }
                 _uiState.update { it.copy(rows = rows) }
             } catch (e: Exception) {
@@ -134,7 +144,8 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                         volume = draft.volume,
                         duration = draft.duration,
                         users = draft.users,
-                        name = remarks.ifBlank { "Config" }
+                        name = remarks.ifBlank { "Config" },
+                        ownerId = deviceId
                     )
                 }
                 toastSuccess(R.string.community_share_success)
@@ -144,6 +155,22 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                 toastError(e.message ?: getString(R.string.community_share_failed))
             } finally {
                 _uiState.update { it.copy(submitting = false) }
+            }
+        }
+    }
+
+    fun deleteRow(configId: String) {
+        val row = _uiState.value.rows.firstOrNull { it.config.id == configId } ?: return
+        if (!row.isMine) return
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    CommunityConfigManager.removeConfig(configId, deviceId)
+                }
+                toastSuccess(R.string.community_deleted)
+                load()
+            } catch (e: Exception) {
+                toastError(e.message ?: getString(R.string.community_delete_failed))
             }
         }
     }

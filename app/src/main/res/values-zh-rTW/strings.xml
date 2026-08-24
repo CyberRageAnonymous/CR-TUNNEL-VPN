@@ -603,4 +603,8 @@
     <string name="community_invalid_link">無效的設定檔連結</string>
     <string name="community_share_success">設定檔發布成功</string>
     <string name="community_share_failed">發布設定檔失敗</string>
+    <string name="community_delete">刪除</string>
+    <string name="community_delete_confirm">從社群清單中刪除此共用設定檔？</string>
+    <string name="community_deleted">已刪除共用設定檔</string>
+    <string name="community_delete_failed">刪除設定檔失敗</string>
 </resources>

@@ -9,7 +9,8 @@ data class CommunityConfigItem(
     @SerializedName("volume") val volume: String = "",
     @SerializedName("duration") val duration: String = "",
     @SerializedName("users") val users: String = "",
-    @SerializedName("createdAt") val createdAt: Long = 0L
+    @SerializedName("createdAt") val createdAt: Long = 0L,
+    @SerializedName("ownerId") val ownerId: String = ""
 )
 
 data class GitHubContentResponse(

@@ -603,4 +603,8 @@
     <string name="community_invalid_link">Неверная ссылка на конфиг</string>
     <string name="community_share_success">Конфиг успешно опубликован</string>
     <string name="community_share_failed">Не удалось опубликовать конфиг</string>
+    <string name="community_delete">Удалить</string>
+    <string name="community_delete_confirm">Удалить этот общий конфиг из списка сообщества?</string>
+    <string name="community_deleted">Общий конфиг удалён</string>
+    <string name="community_delete_failed">Не удалось удалить конфиг</string>
 </resources>

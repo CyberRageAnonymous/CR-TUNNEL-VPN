@@ -602,4 +602,8 @@
     <string name="community_invalid_link">Invalid config link</string>
     <string name="community_share_success">Config shared successfully</string>
     <string name="community_share_failed">Failed to share config</string>
+    <string name="community_delete">Delete</string>
+    <string name="community_delete_confirm">Delete this shared config from the community list?</string>
+    <string name="community_deleted">Shared config deleted</string>
+    <string name="community_delete_failed">Failed to delete config</string>
 </resources>

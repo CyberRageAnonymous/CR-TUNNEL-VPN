@@ -603,4 +603,8 @@
     <string name="community_invalid_link">لینک کانفیگ نامعتبر است</string>
     <string name="community_share_success">کانفیگ با موفقیت منتشر شد</string>
     <string name="community_share_failed">انتشار کانفیگ ناموفق بود</string>
+    <string name="community_delete">حذف</string>
+    <string name="community_delete_confirm">این کانفیگ اشتراکی از لیست کامیونیتی حذف شود؟</string>
+    <string name="community_deleted">کانفیگ اشتراکی حذف شد</string>
+    <string name="community_delete_failed">حذف کانفیگ ناموفق بود</string>
 </resources>

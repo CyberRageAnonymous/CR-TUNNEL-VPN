@@ -603,4 +603,8 @@
     <string name="community_invalid_link">رابط الإعداد غير صالح</string>
     <string name="community_share_success">تم نشر الإعداد بنجاح</string>
     <string name="community_share_failed">فشل نشر الإعداد</string>
+    <string name="community_delete">حذف</string>
+    <string name="community_delete_confirm">هل تريد حذف هذا الإعداد من قائمة المجتمع؟</string>
+    <string name="community_deleted">تم حذف الإعداد المشترك</string>
+    <string name="community_delete_failed">فشل حذف الإعداد</string>
 </resources>

@@ -603,4 +603,8 @@
     <string name="community_invalid_link">无效的配置链接</string>
     <string name="community_share_success">配置发布成功</string>
     <string name="community_share_failed">发布配置失败</string>
+    <string name="community_delete">删除</string>
+    <string name="community_delete_confirm">从社区列表中删除此共享配置？</string>
+    <string name="community_deleted">共享配置已删除</string>
+    <string name="community_delete_failed">删除配置失败</string>
 </resources>

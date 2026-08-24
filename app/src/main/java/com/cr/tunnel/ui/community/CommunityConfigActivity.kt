@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -115,7 +118,8 @@ fun CommunityScreen(
                                 copyToClipboard(context, row.config.link)
                                 context.toastSuccess(R.string.community_copied)
                             },
-                            onPing = { viewModel.pingRow(row.config.id) }
+                            onPing = { viewModel.pingRow(row.config.id) },
+                            onDelete = { viewModel.deleteRow(row.config.id) }
                         )
                     }
                 }
@@ -154,8 +158,10 @@ private fun ShareButton(onClick: () -> Unit) {
 private fun CommunityCard(
     row: CommunityRow,
     onCopy: () -> Unit,
-    onPing: () -> Unit
+    onPing: () -> Unit,
+    onDelete: () -> Unit
 ) {
+    var showDeleteConfirm by remember { mutableStateOf(false) }
     val config = row.config
     Column(
         modifier = Modifier
@@ -176,6 +182,15 @@ private fun CommunityCard(
                 modifier = Modifier.weight(1f)
             )
             PingText(row = row)
+            if (row.isMine) {
+                IconButton(onClick = { showDeleteConfirm = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete_24dp),
+                        contentDescription = stringResource(R.string.community_delete),
+                        tint = Color(0xFFF44336)
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -207,6 +222,27 @@ private fun CommunityCard(
                 Text(stringResource(R.string.community_ping))
             }
         }
+    }
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text(stringResource(R.string.community_delete)) },
+            text = { Text(stringResource(R.string.community_delete_confirm)) },
+            confirmButton = {
+                Button(onClick = {
+                    showDeleteConfirm = false
+                    onDelete()
+                }) {
+                    Text(stringResource(R.string.community_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 }
 

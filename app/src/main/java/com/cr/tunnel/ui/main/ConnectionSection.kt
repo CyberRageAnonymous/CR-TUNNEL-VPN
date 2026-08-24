@@ -275,13 +275,11 @@ private fun ConnectionCircle(
     onClick: () -> Unit
 ) {
     val glowColor = when {
-        isRunning -> colorPing
-        isConnecting -> Color(0xFFFFC107)
+        isRunning || isConnecting -> colorPing
         else -> NeonCyan
     }
     val ringColors = when {
-        isRunning -> listOf(colorPing, NeonCyan, colorPing)
-        isConnecting -> listOf(Color(0xFFFFC107), NeonPurple, Color(0xFFFFC107))
+        isRunning || isConnecting -> listOf(colorPing, NeonCyan, colorPing)
         else -> listOf(NeonCyan, NeonPurple, NeonCyan)
     }
 
@@ -461,7 +459,7 @@ private fun ConnectionCircle(
                 .border(
                     1.dp,
                     Brush.linearGradient(
-                        listOf(glowColor.copy(alpha = if (isRunning) 0.8f else 0.4f), NeonPurple.copy(alpha = 0.3f))
+                        listOf(glowColor.copy(alpha = if (isRunning || isConnecting) 0.8f else 0.4f), NeonPurple.copy(alpha = 0.3f))
                     ),
                     CircleShape
                 ),
@@ -491,7 +489,7 @@ private fun ConnectionCircle(
                 Icon(
                     painter = painterResource(R.drawable.ic_play_24dp),
                     contentDescription = stringResource(R.string.acc_start),
-                    tint = NeonCyan,
+                    tint = if (isConnecting) colorPing else NeonCyan,
                     modifier = Modifier.size(48.dp)
                 )
             }

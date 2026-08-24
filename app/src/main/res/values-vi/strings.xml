@@ -603,4 +603,8 @@
     <string name="community_invalid_link">Liên kết cấu hình không hợp lệ</string>
     <string name="community_share_success">Đã xuất bản cấu hình thành công</string>
     <string name="community_share_failed">Không thể xuất bản cấu hình</string>
+    <string name="community_delete">Xóa</string>
+    <string name="community_delete_confirm">Xóa cấu hình đã chia sẻ này khỏi danh sách cộng đồng?</string>
+    <string name="community_deleted">Đã xóa cấu hình chia sẻ</string>
+    <string name="community_delete_failed">Không thể xóa cấu hình</string>
 </resources>
