@@ -82,7 +82,15 @@ fun CommunityScreen(
             AppTopBar(
                 title = stringResource(R.string.community_title),
                 onBackClick = onBackClick,
-                isLoading = uiState.loading
+                isLoading = uiState.loading,
+                actions = {
+                    IconButton(onClick = { viewModel.load() }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_refresh_24dp),
+                            contentDescription = stringResource(R.string.community_refresh)
+                        )
+                    }
+                }
             )
         },
         bottomBar = {

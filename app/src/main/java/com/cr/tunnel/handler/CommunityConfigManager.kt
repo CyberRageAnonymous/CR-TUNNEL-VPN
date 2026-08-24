@@ -49,22 +49,26 @@ object CommunityConfigManager {
         users: String,
         name: String,
         ownerId: String
-    ) {
+    ): CommunityConfigItem {
         require(ownerId.isNotBlank()) { "Device id missing" }
         require(link.contains("://")) { "Invalid config link" }
         require(link.length <= MAX_LINK_LENGTH) { "Link too long" }
+
+        val entry = CommunityConfigItem(
+            id = UUID.randomUUID().toString(),
+            name = name.ifBlank { "Config" },
+            link = link.trim(),
+            volume = volume.trim(),
+            duration = duration.trim(),
+            users = users.trim(),
+            createdAt = System.currentTimeMillis(),
+            ownerId = ownerId
+        )
+
         updateConfigs { current ->
-            (current + CommunityConfigItem(
-                id = UUID.randomUUID().toString(),
-                name = name.ifBlank { "Config" },
-                link = link.trim(),
-                volume = volume.trim(),
-                duration = duration.trim(),
-                users = users.trim(),
-                createdAt = System.currentTimeMillis(),
-                ownerId = ownerId
-            )).takeLast(MAX_ENTRIES)
+            (current + entry).takeLast(MAX_ENTRIES)
         }
+        return entry
     }
 
     fun removeConfig(id: String, ownerId: String) {
@@ -79,8 +83,8 @@ object CommunityConfigManager {
         }
     }
 
-    private inline fun updateConfigs(
-        crossinline transform: (List<CommunityConfigItem>) -> List<CommunityConfigItem>
+    private fun updateConfigs(
+        transform: (List<CommunityConfigItem>) -> List<CommunityConfigItem>
     ) {
         val token = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed())
         require(token.isNotBlank()) { "Sharing token not configured" }
@@ -97,51 +101,63 @@ object CommunityConfigManager {
             "User-Agent" to "CR-TUNNEL-VPN"
         )
 
-        var sha: String? = null
-        var existingJson = "[]"
+        var attempt = 0
+        while (true) {
+            var sha: String? = null
+            var existingJson = "[]"
 
-        val builder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
-        headers.forEach { (k, v) -> builder.header(k, v) }
+            val builder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
+            headers.forEach { (k, v) -> builder.header(k, v) }
 
-        client.newCall(builder.get().build()).execute().use { response ->
-            if (response.isSuccessful) {
-                val content = JsonUtil.fromJsonSafe(
-                    response.body?.string().orEmpty(),
-                    GitHubContentResponse::class.java
-                )
-                sha = content?.sha
-                existingJson = decodeContent(content?.content)
-            } else if (response.code != 404) {
-                throw RuntimeException("Failed to read community configs (code ${response.code})")
+            client.newCall(builder.get().build()).execute().use { response ->
+                if (response.isSuccessful) {
+                    val content = JsonUtil.fromJsonSafe(
+                        response.body?.string().orEmpty(),
+                        GitHubContentResponse::class.java
+                    )
+                    sha = content?.sha
+                    existingJson = decodeContent(content?.content)
+                } else if (response.code != 404) {
+                    throw RuntimeException("Failed to read community configs (code ${response.code})")
+                }
             }
-        }
 
-        val current = try {
-            JsonUtil.fromJsonSafe(existingJson, Array<CommunityConfigItem>::class.java)?.toList().orEmpty()
-        } catch (e: Exception) {
-            emptyList()
-        }
-
-        val updated = transform(current)
-
-        val newJson = JsonUtil.toJson(updated.toTypedArray())
-        val encoded = Base64.encodeToString(newJson.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
-
-        val payload = if (sha != null) {
-            """{"message":"Community config update","branch":"${AppConfig.COMMUNITY_BRANCH}","content":"$encoded","sha":"$sha"}"""
-        } else {
-            """{"message":"Community config update","branch":"${AppConfig.COMMUNITY_BRANCH}","content":"$encoded"}"""
-        }
-
-        val putBuilder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
-        headers.forEach { (k, v) -> putBuilder.header(k, v) }
-        putBuilder.put(payload.toRequestBody("application/json".toMediaType()))
-
-        client.newCall(putBuilder.build()).execute().use { response ->
-            if (!response.isSuccessful) {
-                val err = response.body?.string().orEmpty().take(200)
-                throw RuntimeException("Upload failed (code ${response.code}) $err")
+            val current = try {
+                JsonUtil.fromJsonSafe(existingJson, Array<CommunityConfigItem>::class.java)?.toList().orEmpty()
+            } catch (e: Exception) {
+                emptyList()
             }
+
+            val updated = transform(current)
+
+            val newJson = JsonUtil.toJson(updated.toTypedArray())
+            val encoded = Base64.encodeToString(newJson.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+
+            val payload = if (sha != null) {
+                """{"message":"Community config update","branch":"${AppConfig.COMMUNITY_BRANCH}","content":"$encoded","sha":"$sha"}"""
+            } else {
+                """{"message":"Community config update","branch":"${AppConfig.COMMUNITY_BRANCH}","content":"$encoded"}"""
+            }
+
+            val putBuilder = Request.Builder().url(AppConfig.COMMUNITY_API_URL)
+            headers.forEach { (k, v) -> putBuilder.header(k, v) }
+            putBuilder.put(payload.toRequestBody("application/json".toMediaType()))
+
+            var retry = false
+            client.newCall(putBuilder.build()).execute().use { response ->
+                when {
+                    response.isSuccessful -> return
+                    (response.code == 409 || response.code == 422) && attempt == 0 -> {
+                        retry = true
+                        attempt++
+                    }
+                    else -> {
+                        val err = response.body?.string().orEmpty().take(200)
+                        throw RuntimeException("Upload failed (code ${response.code}) $err")
+                    }
+                }
+            }
+            if (!retry) return
         }
     }
 

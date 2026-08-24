@@ -137,7 +137,7 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
         viewModelScope.launch {
             _uiState.update { it.copy(submitting = true) }
             try {
-                withContext(Dispatchers.IO) {
+                val saved = withContext(Dispatchers.IO) {
                     val remarks = AngConfigManager.parseSingleLink(link)?.description.orEmpty()
                     CommunityConfigManager.addConfig(
                         link = link,
@@ -149,8 +149,13 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                     )
                 }
                 toastSuccess(R.string.community_share_success)
-                _uiState.update { it.copy(shareStep = null, draft = ShareDraft()) }
-                load()
+                _uiState.update { state ->
+                    state.copy(
+                        shareStep = null,
+                        draft = ShareDraft(),
+                        rows = listOf(CommunityRow(saved, isMine = true)) + state.rows
+                    )
+                }
             } catch (e: Exception) {
                 toastError(e.message ?: getString(R.string.community_share_failed))
             } finally {
@@ -168,7 +173,9 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                     CommunityConfigManager.removeConfig(configId, deviceId)
                 }
                 toastSuccess(R.string.community_deleted)
-                load()
+                _uiState.update { state ->
+                    state.copy(rows = state.rows.filter { it.config.id != configId })
+                }
             } catch (e: Exception) {
                 toastError(e.message ?: getString(R.string.community_delete_failed))
             }
