@@ -13,8 +13,8 @@ android {
         applicationId = "com.cr.tunnel"
         minSdk = 24
         targetSdk = 37
-        versionCode = 8
-        versionName = "1.0.7"
+        versionCode = 9
+        versionName = "1.0.8"
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {

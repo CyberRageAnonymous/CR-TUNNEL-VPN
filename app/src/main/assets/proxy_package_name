@@ -375,7 +375,6 @@ io.syncapps.lemmy_sync
 com.seazon.feedme
 com.readwise
 de.spiritcroc.riotx
-com.openai.chatgpt
 io.changenow.changenow
 com.poe.android
 com.twingate
@@ -407,7 +406,6 @@ com.nutomic.syncthingandroid
 com.bumble.app
 com.cnn.mobile.android.phone
 com.google.android.apps.authenticator2
-com.microsoft.copilot
 com.netflix.NGP.Storyteller
 com.Slack
 com.server.auditor.ssh.client
