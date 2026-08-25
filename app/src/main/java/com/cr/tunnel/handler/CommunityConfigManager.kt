@@ -20,8 +20,26 @@ object CommunityConfigManager {
 
     private const val MAX_ENTRIES = 200
     private const val MAX_LINK_LENGTH = 8000
+    private const val MAX_NAME_LENGTH = 60
+    private const val MAX_FIELD_LENGTH = 40
+    private const val MAX_CONFIGS_PER_OWNER = 15
+
+    private val ALLOWED_SCHEMES = setOf(
+        "vmess", "ss", "socks", "socks4", "socks5",
+        "trojan", "vless", "wireguard", "hysteria2", "hy2", "v2rayn"
+    )
 
     fun isSharingEnabled(): Boolean = Utils.decode(AppConfig.COMMUNITY_TOKEN.reversed()).isNotBlank()
+
+    fun isValidConfigLink(link: String?): Boolean {
+        if (link.isNullOrBlank()) return false
+        val trimmed = link.trim()
+        if (trimmed.length > MAX_LINK_LENGTH) return false
+        if (trimmed.any { it.isWhitespace() || it.isISOControl() }) return false
+        val schemeEnd = trimmed.indexOf("://")
+        if (schemeEnd <= 0) return false
+        return trimmed.substring(0, schemeEnd).lowercase() in ALLOWED_SCHEMES
+    }
 
     fun fetchConfigs(): List<CommunityConfigItem> {
         parseConfigList(fetchViaApi())?.let { return it }
@@ -74,7 +92,7 @@ object CommunityConfigManager {
             JsonUtil.fromJsonSafe(body, Array<CommunityConfigItem>::class.java)
                 ?.toList()
                 .orEmpty()
-                .filter { it.link.isNotBlank() }
+                .filter { isValidConfigLink(it.link) }
         } catch (e: Exception) {
             null
         }
@@ -89,21 +107,26 @@ object CommunityConfigManager {
         ownerId: String
     ): CommunityConfigItem {
         require(ownerId.isNotBlank()) { "Device id missing" }
-        require(link.contains("://")) { "Invalid config link" }
-        require(link.length <= MAX_LINK_LENGTH) { "Link too long" }
-
+        require(isValidConfigLink(link)) { "Unsupported config protocol" }
+        val safeName = name.trim().take(MAX_NAME_LENGTH)
         val entry = CommunityConfigItem(
             id = UUID.randomUUID().toString(),
-            name = name.ifBlank { "Config" },
+            name = safeName.ifBlank { "Config" },
             link = link.trim(),
-            volume = volume.trim(),
-            duration = duration.trim(),
-            users = users.trim(),
+            volume = volume.trim().take(MAX_FIELD_LENGTH),
+            duration = duration.trim().take(MAX_FIELD_LENGTH),
+            users = users.trim().take(MAX_FIELD_LENGTH),
             createdAt = System.currentTimeMillis(),
             ownerId = ownerId
         )
 
         updateConfigs { current ->
+            if (current.any { it.link == entry.link }) {
+                throw RuntimeException("Duplicate config")
+            }
+            if (current.count { it.ownerId == ownerId } >= MAX_CONFIGS_PER_OWNER) {
+                throw RuntimeException("Sharing limit reached")
+            }
             (current + entry).takeLast(MAX_ENTRIES)
         }
         return entry

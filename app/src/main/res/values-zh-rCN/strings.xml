@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">从社区列表中删除此共享配置？</string>
     <string name="community_deleted">共享配置已删除</string>
     <string name="community_delete_failed">删除配置失败</string>
+    <string name="community_link_not_supported">仅允许真实的VPN配置链接（vless、vmess、trojan、ss等）</string>
+    <string name="community_duplicate_config">此配置已存在于列表中</string>
+    <string name="community_limit_reached">已达分享上限，请先删除您的一个配置</string>
 </resources>

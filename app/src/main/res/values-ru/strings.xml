@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">Удалить этот общий конфиг из списка сообщества?</string>
     <string name="community_deleted">Общий конфиг удалён</string>
     <string name="community_delete_failed">Не удалось удалить конфиг</string>
+    <string name="community_link_not_supported">Разрешены только реальные ссылки конфигураций VPN (vless, vmess, trojan, ss, …)</string>
+    <string name="community_duplicate_config">Этот конфиг уже есть в списке</string>
+    <string name="community_limit_reached">Достигнут лимит публикаций. Сначала удалите один из своих конфигов</string>
 </resources>

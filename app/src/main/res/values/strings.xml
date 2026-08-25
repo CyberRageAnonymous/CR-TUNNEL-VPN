@@ -606,4 +606,7 @@
     <string name="community_delete_confirm">Delete this shared config from the community list?</string>
     <string name="community_deleted">Shared config deleted</string>
     <string name="community_delete_failed">Failed to delete config</string>
+    <string name="community_link_not_supported">Only real VPN config links are allowed (vless, vmess, trojan, ss, …)</string>
+    <string name="community_duplicate_config">This config is already in the list</string>
+    <string name="community_limit_reached">Sharing limit reached. Delete one of your configs first</string>
 </resources>

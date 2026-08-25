@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">從社群清單中刪除此共用設定檔？</string>
     <string name="community_deleted">已刪除共用設定檔</string>
     <string name="community_delete_failed">刪除設定檔失敗</string>
+    <string name="community_link_not_supported">僅允許真實的VPN設定檔連結（vless、vmess、trojan、ss等）</string>
+    <string name="community_duplicate_config">此設定檔已在清單中</string>
+    <string name="community_limit_reached">已達分享上限，請先刪除您的一個設定檔</string>
 </resources>

@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">این کانفیگ اشتراکی از لیست کامیونیتی حذف شود؟</string>
     <string name="community_deleted">کانفیگ اشتراکی حذف شد</string>
     <string name="community_delete_failed">حذف کانفیگ ناموفق بود</string>
+    <string name="community_link_not_supported">فقط لینک کانفیگ واقعی مجاز است (vless، vmess، trojan، ss و …)</string>
+    <string name="community_duplicate_config">این کانفیگ قبلا در لیست موجود است</string>
+    <string name="community_limit_reached">به سقف اشتراکگذاری رسیدید. اول یکی از کانفیگهای خودتان را حذف کنید</string>
 </resources>

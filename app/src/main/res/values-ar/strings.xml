@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">هل تريد حذف هذا الإعداد من قائمة المجتمع؟</string>
     <string name="community_deleted">تم حذف الإعداد المشترك</string>
     <string name="community_delete_failed">فشل حذف الإعداد</string>
+    <string name="community_link_not_supported">فقط روابط إعدادات VPN الحقيقية مسموح بها (vless، vmess، trojan، ss، …)</string>
+    <string name="community_duplicate_config">هذا الإعداد موجود بالفعل في القائمة</string>
+    <string name="community_limit_reached">تم الوصول إلى حد المشاركة. احذف أحد إعداداتك أولاً</string>
 </resources>

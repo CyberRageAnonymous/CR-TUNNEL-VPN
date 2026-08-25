@@ -135,8 +135,8 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
     private fun submit() {
         val draft = _uiState.value.draft
         val link = draft.link.trim()
-        if (!link.contains("://") || link.length > 8000) {
-            toastError(R.string.community_invalid_link)
+        if (!CommunityConfigManager.isValidConfigLink(link)) {
+            toastError(R.string.community_link_not_supported)
             return
         }
         viewModelScope.launch {
@@ -162,7 +162,11 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                     )
                 }
             } catch (e: Exception) {
-                toastError(e.message ?: getString(R.string.community_share_failed))
+                toastError(when (e.message) {
+                    "Duplicate config" -> getString(R.string.community_duplicate_config)
+                    "Sharing limit reached" -> getString(R.string.community_limit_reached)
+                    else -> getString(R.string.community_link_not_supported)
+                })
             } finally {
                 _uiState.update { it.copy(submitting = false) }
             }

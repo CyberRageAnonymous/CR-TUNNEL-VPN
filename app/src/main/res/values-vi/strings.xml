@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">Xóa cấu hình đã chia sẻ này khỏi danh sách cộng đồng?</string>
     <string name="community_deleted">Đã xóa cấu hình chia sẻ</string>
     <string name="community_delete_failed">Không thể xóa cấu hình</string>
+    <string name="community_link_not_supported">Chỉ cho phép liên kết cấu hình VPN thật (vless, vmess, trojan, ss, …)</string>
+    <string name="community_duplicate_config">Cấu hình này đã có trong danh sách</string>
+    <string name="community_limit_reached">Đã đạt giới hạn chia sẻ. Hãy xóa một cấu hình của bạn trước</string>
 </resources>

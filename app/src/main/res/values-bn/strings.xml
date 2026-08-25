@@ -607,4 +607,7 @@
     <string name="community_delete_confirm">কমিউনিটি তালিকা থেকে এই শেয়ার করা কনফিগটি মুছে ফেলবেন?</string>
     <string name="community_deleted">শেয়ার করা কনফিগ মুছে ফেলা হয়েছে</string>
     <string name="community_delete_failed">কনফিগ মুছতে ব্যর্থ</string>
+    <string name="community_link_not_supported">শুধুমাত্র সত্যিকারের VPN কনফিগ লিংক অনুমোদিত (vless, vmess, trojan, ss, …)</string>
+    <string name="community_duplicate_config">এই কনফিগটি ইতিমধ্যে তালিকায় আছে</string>
+    <string name="community_limit_reached">শেয়ারিং সীমা শেষ। প্রথমে আপনার একটি কনফিগ মুছুন</string>
 </resources>
