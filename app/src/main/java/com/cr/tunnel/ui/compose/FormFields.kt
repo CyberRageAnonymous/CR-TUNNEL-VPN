@@ -43,6 +43,7 @@ fun FormTextField(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
+            .glassFill(LocalDarkTheme.current)
     ) {
         OutlinedTextField(
             value = value,
@@ -96,6 +97,7 @@ fun FormDropdownField(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
+            .glassFill(LocalDarkTheme.current)
     ) {
         OutlinedTextField(
             value = value,
@@ -131,7 +133,7 @@ fun FormDropdownField(
             onDismissRequest = { expanded = false },
             modifier = Modifier.verticalScrollbar(menuScrollState),
             scrollState = menuScrollState,
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = glassDialogColor()
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

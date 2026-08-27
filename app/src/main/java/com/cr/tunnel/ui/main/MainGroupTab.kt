@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.dto.GroupMapItem
 import com.cr.tunnel.dto.entities.ServersCache
 import com.cr.tunnel.ui.compose.colorFabActive
+import com.cr.tunnel.ui.compose.glassDialogColor
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -36,7 +37,7 @@ fun GroupTabBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f),
+        containerColor = glassDialogColor(),
         contentColor = MaterialTheme.colorScheme.onSurface,
         edgePadding = 16.dp,
         minTabWidth = 56.dp,

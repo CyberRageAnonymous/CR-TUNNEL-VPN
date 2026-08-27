@@ -2,6 +2,7 @@ package com.cr.tunnel.ui.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -91,6 +92,14 @@ private fun SettingsItemRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 3.dp)
+            .glassSurface(
+                darkTheme = LocalDarkTheme.current,
+                cornerRadius = 18.dp,
+                fillAlpha = if (LocalDarkTheme.current) 0.10f else 0.22f,
+                edgeAlpha = 0.34f
+            )
+            .alpha(if (enabled) 1f else 0.45f)
             .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically

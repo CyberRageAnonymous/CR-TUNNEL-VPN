@@ -65,6 +65,7 @@ import com.cr.tunnel.R
 import com.cr.tunnel.dto.entities.ProfileItem
 import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.QRCodeDialog
+import com.cr.tunnel.ui.compose.glassDialogColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -243,7 +244,7 @@ fun MainScreen(
                     Text(stringResource(R.string.action_cancel))
                 }
             },
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = glassDialogColor()
         )
     }
 

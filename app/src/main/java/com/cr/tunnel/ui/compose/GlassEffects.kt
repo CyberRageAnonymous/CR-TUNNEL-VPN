@@ -47,54 +47,95 @@ fun GlassBackground(
     }
 }
 
+/** Frosted glass tile: rounded translucent fill with a specular top highlight and a thin gradient edge. */
+fun Modifier.glassSurface(
+    darkTheme: Boolean,
+    cornerRadius: Dp = 18.dp,
+    fillAlpha: Float = if (darkTheme) 0.12f else 0.18f,
+    edgeAlpha: Float = 0.38f
+): Modifier = this
+    .clip(RoundedCornerShape(cornerRadius))
+    .background(
+        if (darkTheme) Color(0xFF22305C).copy(alpha = fillAlpha)
+        else Color.White.copy(alpha = fillAlpha)
+    )
+    .drawWithCache {
+        val radius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
+        val highlightBrush = Brush.verticalGradient(
+            colors = listOf(
+                Color.White.copy(alpha = if (darkTheme) 0.10f else 0.32f),
+                Color.Transparent
+            ),
+            startY = 0f,
+            endY = size.height * 0.5f
+        )
+        val edgeBrush = Brush.linearGradient(
+            colors = listOf(
+                Color.White.copy(alpha = edgeAlpha),
+                glassCyan.copy(alpha = edgeAlpha * 0.6f),
+                glassPurple.copy(alpha = edgeAlpha * 0.45f),
+                Color.White.copy(alpha = edgeAlpha * 0.15f)
+            )
+        )
+        onDrawBehind {
+            drawRoundRect(brush = highlightBrush, cornerRadius = radius)
+            drawRoundRect(
+                brush = edgeBrush,
+                cornerRadius = radius,
+                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
+            )
+        }
+    }
+
+/** Soft frosted fill without an edge, used behind form fields where the outline is drawn by the field itself. */
+fun Modifier.glassFill(
+    darkTheme: Boolean,
+    cornerRadius: Dp = 14.dp,
+    fillAlpha: Float = if (darkTheme) 0.10f else 0.16f
+): Modifier = this
+    .clip(RoundedCornerShape(cornerRadius))
+    .background(
+        if (darkTheme) Color(0xFFB8C7FF).copy(alpha = fillAlpha)
+        else Color.White.copy(alpha = fillAlpha)
+    )
+    .drawWithCache {
+        val radius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
+        val highlightBrush = Brush.verticalGradient(
+            colors = listOf(
+                Color.White.copy(alpha = if (darkTheme) 0.08f else 0.30f),
+                Color.Transparent
+            ),
+            startY = 0f,
+            endY = size.height * 0.45f
+        )
+        onDrawBehind {
+            drawRoundRect(brush = highlightBrush, cornerRadius = radius)
+        }
+    }
+
+@Composable
+fun glassDialogColor(): Color {
+    val dark = LocalDarkTheme.current
+    return if (dark) Color(0xFF101A3C).copy(alpha = 0.95f)
+    else Color(0xFFF2F9FF).copy(alpha = 0.97f)
+}
+
 @Composable
 fun GlassCard(
     darkTheme: Boolean,
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 20.dp,
-    fillAlpha: Float = if (darkTheme) 0.10f else 0.14f,
-    edgeAlpha: Float = 0.35f,
+    fillAlpha: Float = if (darkTheme) 0.12f else 0.18f,
+    edgeAlpha: Float = 0.38f,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(cornerRadius))
-            .background(
-                if (darkTheme) {
-                    Color(0xFFB8C7FF).copy(alpha = fillAlpha)
-                } else {
-                    Color.White.copy(alpha = fillAlpha)
-                }
-            )
-            .drawWithCache {
-                val highlightBrush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = if (darkTheme) 0.10f else 0.30f),
-                        Color.Transparent
-                    ),
-                    startY = 0f,
-                    endY = size.height * 0.45f
-                )
-                val edgeBrush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = edgeAlpha),
-                        glassCyan.copy(alpha = edgeAlpha * 0.7f),
-                        glassPurple.copy(alpha = edgeAlpha * 0.5f),
-                        Color.White.copy(alpha = edgeAlpha * 0.2f)
-                    )
-                )
-                onDrawBehind {
-                    drawRoundRect(
-                        brush = highlightBrush,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
-                    )
-                    drawRoundRect(
-                        brush = edgeBrush,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx()),
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
-                    )
-                }
-            }
+        modifier = modifier.glassSurface(
+            darkTheme = darkTheme,
+            cornerRadius = cornerRadius,
+            fillAlpha = fillAlpha,
+            edgeAlpha = edgeAlpha
+        )
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             content()

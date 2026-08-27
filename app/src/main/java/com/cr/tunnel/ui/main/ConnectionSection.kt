@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.cr.tunnel.R
 import com.cr.tunnel.ui.compose.colorPing
 import com.cr.tunnel.ui.compose.glassCyan
+import com.cr.tunnel.ui.compose.glassSurface
 import kotlinx.coroutines.delay
 
 private val NeonCyan = Color(0xFF00E5FF)
@@ -155,11 +156,12 @@ private fun ProtectedBanner(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                if (isDarkTheme) Color(0x2200E5FF) else Color(0x0F00A8C4)
+            .glassSurface(
+                darkTheme = isDarkTheme,
+                cornerRadius = 18.dp,
+                fillAlpha = if (isDarkTheme) 0.10f else 0.16f,
+                edgeAlpha = 0.45f
             )
-            .border(1.dp, Color(0x4400E5FF), RoundedCornerShape(18.dp))
             .padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -233,11 +235,12 @@ private fun ConnectionStatsBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                if (isDarkTheme) Color(0x2200E5FF) else Color(0x0F00A8C4)
+            .glassSurface(
+                darkTheme = isDarkTheme,
+                cornerRadius = 18.dp,
+                fillAlpha = if (isDarkTheme) 0.10f else 0.16f,
+                edgeAlpha = 0.35f
             )
-            .border(1.dp, Color(0x3300E5FF), RoundedCornerShape(18.dp))
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

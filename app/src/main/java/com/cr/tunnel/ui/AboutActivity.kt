@@ -34,6 +34,7 @@ import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.compose.AppTopBar
 import com.cr.tunnel.ui.compose.SettingsMenuItem
 import com.cr.tunnel.ui.compose.VersionInfoBlock
+import com.cr.tunnel.ui.compose.glassDialogColor
 import com.cr.tunnel.util.Utils
 
 class AboutActivity : BaseComponentActivity() {
@@ -125,7 +126,7 @@ fun AboutScreen(onBackClick: () -> Unit) {
                     Text(stringResource(R.string.action_ok))
                 }
             },
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = glassDialogColor(),
             modifier = Modifier.padding(bottom = 60.dp)
         )
     }

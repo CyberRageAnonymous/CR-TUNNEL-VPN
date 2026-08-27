@@ -1,7 +1,6 @@
 package com.cr.tunnel.ui.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,8 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import com.cr.tunnel.R
 import com.cr.tunnel.handler.StatsManager
 import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.glassDialogColor
+import com.cr.tunnel.ui.compose.glassSurface
 
 enum class MainTab(@androidx.annotation.DrawableRes val iconRes: Int, @androidx.annotation.StringRes val labelRes: Int) {
     Home(R.drawable.ic_home_24dp, R.string.nav_home),
@@ -126,11 +125,12 @@ fun StatsPage(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
-                .background(
-                    if (isDarkTheme) Color(0x2200E5FF) else Color(0x0F00A8C4)
+                .glassSurface(
+                    darkTheme = isDarkTheme,
+                    cornerRadius = 18.dp,
+                    fillAlpha = if (isDarkTheme) 0.12f else 0.18f,
+                    edgeAlpha = 0.4f
                 )
-                .border(1.dp, Color(0x3300E5FF), RoundedCornerShape(18.dp))
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -238,7 +238,8 @@ fun StatsPage(
                     TextButton(onClick = { showResetConfirm = false }) {
                         Text(stringResource(R.string.action_cancel))
                     }
-                }
+                },
+                containerColor = glassDialogColor()
             )
         }
     }
@@ -253,11 +254,12 @@ private fun StatCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                if (isDarkTheme) Color(0x2200E5FF) else Color(0x0F00A8C4)
+            .glassSurface(
+                darkTheme = isDarkTheme,
+                cornerRadius = 18.dp,
+                fillAlpha = if (isDarkTheme) 0.12f else 0.18f,
+                edgeAlpha = 0.35f
             )
-            .border(1.dp, Color(0x3300E5FF), RoundedCornerShape(18.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -321,9 +323,11 @@ fun SettingsPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(
-                        if (isDarkTheme) Color(0x1AFFFFFF) else Color(0x0F00A8C4)
+                    .glassSurface(
+                        darkTheme = isDarkTheme,
+                        cornerRadius = 16.dp,
+                        fillAlpha = if (isDarkTheme) 0.10f else 0.20f,
+                        edgeAlpha = 0.32f
                     )
                     .clickable { onNavigate(item) }
                     .padding(horizontal = 16.dp, vertical = 14.dp),

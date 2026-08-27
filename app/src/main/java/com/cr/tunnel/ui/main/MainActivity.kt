@@ -170,7 +170,9 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun handleFabAction() {
-        if (mainViewModel.uiState.value.isRunning) {
+        val state = mainViewModel.uiState.value
+        if (state.isRunning || state.isConnecting) {
+            mainViewModel.cancelConnectingAttempt()
             LauncherManager.stopService(this)
         } else if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)
@@ -187,6 +189,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun startV2Ray() {
+        if (mainViewModel.uiState.value.isConnecting) return
         if (mainViewModel.uiState.value.selectedGuid.isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
             return

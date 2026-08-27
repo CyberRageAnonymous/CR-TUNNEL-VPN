@@ -61,6 +61,9 @@ import com.cr.tunnel.dto.CommunityConfigItem
 import com.cr.tunnel.extension.toastSuccess
 import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.compose.AppTopBar
+import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.glassDialogColor
+import com.cr.tunnel.ui.compose.glassSurface
 
 class CommunityConfigActivity : BaseComponentActivity() {
 
@@ -189,8 +192,12 @@ private fun CommunityCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+            .glassSurface(
+                darkTheme = LocalDarkTheme.current,
+                cornerRadius = 16.dp,
+                fillAlpha = if (LocalDarkTheme.current) 0.12f else 0.24f,
+                edgeAlpha = 0.32f
+            )
             .padding(14.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -290,7 +297,8 @@ private fun CommunityCard(
                 TextButton(onClick = { showDeleteConfirm = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
+            containerColor = glassDialogColor()
         )
     }
 }
@@ -401,7 +409,8 @@ private fun ShareStepDialog(
             TextButton(onClick = onCancel, enabled = !submitting) {
                 Text(stringResource(R.string.action_cancel))
             }
-        }
+        },
+        containerColor = glassDialogColor()
     )
 }
 

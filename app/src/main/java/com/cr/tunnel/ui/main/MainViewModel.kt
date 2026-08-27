@@ -51,7 +51,7 @@ class MainViewModel(
     private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
     private val connectedText: String = dataSource.getString(R.string.connection_connected)
 
-    private val CONNECT_WATCHDOG_MS = 10_000L
+    private val CONNECT_WATCHDOG_MS = 25_000L
     private var connectWatchdogJob: Job? = null
 
     private var trafficPollJob: Job? = null
@@ -884,8 +884,18 @@ init {
                         statusText = disconnectedText
                     )
                 }
+                dataSource.sendMsg2Service(AppConfig.MSG_STATE_STOP, "")
                 toastError(dataSource.getString(R.string.connection_timeout))
             }
+        }
+    }
+
+    fun cancelConnectingAttempt() {
+        connectWatchdogJob?.cancel()
+        connectWatchdogJob = null
+        _uiState.update { state ->
+            if (state.isConnecting) state.copy(isConnecting = false, statusText = disconnectedText)
+            else state
         }
     }
 

@@ -61,6 +61,7 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
     val uiState = _uiState.asStateFlow()
 
     private val pingJobs = mutableMapOf<String, Job>()
+    private val likeJobs = mutableMapOf<String, Job>()
 
     private val deviceId: String by lazy {
         var id = MmkvManager.decodeSettingsString(AppConfig.PREF_COMMUNITY_DEVICE_ID)
@@ -213,9 +214,10 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
             toastError(R.string.community_cannot_self_like)
             return
         }
-        viewModelScope.launch {
+        if (likeJobs.containsKey(configId)) return
+        val liked = !likedSet().contains(configId)
+        likeJobs[configId] = viewModelScope.launch {
             try {
-                val liked = !likedSet().contains(configId)
                 withContext(Dispatchers.IO) {
                     CommunityConfigManager.likeConfig(configId, liked, deviceId)
                     updateLikedSet(configId, liked)
@@ -234,6 +236,8 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                     "Self like" -> getString(R.string.community_cannot_self_like)
                     else -> getString(R.string.community_like_failed)
                 })
+            } finally {
+                likeJobs.remove(configId)
             }
         }
     }
