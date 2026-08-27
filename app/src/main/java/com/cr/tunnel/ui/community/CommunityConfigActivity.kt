@@ -208,7 +208,7 @@ private fun CommunityCard(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable(enabled = !row.isMine, onClick = onLike)
+                    .clickable(onClick = onLike)
                     .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -219,7 +219,7 @@ private fun CommunityCard(
                     ),
                     contentDescription = stringResource(R.string.community_like),
                     tint = if (row.isLiked) Color(0xFFFF2D78)
-                    else if (row.isMine) Color(0x44FFFFFF)
+                    else if (row.isMine) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
                     else Color(0xFF00B8D4),
                     modifier = Modifier.size(20.dp)
                 )

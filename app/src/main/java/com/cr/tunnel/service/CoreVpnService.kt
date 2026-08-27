@@ -58,9 +58,8 @@ class CoreVpnService : VpnService(), ServiceControl {
         super.onDestroy()
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service destroyed")
 
-        // Ensure VPN interface is properly closed when the service is destroyed without
-        // going through stopAllService() (e.g. when killed unexpectedly). isRunning is
-        // set to false at the start of stopAllService(), so this guard prevents a double-close.
+        // Close the interface if the service is killed without stopAllService().
+        // stopAllService() clears isRunning first, so this guard prevents a double-close.
         if (isRunning) {
             try {
                 if (::mInterface.isInitialized) {
@@ -78,8 +77,8 @@ class CoreVpnService : VpnService(), ServiceControl {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         NotificationManager.ensureForeground()
-        // Always-on VPN restarts from OS deliver intent.action == SERVICE_INTERFACE or null intent.
-        // Reset any stuck start lock left by a killed process to allow setupVpnService() to run.
+        // A killed process may leave a stale start lock set.
+        // Always-on restarts (SERVICE_INTERFACE or null) must release it first.
         val isSystemVpnStart = intent == null || intent.action == SERVICE_INTERFACE
         if (isSystemVpnStart) {
             unlockStart()
@@ -91,8 +90,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
         if (!setupVpnService()) {
             unlockStart()
-            // Report the failure to the UI immediately; otherwise the app would stay
-            // in "connecting" forever while the service silently dies.
+            // Surface the failure or the UI would stay stuck in "connecting".
             MessageHelper.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, getString(R.string.toast_vpn_setup_failure))
             // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
             stopSelf()
@@ -124,10 +122,8 @@ class CoreVpnService : VpnService(), ServiceControl {
     }
 
     override fun stopService() {
-        // Kill switch: keep the tunnel (interface + routing) up but idle so no
-        // traffic can leave the phone while the core is down. The VPN interface
-        // stays established with no tun2socks upstream, so every packet dies inside
-        // the tunnel. A later connect re-establishes and starts the core normally.
+        // Kill switch: keep the interface and routing up but idle, so traffic
+        // dies inside the tunnel while the core is stopped.
         if (SettingsManager.isKillSwitchEnabled() && ::mInterface.isInitialized && isRunning) {
             LogUtil.i(AppConfig.TAG, "StartCore-VPN: Kill switch engaged, keeping tunnel up")
             unlockStart()
@@ -365,9 +361,8 @@ class CoreVpnService : VpnService(), ServiceControl {
             //which means the first v2ray core somehow failed to stop and release the port.
             stopSelf()
 
-            // Add a small delay to allow the async core stop operation to complete
-            // before closing the VPN interface, preventing a race condition that can
-            // leave the VPN icon in the status bar after stopping the service.
+            // Wait for the async core stop before closing the interface, so the
+            // VPN icon disappears with the service.
             try {
                 Thread.sleep(100)
             } catch (e: InterruptedException) {

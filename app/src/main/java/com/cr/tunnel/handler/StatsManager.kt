@@ -6,12 +6,8 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Persistent per-day and per-month traffic totals.
- *
- * Accumulation happens inside the always-alive service process (where the core
- * counters are read), while the statistics screen only reads. Deltas are
- * applied after the day/month rollover is detected so a stale counter is reset
- * instead of summed across periods.
+ * Per-day and per-month traffic totals, accumulated in the service process
+ * and read by the statistics screen.
  */
 object StatsManager {
 

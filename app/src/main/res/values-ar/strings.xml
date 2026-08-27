@@ -621,10 +621,6 @@
     <string name="stats_total">الإجمالي</string>
     <string name="stats_reset">إعادة ضبط الإحصائيات</string>
     <string name="stats_reset_confirm">مسح عدّادات حركة المرور لليوم وهذا الشهر؟</string>
-    <string name="speed_test_button">اختبار السرعة</string>
-    <string name="speed_test_title">اختبار السرعة</string>
-    <string name="speed_test_result">سرعة التنزيل: %1$s ميجابايت/ثانية</string>
-    <string name="speed_test_failed">فشل اختبار السرعة. تحقق من اتصالك.</string>
     <string name="community_like">إعجاب</string>
     <string name="community_cannot_self_like">لا يمكنك الإعجاب بكونفيغك الخاص</string>
     <string name="community_like_failed">فشل تحديث الإعجاب</string>

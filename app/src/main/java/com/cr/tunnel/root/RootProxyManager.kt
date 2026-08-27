@@ -15,16 +15,13 @@ import java.io.File
 
 /**
  * Installs and removes the iptables / ip-rule routing that pushes system-wide traffic
+ * into a tun device (root mode, and LAN/tethering sharing for VPN mode).
  *
- * A bundled `hev-socks5-tunnel` binary (run as root) creates a tun device and forwards it to
- * the in-process core's SOCKS inbound; a mangle MARK chain plus a dedicated routing table /
- * ip rule steer all traffic into the tun. Full TCP + UDP.
- *
- * All rules live in dedicated chains ([AppConfig.ROOT_IPTABLES_CHAIN] in the mangle
- * table, [AppConfig.ROOT_FWD_CHAIN] for LAN sharing) plus a dedicated routing table, so
- * [teardown] is a clean, bounded flush. Teardown runs before every setup (to clear stale
- * rules) and on every stop path — leaving rules behind after the core dies would break
- * the device's connectivity.
+ * A bundled hev-socks5-tunnel binary (run as root) creates the tun and forwards it to
+ * the in-process core's SOCKS inbound; a mangle MARK chain plus a dedicated routing
+ * table and ip rule steer traffic into the tun. Rules live in dedicated chains/tables
+ * so teardown is a bounded flush, and teardown runs before every setup and on every
+ * stop path so no stale rule can break connectivity.
  */
 object RootProxyManager {
 
@@ -41,8 +38,8 @@ object RootProxyManager {
         "172.16.0.0/12", "192.168.0.0/16", "224.0.0.0/4", "240.0.0.0/4"
     )
 
-    // IPv6 equivalents (loopback, link-local, ULA/private, multicast). Feeding the v4 list
-    // above to ip6tables silently fails, so the v6 chain needs its own.
+    // IPv6 equivalents (loopback, link-local, ULA/private, multicast).
+    // ip6tables needs its own list; the v4 list fails there silently.
     private val bypassCidrsV6 = listOf(
         "::1/128", "fe80::/10", "fc00::/7", "ff00::/8"
     )
@@ -60,10 +57,9 @@ object RootProxyManager {
     }
 
     /**
-     * Set up LAN/tethering sharing while the device itself uses another mode (e.g. VPN
-     * mode). Runs a dedicated client tun2socks into the in-process core's SOCKS inbound
-     * and forwards tethered clients into it, WITHOUT capturing the device's own traffic
-     * (that keeps flowing through the VpnService). Requires root.
+     * LAN/tethering sharing while the device itself stays on VPN mode: a client tun2socks
+     * forwards tethered clients into the core's SOCKS inbound without touching the
+     * device's own traffic. Requires root.
      */
     fun startClientSharing(context: Context): Boolean {
         teardown(context)
@@ -92,11 +88,9 @@ object RootProxyManager {
     // --------------------------------------------------------------- TUN2SOCKS
 
     /**
-     * @param captureDeviceTraffic when true (Root mode) the device's own OUTPUT traffic is
-     *   marked into the tun. When false (VPN-mode LAN sharing) the device keeps using the
-     *   VpnService and only forwarded clients are routed into this tun.
-     * @param forceLanShare force the LAN/tethering forward rules on regardless of the pref
-     *   (used by VPN-mode sharing, where the whole point is forwarding clients).
+     * @param captureDeviceTraffic Root mode: capture the device's own OUTPUT traffic.
+     *   VPN-mode sharing: only forwarded clients are routed into the tun.
+     * @param forceLanShare Force the LAN forward rules regardless of the preference.
      */
     private fun buildTun2socksSetup(
         context: Context,
@@ -121,7 +115,7 @@ object RootProxyManager {
         val lanShare = forceLanShare || MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
         val corePid = Process.myPid()
 
-        // Per-app proxy/bypass (mirrors what VpnService does via allowed/disallowed apps).
+        // Per-app proxy/bypass selection.
         val perAppEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)
         val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS)
         val selectedUids = if (perAppEnabled) {
@@ -134,18 +128,14 @@ object RootProxyManager {
         return buildString {
             appendLine("set -e")
             appendLine("BIN='${bin.absolutePath}'")
-            // Protect the core (this app process) from the Android low-memory killer.
-            // system_server keeps recomputing oom_score_adj for app processes, so a single
-            // write would be reverted — re-pin it from a small root loop instead.
+            // Keep the core process alive: system_server keeps recomputing oom_score_adj,
+            // so re-pin it from a small root loop instead of a one-shot write.
             appendLine("nohup sh -c 'while true; do echo ${AppConfig.ROOT_OOM_SCORE} > /proc/$corePid/oom_score_adj 2>/dev/null; sleep 5; done' >/dev/null 2>&1 &")
             appendLine("echo \$! > '$oomGuardPid'")
             // tun device node
             appendLine("if [ ! -e /dev/net/tun ]; then mkdir -p /dev/net; mknod /dev/net/tun c 10 200; chmod 666 /dev/net/tun; fi")
-            // hev-socks5-tunnel config: it creates the tun ($TUN) itself and forwards it to the
-            // in-process core's SOCKS inbound on loopback. MTU comes from the existing VPN MTU
-            // setting. No fwmark on hev's sockets: its only upstream connection is to 127.0.0.1
-            // (loopback, already RETURNed by the 127.0.0.0/8 bypass) and the core's real outbound
-            // runs as the app uid (RETURNed by the uid-owner rule), so traffic can't loop.
+            // hev creates the tun ($TUN) itself and forwards it to the in-process core's SOCKS
+            // inbound on loopback. MTU comes from the existing VPN MTU setting.
             appendLine("cat > '$cfgFile' <<'HEVCFG'")
             append(buildHevConfig(socksUsername = socksUsername, socksPassword = socksPassword, socksPort = port, ipv6 = ipv6))
             appendLine("HEVCFG")
@@ -182,8 +172,8 @@ object RootProxyManager {
                     appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
                     append(buildMangleMarking("ip6tables", appUid, perAppEnabled, bypassApps, selectedUids))
                 } else {
-                    // v6 disabled: blackhole native v6 egress for the captured apps so they
-                    // fall back to v4-through-proxy, matching what a v4-only VpnService does.
+                    // v6 disabled: reject the captured apps' native v6 so it falls back to
+                    // v4-through-proxy, matching a v4-only VpnService.
                     append(buildV6Blackhole(appUid, perAppEnabled, bypassApps, selectedUids))
                 }
             }
@@ -191,11 +181,9 @@ object RootProxyManager {
     }
 
     /**
-     * hev-socks5-tunnel YAML config. hev creates the tun device named [TUN] itself, assigns it
-     * the tun addresses, and forwards everything it receives to the core's SOCKS inbound on
-     * loopback (TCP + UDP). MTU is taken from the existing VPN MTU setting. v6 is only given a
-     * tun address when IPv6 is enabled; whether v6 actually flows in is decided separately by
-     * the v6 route into [TABLE].
+     * hev-socks5-tunnel YAML config. hev creates the tun named [TUN], assigns it the
+     * addresses, and forwards everything it receives to the core's SOCKS inbound on
+     * loopback (TCP + UDP). MTU comes from the existing VPN MTU setting.
      */
     private fun buildHevConfig(socksUsername: String?, socksPassword: String?, socksPort: Int, ipv6: Boolean): String {
         val v4 = AppConfig.ROOT_TUN_ADDR_V4.substringBefore("/")
@@ -220,11 +208,9 @@ object RootProxyManager {
     }
 
     /**
-     * mangle OUTPUT marking chain (ipv4/ipv6). Mirrors VpnService's capture behavior:
-     * - all-apps (no per-app): mark EVERY remaining uid (incl uid 0 + all system uids), so
-     *   nothing is missed;
-     * - bypass mode: the selected apps go fully direct, everything else is captured;
-     * - proxy mode: only the selected apps are captured.
+     * mangle OUTPUT marking chain (ipv4/ipv6), mirroring VpnService capture behavior:
+     * all-apps mode marks every remaining uid; bypass mode keeps the selected apps
+     * direct and captures everything else; proxy mode captures only the selected apps.
      */
     private fun buildMangleMarking(
         cmd: String,
@@ -238,37 +224,29 @@ object RootProxyManager {
         return buildString {
             appendLine("$cmd -t mangle -N $CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -F $CHAIN")
-            // the app's own core traffic (the real outbound) must not loop back into the tun.
-            // The $FWMARK RETURN is kept defensively (hev itself only talks to loopback, which
-            // the 127.0.0.0/8 bypass below already RETURNs).
+            // The core's own outbound and the helper's loopback traffic must not loop into the tun.
             appendLine("$cmd -t mangle -A $CHAIN -m mark --mark $FWMARK -j RETURN")
             appendLine("$cmd -t mangle -A $CHAIN -m owner --uid-owner $appUid -j RETURN")
             // bypass mode: selected apps go fully direct (incl their DNS)
             if (bypassSelected) {
                 selectedUids.forEach { appendLine("$cmd -t mangle -A $CHAIN -m owner --uid-owner $it -j RETURN") }
             }
-            // Route DNS through the core for ALL modes, with no uid filter. On Android the
-            // DNS query is sent by netd (a shared system uid) on behalf of the app, not under
-            // the app's own uid, so it can't be attributed to a selected uid via owner-match.
-            // This MUST also run before the LAN-bypass RETURNs below, otherwise a query to a
-            // LAN/router resolver (192.168.x / 10.x) would be returned direct and resolved by
-            // the local ISP resolver (DNS leak + CDN mis-resolution, e.g. Instagram media).
-            // The MARK survives a later RETURN, so the marked query still routes into the tun.
+            // Route DNS through the core for all modes, without a uid filter: on Android the
+            // query is sent by netd (a shared uid), not under the app's uid. Also runs
+            // before the LAN-bypass RETURNs so a LAN/router-resolver query is not
+            // resolved direct (DNS leak / CDN mis-resolution). The MARK survives RETURN.
             appendLine("$cmd -t mangle -A $CHAIN -p udp --dport 53 -j MARK --set-xmark $MARK")
             appendLine("$cmd -t mangle -A $CHAIN -p tcp --dport 53 -j MARK --set-xmark $MARK")
             // keep LAN / private destinations direct (per-family CIDR list)
             val cidrs = if (cmd == "ip6tables") bypassCidrsV6 else bypassCidrs
             cidrs.forEach { appendLine("$cmd -t mangle -A $CHAIN -d $it -j RETURN") }
             if (allowMode) {
-                // Proxy ONLY the explicitly selected apps. If nothing resolved (e.g. the
-                // selected packages failed to resolve to uids at early boot), mark nothing
-                // instead of falling through to the catch-all below: a fail-open here would
-                // tunnel every unselected app — both a privacy leak and the "per-app proxies
-                // everything after a reboot" bug.
+                // Proxy only the explicitly selected apps. If none resolved (early-boot uid lookup
+                // failure), mark nothing instead of falling through to the catch-all below,
+                // which would tunnel every unselected app.
                 selectedUids.forEach { appendLine("$cmd -t mangle -A $CHAIN -m owner --uid-owner $it -j MARK --set-xmark $MARK") }
             } else {
-                // all-apps mode (per-app off) or bypass mode: capture EVERY remaining uid
-                // (incl uid 0 + system uids)
+                // all-apps / bypass mode: capture every remaining uid (incl 0 + system uids)
                 appendLine("$cmd -t mangle -A $CHAIN -j MARK --set-xmark $MARK")
             }
             appendLine("$cmd -t mangle -D OUTPUT -j $CHAIN 2>/dev/null || true")
@@ -277,16 +255,14 @@ object RootProxyManager {
     }
 
     /**
-     * Blackhole native IPv6 egress for the captured app population when IPv6 is NOT routed
-     * into the tun. A v4-only VpnService has no v6 route, so the kernel rejects apps' v6 and
-     * they fall back to IPv4; Root mode has to reproduce that explicitly, otherwise v6-capable
-     * apps reach destinations natively, bypassing the proxy / leaking. REJECT (not DROP) gives
-     * an instant failure so happy-eyeballs falls back to v4 without a timeout.
+     * Reject native IPv6 egress for the captured apps when IPv6 is not routed into the
+     * tun. A v4-only VpnService has no v6 route, so the kernel rejects apps' v6 and they
+     * fall back to IPv4; root mode must reproduce that explicitly or v6-capable apps
+     * reach destinations natively, bypassing the proxy. REJECT (not DROP) fails fast so
+     * happy-eyeballs falls back to v4 without a timeout.
      *
-     * Exemptions mirror the v4 chain: the tun2socks helper (fwmark), the app's own core (uid),
-     * loopback, link-local / multicast (NDP/RA/MLD) and ULA/LAN destinations. Per-app selection
-     * is honored: in bypass mode the bypassed apps keep native v6; in proxy mode only the
-     * selected apps lose v6 (everything else stays fully direct).
+     * Exemptions mirror the v4 chain (helper fwmark, app core uid, loopback,
+     * link-local/multicast, ULA/LAN) and per-app selection is honored.
      */
     private fun buildV6Blackhole(
         appUid: Int,
@@ -326,9 +302,9 @@ object RootProxyManager {
     // -------------------------------------------------- LAN / tethering sharing
 
     /**
-     * Route Wi-Fi-hotspot / USB-tethered clients through the tun as well (ipv4).
-     * Best-effort: wrapped in `set +e` so a failure here never breaks the working proxy.
-     * Mirrors Magic_V2Ray's hotspot rules (FORWARD accept, DNS DNAT, source-based policy
+     * Route Wi-Fi-hotspot / USB-tethered clients through the tun (ipv4). Best-effort:
+     * wrapped in `set +e` so a failure here never breaks the working proxy. Mirrors
+     * Magic_V2Ray's hotspot rules (FORWARD accept, DNS DNAT, source-based policy
      * routing for private client ranges, MSS clamp).
      */
     private fun buildLanShareSetup(captureDeviceTraffic: Boolean, ipv6: Boolean): String {
@@ -336,9 +312,8 @@ object RootProxyManager {
         val dnsChain = AppConfig.ROOT_DNS_CHAIN
         val v6fwd = AppConfig.ROOT_V6_FWD_CHAIN
         val v6pre = AppConfig.ROOT_V6_PRE_CHAIN
-        // Use the app's configured remote DNS (first plain IPv4) as the DNAT target for
-        // tethered clients; fall back to the default when it's a DoH/DoT/IPv6 value that
-        // can't be a DNAT target.
+        // DNAT target for tethered clients: the configured remote DNS when it is a
+        // plain IPv4 address, else the fallback resolver.
         val dns = SettingsManager.getRemoteDnsServers()
             .firstOrNull { Utils.isPureIpAddress(it) && !it.contains(":") }
             ?: AppConfig.ROOT_LAN_DNS
@@ -356,8 +331,8 @@ object RootProxyManager {
             // clamp MSS to avoid TLS fragmentation overhead through the tunnel
             appendLine("iptables -t mangle -D FORWARD -o $TUN -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true")
             appendLine("iptables -t mangle -A FORWARD -o $TUN -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350")
-            // hijack tethered clients' DNS into a dedicated chain so it resolves through the
-            // tunnel; the chain keeps teardown independent of the resolver IP
+            // Hijack tethered clients' DNS into a dedicated chain (teardown stays
+            // independent of the resolver IP).
             appendLine("iptables -t nat -N $dnsChain 2>/dev/null || true")
             appendLine("iptables -t nat -F $dnsChain")
             lanCidrs.forEach {
@@ -377,19 +352,17 @@ object RootProxyManager {
             appendLine("ip rule add from 192.168.0.0/16 lookup $TABLE pref 5050 2>/dev/null || true")
             appendLine("ip rule add nop pref 6000 2>/dev/null || true")
 
-            // ---------------------------------------------------------- IPv6 clients
-            // Tethered/hotspot clients get a native (RA-assigned) global IPv6. The IPv4 rules
-            // above don't touch it, so it egresses the upstream interface directly, bypassing
-            // the proxy = IPv6 leak. Handle it explicitly (mirrors vincentng295/Magic_V2Ray
-            // cae4f7f): route it through the tun when v6 is enabled, reject it when it isn't.
+            // Tethered clients get a native (RA-assigned) global IPv6 that the IPv4 rules
+            // don't touch, so it would egress upstream directly, bypassing the proxy.
+            // Route it through the tun when v6 is enabled, reject it when it isn't.
             appendLine("ip6tables -N $v6fwd 2>/dev/null || true")
             appendLine("ip6tables -F $v6fwd")
             appendLine("ip6tables -D FORWARD -j $v6fwd 2>/dev/null || true")
             appendLine("ip6tables -I FORWARD -j $v6fwd")
             if (ipv6) {
-                // When the device itself isn't capturing v6 (VPN-mode sharing) the tun table
-                // has no v6 default and the tun has no v6 address — add them so marked client
-                // v6 has somewhere to go. In Root mode the device-capture block already did.
+                // VPN-mode sharing: the tun table has no v6 default and the tun has no v6
+                // address while the device itself isn't capturing v6 — add them so marked
+                // client v6 has somewhere to go.
                 if (!captureDeviceTraffic) {
                     appendLine("ip -6 addr add ${AppConfig.ROOT_TUN_ADDR_V6} dev $TUN 2>/dev/null || true")
                     appendLine("ip -6 route replace default dev $TUN table $TABLE 2>/dev/null || true")
@@ -398,9 +371,9 @@ object RootProxyManager {
                 // allow forwarding to/from the tun
                 appendLine("ip6tables -A $v6fwd -i $TUN -j ACCEPT")
                 appendLine("ip6tables -A $v6fwd -o $TUN -j ACCEPT")
-                // mark forwarded (non-locally-sourced) client v6 into the tun table. DNS first
-                // so a query to a LAN/router resolver is still tunneled (MARK survives RETURN);
-                // keep loopback, link-local (NDP/RA) and ULA/multicast direct.
+                // Mark forwarded (non-locally-sourced) client v6 into the tun table. DNS
+                // first so a query to a LAN/router resolver is still tunneled (the MARK
+                // survives RETURN); loopback, link-local (NDP/RA) and ULA/multicast stay direct.
                 appendLine("ip6tables -t mangle -N $v6pre 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -F $v6pre")
                 appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -p udp --dport 53 -j MARK --set-xmark $MARK")
@@ -409,13 +382,12 @@ object RootProxyManager {
                 appendLine("ip6tables -t mangle -A $v6pre ! -i $TUN -j MARK --set-xmark $MARK")
                 appendLine("ip6tables -t mangle -D PREROUTING -j $v6pre 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -A PREROUTING -j $v6pre")
-                // fail closed: any forwarded v6 that wasn't marked into the tun (e.g. the
-                // addrtype match is unavailable, or marking failed) is rejected rather than
-                // leaked straight out the upstream interface.
+                // Fail closed: forwarded v6 that was not marked into the tun is rejected
+                // rather than leaked out the upstream interface.
                 appendLine("ip6tables -A $v6fwd -j REJECT --reject-with icmp6-no-route")
             } else {
-                // v6 disabled: reject forwarded clients' native v6 so it can't leak past the
-                // proxy (the device's own v6 is blackholed separately in OUTPUT).
+                // v6 disabled: reject forwarded clients' native v6 so it can't leak past
+                // the proxy (the device's own v6 is handled in OUTPUT).
                 appendLine("ip6tables -A $v6fwd -j REJECT --reject-with icmp6-no-route")
             }
         }

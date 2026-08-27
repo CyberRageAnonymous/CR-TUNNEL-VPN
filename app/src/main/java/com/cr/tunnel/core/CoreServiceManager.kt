@@ -277,16 +277,14 @@ object CoreServiceManager {
 
     /**
      * Queries all outbound traffic counters.
-     * Uses the Go-side bulk query (known to work) and supplements any tags it
-     * misses by reading them individually with queryStats.
+     * Uses the Go-side bulk query and supplements any tags it misses.
      */
     fun queryAllOutboundTrafficStats(): List<OutboundTrafficStat> {
-        // The stats manager is gone once the core stops, querying it then reaches into freed state.
         if (!isRunning()) return emptyList()
 
         val result = ArrayList<OutboundTrafficStat>()
 
-        // 1) Bulk query from the core (Go side format: tag,direction,value;tag,direction,value;)
+        // 1) Bulk query from the core (tag,direction,value;...)
         runCatching {
             coreController.queryAllOutboundTrafficStats().split(';').forEach { entry ->
                 if (entry.isBlank()) return@forEach
@@ -297,7 +295,7 @@ object CoreServiceManager {
             }
         }
 
-        // 2) Fill any tags the bulk query did not cover, using the direct per-tag query.
+        // 2) Fill tags the bulk query missed, using the direct per-tag query.
         val coveredTags = result.mapTo(mutableSetOf()) { it.tag }
         for (tag in currentOutboundTags) {
             if (tag in coveredTags) continue

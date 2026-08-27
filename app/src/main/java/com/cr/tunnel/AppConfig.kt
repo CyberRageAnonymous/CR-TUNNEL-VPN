@@ -65,7 +65,6 @@ object AppConfig {
     const val PREF_STATS_MONTH_DATE = "pref_stats_month_date"
     const val PREF_STATS_MONTH_UP = "pref_stats_month_up"
     const val PREF_STATS_MONTH_DOWN = "pref_stats_month_down"
-    const val SPEED_TEST_DURATION_MS = 3000L
     const val PREF_LANGUAGE = "pref_language"
     const val PREF_APP_LOCALE_MIGRATED = "pref_app_locale_migrated"
     const val PREF_UI_MODE_NIGHT = "pref_ui_mode_night"
@@ -154,7 +153,6 @@ object AppConfig {
     const val TG_CHANNEL_URL = "https://t.me/R4G3_2024"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
-    const val SPEED_TEST_URL = "https://speed.cloudflare.com/__down?bytes=104857600"
     const val OBSERVATORY_LEAST_PING_INTERVAL = "3m"
     const val OBSERVATORY_LEAST_LOAD_INTERVAL = "5m"
     const val OBSERVATORY_LEAST_LOAD_METHOD = "HEAD"
@@ -239,24 +237,24 @@ object AppConfig {
     /** Root (system-wide) mode runtime constants. */
     const val ROOT_RUNTIME_DIR = "sys_cache"
     const val ROOT_IPTABLES_CHAIN = "CORE_FILTER"
-    const val ROOT_FWMARK = 255            // defensive RETURN tag; hev's only upstream socket is loopback (already bypassed)
-    const val ROOT_MARK_ROUTE = 1          // packets we want pushed into the tun device
+    const val ROOT_FWMARK = 255            // mark for RETURN (untouched) packets
+    const val ROOT_MARK_ROUTE = 1          // mark for packets routed into the tun
     const val ROOT_ROUTE_TABLE = 2024
     const val ROOT_RULE_PRIORITY = 1000
     const val ROOT_TUN_NAME = "utun7788"
     const val ROOT_TUN_ADDR_V4 = "198.18.0.1/15"
     const val ROOT_TUN_ADDR_V6 = "fdfe:dcba:9876::1/64"
 
-    // hev-socks5-tunnel run as a standalone root binary (reuses the same project already
-    // bundled for the VPN hev path; distinct filename from the JNI lib to avoid collision).
+    // Standalone root tun2socks binary (same project as the VPN hev path,
+    // distinct name to avoid a collision with the JNI library).
     const val ROOT_TUN2SOCKS_BIN = "libhevsockstun.so"
-    const val ROOT_FWD_CHAIN = "CORE_FWD"   // FORWARD chain for LAN/tethering sharing
-    const val ROOT_DNS_CHAIN = "CORE_DNS"   // nat chain for tethered-client DNS DNAT
-    const val ROOT_V6_CHAIN = "CORE6_FILTER"       // ip6tables filter/OUTPUT chain: blackhole native IPv6 when it isn't tunneled
-    const val ROOT_V6_FWD_CHAIN = "CORE6_FWD" // ip6tables FORWARD chain: route or reject tethered clients' native IPv6
-    const val ROOT_V6_PRE_CHAIN = "CORE6_PRE" // ip6tables mangle/PREROUTING chain: mark forwarded clients' IPv6 into the tun
-    const val ROOT_LAN_DNS = "1.1.1.1"          // fallback resolver for tethered clients when no plain-IPv4 DNS is configured
-    const val ROOT_OOM_SCORE = "-1000"          // oom_score_adj that makes the LMK never kill us
+    const val ROOT_FWD_CHAIN = "CORE_FWD"   // FORWARD chain for LAN sharing
+    const val ROOT_DNS_CHAIN = "CORE_DNS"   // nat chain for tethered-client DNS
+    const val ROOT_V6_CHAIN = "CORE6_FILTER"       // ip6tables OUTPUT chain for native IPv6
+    const val ROOT_V6_FWD_CHAIN = "CORE6_FWD" // ip6tables FORWARD chain for tethered clients
+    const val ROOT_V6_PRE_CHAIN = "CORE6_PRE" // ip6tables PREROUTING chain for tethered clients
+    const val ROOT_LAN_DNS = "1.1.1.1"          // fallback resolver for tethered clients
+    const val ROOT_OOM_SCORE = "-1000"          // oom_score_adj so the LMK never kills us
 
     /** hev-sock5-tunnel read-write-timeout value */
     const val HEVTUN_RW_TIMEOUT = "300,60"

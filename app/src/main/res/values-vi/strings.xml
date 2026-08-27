@@ -621,10 +621,6 @@
     <string name="stats_total">Tổng</string>
     <string name="stats_reset">Đặt lại số liệu</string>
     <string name="stats_reset_confirm">Xóa bộ đếm lưu lượng hôm nay và tháng này?</string>
-    <string name="speed_test_button">Kiểm tra tốc độ</string>
-    <string name="speed_test_title">Kiểm tra tốc độ</string>
-    <string name="speed_test_result">Tốc độ tải xuống: %1$s MB/s</string>
-    <string name="speed_test_failed">Kiểm tra tốc độ thất bại. Kiểm tra kết nối của bạn.</string>
     <string name="community_like">Thích</string>
     <string name="community_cannot_self_like">Bạn không thể thích cấu hình của chính mình</string>
     <string name="community_like_failed">Không cập nhật được lượt thích</string>

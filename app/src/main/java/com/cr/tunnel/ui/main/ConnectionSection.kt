@@ -22,10 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,9 +74,7 @@ fun ConnectionSection(
     onToggle: () -> Unit,
     onTest: () -> Unit,
     onAutoOptimize: () -> Unit,
-    onCancelAutoOptimize: () -> Unit,
-    speedTesting: Boolean,
-    onSpeedTest: () -> Unit
+    onCancelAutoOptimize: () -> Unit
 ) {
     var elapsedSeconds by remember { mutableStateOf(0L) }
 
@@ -143,22 +139,6 @@ fun ConnectionSection(
                 totalUplink = totalUplink,
                 totalDownlink = totalDownlink
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedButton(
-                onClick = onSpeedTest,
-                enabled = !speedTesting,
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (speedTesting) {
-                    CircularProgressIndicator(
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                Text(stringResource(R.string.speed_test_button))
-            }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

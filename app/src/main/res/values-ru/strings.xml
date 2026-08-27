@@ -621,10 +621,6 @@
     <string name="stats_total">Итого</string>
     <string name="stats_reset">Сбросить статистику</string>
     <string name="stats_reset_confirm">Стереть счётчики трафика за сегодня и за месяц?</string>
-    <string name="speed_test_button">Тест скорости</string>
-    <string name="speed_test_title">Тест скорости</string>
-    <string name="speed_test_result">Скорость загрузки: %1$s МБ/с</string>
-    <string name="speed_test_failed">Не удалось выполнить тест скорости. Проверьте подключение.</string>
     <string name="community_like">Нравится</string>
     <string name="community_cannot_self_like">Нельзя оценить собственный конфиг</string>
     <string name="community_like_failed">Не удалось обновить оценку</string>

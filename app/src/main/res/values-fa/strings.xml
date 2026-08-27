@@ -621,10 +621,6 @@
     <string name="stats_total">مجموع</string>
     <string name="stats_reset">بازنشانی آمار</string>
     <string name="stats_reset_confirm">شمارندههای ترافیک امروز و این ماه پاک شود؟</string>
-    <string name="speed_test_button">تست سرعت</string>
-    <string name="speed_test_title">تست سرعت</string>
-    <string name="speed_test_result">سرعت دانلود: %1$s مگابایت بر ثانیه</string>
-    <string name="speed_test_failed">تست سرعت ناموفق بود. اتصال خود را بررسی کنید.</string>
     <string name="community_like">پسندیدن</string>
     <string name="community_cannot_self_like">نمیتوانید کانفیگ خودتان را پسند کنید</string>
     <string name="community_like_failed">بروزرسانی پسندیدن ناموفق بود</string>

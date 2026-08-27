@@ -621,10 +621,6 @@
     <string name="stats_total">总计</string>
     <string name="stats_reset">重置统计</string>
     <string name="stats_reset_confirm">清除今天和本月的流量计数？</string>
-    <string name="speed_test_button">测速</string>
-    <string name="speed_test_title">测速</string>
-    <string name="speed_test_result">下载速度：%1$s MB/s</string>
-    <string name="speed_test_failed">测速失败，请检查网络连接。</string>
     <string name="community_like">点赞</string>
     <string name="community_cannot_self_like">不能给自己的配置点赞</string>
     <string name="community_like_failed">更新点赞失败</string>

@@ -621,10 +621,6 @@
     <string name="stats_total">মোট</string>
     <string name="stats_reset">পরিসংখ্যান রিসেট</string>
     <string name="stats_reset_confirm">আজ ও এই মাসের ট্রাফিক কাউন্টার মুছে ফেলবেন?</string>
-    <string name="speed_test_button">গতি পরীক্ষা</string>
-    <string name="speed_test_title">গতি পরীক্ষা</string>
-    <string name="speed_test_result">ডাউনলোড গতি: %1$s MB/s</string>
-    <string name="speed_test_failed">গতি পরীক্ষা ব্যর্থ। আপনার সংযোগ দেখুন।</string>
     <string name="community_like">পছন্দ</string>
     <string name="community_cannot_self_like">আপনি নিজের কনফিগ পছন্দ করতে পারবেন না</string>
     <string name="community_like_failed">পছন্দ আপডেট করা যায়নি</string>

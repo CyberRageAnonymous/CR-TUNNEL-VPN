@@ -597,10 +597,6 @@
     <string name="stats_total">Total</string>
     <string name="stats_reset">Reset statistics</string>
     <string name="stats_reset_confirm">Erase today\'s and this month\'s traffic counters?</string>
-    <string name="speed_test_button">Speed test</string>
-    <string name="speed_test_title">Speed test</string>
-    <string name="speed_test_result">Download speed: %1$s MB/s</string>
-    <string name="speed_test_failed">Speed test failed. Check your connection.</string>
     <string name="community_q_users">How many users is it for?</string>
     <string name="community_paste_link">Paste your config link</string>
     <string name="community_next">Next</string>

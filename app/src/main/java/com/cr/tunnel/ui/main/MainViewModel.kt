@@ -186,8 +186,7 @@ init {
                 val now = System.currentTimeMillis()
                 val elapsedSec = ((now - lastTrafficQueryTime).coerceAtLeast(1L)) / 1000.0
                 lastTrafficQueryTime = now
-                // The service sends absolute session totals; mirror them and derive
-                // speed from the difference between consecutive updates.
+                // Absolute session totals; speed is the delta between updates.
                 val upDelta = if (hasPrevTraffic) (event.uplink - prevTrafficUplink).takeIf { it > 0 } ?: 0L else 0L
                 val downDelta = if (hasPrevTraffic) (event.downlink - prevTrafficDownlink).takeIf { it > 0 } ?: 0L else 0L
                 prevTrafficUplink = event.uplink
@@ -237,10 +236,6 @@ init {
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
-            MainAction.RunSpeedTest -> runSpeedTest()
-            MainAction.DismissSpeedTestResult -> {
-                _uiState.update { it.copy(speedTestResult = null) }
-            }
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
@@ -263,30 +258,6 @@ init {
             is MainAction.ShareClipboard,
             is MainAction.ShareFullContent -> {
                 // Handled by Activity via its onAction lambda
-            }
-        }
-    }
-
-    // ---------- Speed test ----------
-    fun runSpeedTest() {
-        if (_uiState.value.speedTesting) return
-        if (_uiState.value.speedTestResult != null) {
-            _uiState.update { it.copy(speedTestResult = null) }
-        }
-        _uiState.update { it.copy(speedTesting = true) }
-        viewModelScope.launch {
-            try {
-                val (httpPort, socksUser, socksPass) = dataSource.getSpeedtestRuntime()
-                val result = withContext(ioDispatcher) {
-                    dataSource.measureDownloadSpeed(httpPort, socksUser, socksPass)
-                }
-                _uiState.update { it.copy(speedTesting = false, speedTestResult = result) }
-            } catch (cancelled: CancellationException) {
-                _uiState.update { it.copy(speedTesting = false) }
-                throw cancelled
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Speed test failed", e)
-                _uiState.update { it.copy(speedTesting = false, speedTestResult = -1.0) }
             }
         }
     }
