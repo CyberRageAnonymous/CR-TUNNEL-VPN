@@ -21,6 +21,7 @@
     <string name="toast_services_start">Đang khởi động CR TUNNEL…</string>
     <string name="toast_services_stop">Đã dừng CR TUNNEL!</string>
     <string name="toast_services_success">Đã khởi động CR TUNNEL!</string>
+    <string name="toast_vpn_setup_failure">Không thể thiết lập đường hầm VPN</string>
     <string name="toast_services_failure">Không thể khởi động CR TUNNEL, kiểm tra lại cấu hình!</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">Tự động kết nối</string>
     <string name="connection_quality_excellent">Kết nối tuyệt vời</string>
     <string name="connected_status">ĐÃ KẾT NỐI</string>
+    <string name="connection_timeout">Hết thời gian kết nối. Kiểm tra cấu hình và thử lại</string>
     <string name="connection_connecting">Đang kết nối…</string>
 
     <string name="community_title">Cấu hình cộng đồng</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">Chỉ cho phép liên kết cấu hình VPN thật (vless, vmess, trojan, ss, …)</string>
     <string name="community_duplicate_config">Cấu hình này đã có trong danh sách</string>
     <string name="community_limit_reached">Đã đạt giới hạn chia sẻ. Hãy xóa một cấu hình của bạn trước</string>
+    <string name="title_pref_kill_switch_enabled">Công tắc ngắt</string>
+    <string name="summary_pref_kill_switch_enabled">Chặn mọi lưu lượng khi đường hầm bị ngắt</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">Công tắc ngắt đang bật — lưu lượng internet bị chặn đến khi kết nối lại</string>
+    <string name="stats_today_title">Hôm nay</string>
+    <string name="stats_month_title">Tháng này</string>
+    <string name="stats_total">Tổng</string>
+    <string name="stats_reset">Đặt lại số liệu</string>
+    <string name="stats_reset_confirm">Xóa bộ đếm lưu lượng hôm nay và tháng này?</string>
+    <string name="speed_test_button">Kiểm tra tốc độ</string>
+    <string name="speed_test_title">Kiểm tra tốc độ</string>
+    <string name="speed_test_result">Tốc độ tải xuống: %1$s MB/s</string>
+    <string name="speed_test_failed">Kiểm tra tốc độ thất bại. Kiểm tra kết nối của bạn.</string>
+    <string name="community_like">Thích</string>
+    <string name="community_cannot_self_like">Bạn không thể thích cấu hình của chính mình</string>
+    <string name="community_like_failed">Không cập nhật được lượt thích</string>
 </resources>

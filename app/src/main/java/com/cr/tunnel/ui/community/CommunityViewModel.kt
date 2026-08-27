@@ -29,7 +29,8 @@ data class CommunityRow(
     val pingText: String = "",
     val isPinging: Boolean = false,
     val isInvalid: Boolean = false,
-    val isMine: Boolean = false
+    val isMine: Boolean = false,
+    val isLiked: Boolean = false
 )
 
 enum class ShareStep {
@@ -87,8 +88,13 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                     CommunityConfigManager.fetchConfigs()
                 }
                 val previous = _uiState.value.rows.associateBy { it.config.id }
+                val likedIds = likedSet()
                 val rows = configs.map { config ->
-                    previous[config.id] ?: CommunityRow(config, isMine = config.ownerId == deviceId)
+                    previous[config.id] ?: CommunityRow(
+                        config,
+                        isMine = config.ownerId == deviceId,
+                        isLiked = likedIds.contains(config.id)
+                    )
                 }
                 _uiState.update { it.copy(rows = rows) }
             } catch (e: Exception) {
@@ -187,6 +193,47 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
                 }
             } catch (e: Exception) {
                 toastError(e.message ?: getString(R.string.community_delete_failed))
+            }
+        }
+    }
+
+    private fun likedSet(): MutableSet<String> =
+        MmkvManager.decodeSettingsStringSet(AppConfig.PREF_COMMUNITY_LIKED)?.toMutableSet()
+            ?: mutableSetOf()
+
+    private fun updateLikedSet(configId: String, liked: Boolean) {
+        val set = likedSet()
+        if (liked) set.add(configId) else set.remove(configId)
+        MmkvManager.encodeSettings(AppConfig.PREF_COMMUNITY_LIKED, set)
+    }
+
+    fun likeRow(configId: String) {
+        val row = _uiState.value.rows.firstOrNull { it.config.id == configId } ?: return
+        if (row.isMine) {
+            toastError(R.string.community_cannot_self_like)
+            return
+        }
+        viewModelScope.launch {
+            try {
+                val liked = !likedSet().contains(configId)
+                withContext(Dispatchers.IO) {
+                    CommunityConfigManager.likeConfig(configId, liked, deviceId)
+                    updateLikedSet(configId, liked)
+                }
+                markRow(configId) { current ->
+                    val delta = if (liked) 1 else -1
+                    current.copy(
+                        isLiked = liked,
+                        config = current.config.copy(
+                            likes = (current.config.likes + delta).coerceAtLeast(0)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                toastError(when (e.message) {
+                    "Self like" -> getString(R.string.community_cannot_self_like)
+                    else -> getString(R.string.community_like_failed)
+                })
             }
         }
     }

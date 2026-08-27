@@ -14,6 +14,7 @@ import android.os.StrictMode
 import com.cr.tunnel.AppConfig
 import com.cr.tunnel.AppConfig.LOOPBACK
 import com.cr.tunnel.BuildConfig
+import com.cr.tunnel.R
 import com.cr.tunnel.contracts.ServiceControl
 import com.cr.tunnel.contracts.Tun2SocksControl
 import com.cr.tunnel.core.CoreServiceManager
@@ -21,6 +22,7 @@ import com.cr.tunnel.handler.AppLocaleManager
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.NotificationManager
 import com.cr.tunnel.handler.SettingsManager
+import com.cr.tunnel.helper.MessageHelper
 import com.cr.tunnel.root.RootLanSharing
 import com.cr.tunnel.util.LogUtil
 import com.cr.tunnel.util.Utils
@@ -89,6 +91,9 @@ class CoreVpnService : VpnService(), ServiceControl {
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
         if (!setupVpnService()) {
             unlockStart()
+            // Report the failure to the UI immediately; otherwise the app would stay
+            // in "connecting" forever while the service silently dies.
+            MessageHelper.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, getString(R.string.toast_vpn_setup_failure))
             // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
             stopSelf()
             return START_NOT_STICKY
@@ -104,6 +109,8 @@ class CoreVpnService : VpnService(), ServiceControl {
     override fun startService() {
         if (!::mInterface.isInitialized) {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
+            MessageHelper.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, getString(R.string.toast_vpn_setup_failure))
+            stopAllService()
             return
         }
         if (!CoreServiceManager.startCoreLoop(mInterface)) {
@@ -117,6 +124,24 @@ class CoreVpnService : VpnService(), ServiceControl {
     }
 
     override fun stopService() {
+        // Kill switch: keep the tunnel (interface + routing) up but idle so no
+        // traffic can leave the phone while the core is down. The VPN interface
+        // stays established with no tun2socks upstream, so every packet dies inside
+        // the tunnel. A later connect re-establishes and starts the core normally.
+        if (SettingsManager.isKillSwitchEnabled() && ::mInterface.isInitialized && isRunning) {
+            LogUtil.i(AppConfig.TAG, "StartCore-VPN: Kill switch engaged, keeping tunnel up")
+            unlockStart()
+            isRunning = false
+
+            tun2SocksService?.stopTun2Socks()
+            tun2SocksService = null
+
+            RootLanSharing.stopClientSharing(this)
+
+            CoreServiceManager.stopCoreLoop()
+            NotificationManager.showKillSwitchNotification()
+            return
+        }
         stopAllService(true)
     }
 

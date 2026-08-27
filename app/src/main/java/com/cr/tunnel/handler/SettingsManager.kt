@@ -441,10 +441,18 @@ object SettingsManager {
     }
 
     /**
-     * Check if a root (system-wide) run mode is selected.
+     * Check if root (system-wide) run mode is selected.
      */
     fun isRootMode(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
+    }
+
+    /**
+     * Check if the kill switch is enabled. When active, a disconnect leaves the
+     * VPN tunnel up with no working upstream so no traffic can leak outside it.
+     */
+    fun isKillSwitchEnabled(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_KILL_SWITCH, false)
     }
 
     /**

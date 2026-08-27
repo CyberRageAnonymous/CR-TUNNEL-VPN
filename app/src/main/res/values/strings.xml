@@ -22,6 +22,7 @@
     <string name="toast_services_stop">Stopping service</string>
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
+    <string name="toast_vpn_setup_failure">Failed to establish VPN tunnel</string>
 
     <!--ServerActivity-->
     <string name="title_server">Config</string>
@@ -393,6 +394,7 @@
     <string name="optimize_best_selected">Best config selected: %s</string>
     <string name="connection_connected">Connected. Tap to check connection.</string>
     <string name="connection_connecting">Connecting…</string>
+    <string name="connection_timeout">Connection timed out. Check your config and try again.</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
     <string name="protected_title">You are protected</string>
@@ -586,6 +588,19 @@
     <string name="community_share_config">Share a config</string>
     <string name="community_q_volume">What is the config volume?</string>
     <string name="community_q_duration">How long is the config valid?</string>
+    <string name="title_pref_kill_switch_enabled">Kill switch</string>
+    <string name="summary_pref_kill_switch_enabled">Block all traffic when the tunnel is disconnected</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">Kill switch active — internet traffic is blocked until you reconnect</string>
+    <string name="stats_today_title">Today</string>
+    <string name="stats_month_title">This month</string>
+    <string name="stats_total">Total</string>
+    <string name="stats_reset">Reset statistics</string>
+    <string name="stats_reset_confirm">Erase today\'s and this month\'s traffic counters?</string>
+    <string name="speed_test_button">Speed test</string>
+    <string name="speed_test_title">Speed test</string>
+    <string name="speed_test_result">Download speed: %1$s MB/s</string>
+    <string name="speed_test_failed">Speed test failed. Check your connection.</string>
     <string name="community_q_users">How many users is it for?</string>
     <string name="community_paste_link">Paste your config link</string>
     <string name="community_next">Next</string>
@@ -609,4 +624,7 @@
     <string name="community_link_not_supported">Only real VPN config links are allowed (vless, vmess, trojan, ss, …)</string>
     <string name="community_duplicate_config">This config is already in the list</string>
     <string name="community_limit_reached">Sharing limit reached. Delete one of your configs first</string>
+    <string name="community_like">Like</string>
+    <string name="community_cannot_self_like">You cannot like your own config</string>
+    <string name="community_like_failed">Failed to update like</string>
 </resources>

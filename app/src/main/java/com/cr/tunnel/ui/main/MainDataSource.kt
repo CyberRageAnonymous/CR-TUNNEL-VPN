@@ -63,4 +63,16 @@ interface MainDataSource : Closeable {
 
     fun syncSubscriptions()
     fun initAssets()
+
+    /**
+     * Local HTTP proxy credentials used to route an outbound speed-test
+     * request through the active tunnel.
+     */
+    fun getSpeedtestRuntime(): Triple<Int, String?, String?>
+
+    fun measureDownloadSpeed(
+        httpPort: Int,
+        proxyUsername: String?,
+        proxyPassword: String?
+    ): Double
 }

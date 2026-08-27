@@ -21,6 +21,7 @@
     <string name="toast_services_start">সার্ভিস শুরু করুন</string>
     <string name="toast_services_stop">সার্ভিস বন্ধ করুন</string>
     <string name="toast_services_success">সার্ভিস সফলভাবে শুরু হয়েছে</string>
+    <string name="toast_vpn_setup_failure">ভিপিএন টানেল তৈরি করা যায়নি</string>
     <string name="toast_services_failure">সার্ভিস শুরু হতে ব্যর্থ হয়েছে</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">অটো কানেক্ট</string>
     <string name="connection_quality_excellent">চমৎকার সংযোগ</string>
     <string name="connected_status">সংযুক্ত</string>
+    <string name="connection_timeout">সংযোগের সময়সীমা শেষ। আপনার কনফিগারেশন চেক করে আবার চেষ্টা করুন</string>
     <string name="connection_connecting">সংযোগ হচ্ছে…</string>
 
     <string name="community_title">কমিউনিটি কনফিগ</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">শুধুমাত্র সত্যিকারের VPN কনফিগ লিংক অনুমোদিত (vless, vmess, trojan, ss, …)</string>
     <string name="community_duplicate_config">এই কনফিগটি ইতিমধ্যে তালিকায় আছে</string>
     <string name="community_limit_reached">শেয়ারিং সীমা শেষ। প্রথমে আপনার একটি কনফিগ মুছুন</string>
+    <string name="title_pref_kill_switch_enabled">কিল সুইচ</string>
+    <string name="summary_pref_kill_switch_enabled">সংযোগ বিচ্ছিন্ন হলে সব ট্রাফিক ব্লক করুন</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">কিল সুইচ সক্রিয় — আবার সংযোগ না দেওয়া পর্যন্ত ইন্টারনেট ট্রাফিক ব্লক</string>
+    <string name="stats_today_title">আজ</string>
+    <string name="stats_month_title">এই মাসে</string>
+    <string name="stats_total">মোট</string>
+    <string name="stats_reset">পরিসংখ্যান রিসেট</string>
+    <string name="stats_reset_confirm">আজ ও এই মাসের ট্রাফিক কাউন্টার মুছে ফেলবেন?</string>
+    <string name="speed_test_button">গতি পরীক্ষা</string>
+    <string name="speed_test_title">গতি পরীক্ষা</string>
+    <string name="speed_test_result">ডাউনলোড গতি: %1$s MB/s</string>
+    <string name="speed_test_failed">গতি পরীক্ষা ব্যর্থ। আপনার সংযোগ দেখুন।</string>
+    <string name="community_like">পছন্দ</string>
+    <string name="community_cannot_self_like">আপনি নিজের কনফিগ পছন্দ করতে পারবেন না</string>
+    <string name="community_like_failed">পছন্দ আপডেট করা যায়নি</string>
 </resources>

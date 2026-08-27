@@ -112,6 +112,7 @@ object NotificationManager {
                 sessionDownlink += downDelta
                 MmkvManager.encodeSettings(AppConfig.PREF_SESSION_UPLINK, sessionUplink)
                 MmkvManager.encodeSettings(AppConfig.PREF_SESSION_DOWNLINK, sessionDownlink)
+                StatsManager.accumulate(upDelta, downDelta)
                 MessageHelper.sendMsg2UI(service, AppConfig.MSG_TRAFFIC_STATS, "$sessionUplink,$sessionDownlink")
 
                 if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED, true)) {
@@ -236,6 +237,40 @@ object NotificationManager {
 
         mBuilder = null
         mNotificationManager = null
+    }
+
+    /**
+     * Shows the kill switch standby notification. Kept as the foreground-service
+     * notification while the tunnel stays up without a running core, otherwise the
+     * process would be killed and traffic could escape.
+     */
+    fun showKillSwitchNotification() {
+        val service = getService() ?: return
+        val channelId =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel()
+            } else {
+                ""
+            }
+        val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val startMainIntent = Intent(service, MainActivity::class.java)
+        val contentPendingIntent = PendingIntent.getActivity(
+            service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, flags
+        )
+        service.startForeground(
+            NOTIFICATION_ID,
+            NotificationCompat.Builder(service, channelId)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle(service.getString(R.string.kill_switch_title))
+                .setContentText(service.getString(R.string.kill_switch_engaged))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true)
+                .setShowWhen(false)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(contentPendingIntent)
+                .build()
+        )
+        mBuilder = null
     }
 
     /**

@@ -144,6 +144,24 @@ object CommunityConfigManager {
         }
     }
 
+    fun likeConfig(id: String, liked: Boolean, viewerId: String) {
+        require(id.isNotBlank() && viewerId.isNotBlank()) { "Invalid like request" }
+        updateConfigs { current ->
+            val target = current.firstOrNull { it.id == id }
+                ?: throw RuntimeException("Entry not found")
+            if (target.ownerId == viewerId) {
+                throw RuntimeException("Self like")
+            }
+            current.map { item ->
+                if (item.id == id) {
+                    item.copy(likes = (item.likes + if (liked) 1 else -1).coerceAtLeast(0))
+                } else {
+                    item
+                }
+            }
+        }
+    }
+
     private fun updateConfigs(
         transform: (List<CommunityConfigItem>) -> List<CommunityConfigItem>
     ) {

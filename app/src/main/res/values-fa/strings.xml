@@ -21,6 +21,7 @@
     <string name="toast_services_start">شروع خدمات</string>
     <string name="toast_services_stop">توقف سرویس</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
+    <string name="toast_vpn_setup_failure">راه‌اندازی تونل VPN ناموفق بود</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">اتصال خودکار</string>
     <string name="connection_quality_excellent">اتصال عالی</string>
     <string name="connected_status">متصل</string>
+    <string name="connection_timeout">مهلت اتصال تمام شد. کانفیگ خود را بررسی و دوباره تلاش کنید</string>
     <string name="connection_connecting">در حال اتصال…</string>
 
     <string name="community_title">کانفیگهای اشتراکی</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">فقط لینک کانفیگ واقعی مجاز است (vless، vmess، trojan، ss و …)</string>
     <string name="community_duplicate_config">این کانفیگ قبلا در لیست موجود است</string>
     <string name="community_limit_reached">به سقف اشتراکگذاری رسیدید. اول یکی از کانفیگهای خودتان را حذف کنید</string>
+    <string name="title_pref_kill_switch_enabled">کشتن سوییچ</string>
+    <string name="summary_pref_kill_switch_enabled">وقتی تانل قطع میشود همه ترافیک مسدود شود</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">کشتن سوییچ فعال است — تا وقتی دوباره متصل نشوید ترافیک اینترنت مسدود است</string>
+    <string name="stats_today_title">امروز</string>
+    <string name="stats_month_title">این ماه</string>
+    <string name="stats_total">مجموع</string>
+    <string name="stats_reset">بازنشانی آمار</string>
+    <string name="stats_reset_confirm">شمارندههای ترافیک امروز و این ماه پاک شود؟</string>
+    <string name="speed_test_button">تست سرعت</string>
+    <string name="speed_test_title">تست سرعت</string>
+    <string name="speed_test_result">سرعت دانلود: %1$s مگابایت بر ثانیه</string>
+    <string name="speed_test_failed">تست سرعت ناموفق بود. اتصال خود را بررسی کنید.</string>
+    <string name="community_like">پسندیدن</string>
+    <string name="community_cannot_self_like">نمیتوانید کانفیگ خودتان را پسند کنید</string>
+    <string name="community_like_failed">بروزرسانی پسندیدن ناموفق بود</string>
 </resources>

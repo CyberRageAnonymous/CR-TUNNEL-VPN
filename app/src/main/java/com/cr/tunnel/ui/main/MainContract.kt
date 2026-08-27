@@ -23,7 +23,9 @@ data class MainUiState(
     val uplinkSpeed: String = "0 B/s",
     val downlinkSpeed: String = "0 B/s",
     val totalUplink: String = "0 B",
-    val totalDownlink: String = "0 B"
+    val totalDownlink: String = "0 B",
+    val speedTesting: Boolean = false,
+    val speedTestResult: Double? = null
 )
 
 /**
@@ -64,6 +66,9 @@ sealed interface MainAction {
     data object DismissQRCodeDialog : MainAction
 
     data class ImportBatchConfig(val configText: String) : MainAction
+
+    data object RunSpeedTest : MainAction
+    data object DismissSpeedTestResult : MainAction
 
     data class LocateHandled(val target: LocateTarget) : MainAction
 }

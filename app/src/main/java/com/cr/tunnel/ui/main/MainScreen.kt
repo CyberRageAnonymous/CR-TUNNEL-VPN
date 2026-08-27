@@ -224,6 +224,29 @@ fun MainScreen(
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
 
+    val speedResult = uiState.speedTestResult
+    if (speedResult != null) {
+        AlertDialog(
+            onDismissRequest = { onAction(MainAction.DismissSpeedTestResult) },
+            title = { Text(stringResource(R.string.speed_test_title)) },
+            text = {
+                Text(
+                    if (speedResult > 0.0) {
+                        stringResource(R.string.speed_test_result, String.format("%.2f", speedResult))
+                    } else {
+                        stringResource(R.string.speed_test_failed)
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onAction(MainAction.DismissSpeedTestResult) }) {
+                    Text(stringResource(R.string.action_ok))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    }
+
     updatePrompt?.let { result ->
         val context = LocalContext.current
         AlertDialog(
@@ -402,7 +425,9 @@ private fun HomeTab(
             onToggle = { onAction(MainAction.ToggleService) },
             onTest = { onAction(MainAction.TestCurrentServer) },
             onAutoOptimize = { onAction(MainAction.AutoOptimize) },
-            onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) }
+            onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) },
+            speedTesting = uiState.speedTesting,
+            onSpeedTest = { onAction(MainAction.RunSpeedTest) }
         )
         }
     }

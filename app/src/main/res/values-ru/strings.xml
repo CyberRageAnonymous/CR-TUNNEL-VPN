@@ -21,6 +21,7 @@
     <string name="toast_services_start">Запуск служб</string>
     <string name="toast_services_stop">Остановка служб</string>
     <string name="toast_services_success">Службы успешно запущены</string>
+    <string name="toast_vpn_setup_failure">Не удалось создать VPN-туннель</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">Автоподключение</string>
     <string name="connection_quality_excellent">Отличное соединение</string>
     <string name="connected_status">ПОДКЛЮЧЕНО</string>
+    <string name="connection_timeout">Время подключения истекло. Проверьте конфигурацию и попробуйте снова</string>
     <string name="connection_connecting">Подключение…</string>
 
     <string name="community_title">Конфиги сообщества</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">Разрешены только реальные ссылки конфигураций VPN (vless, vmess, trojan, ss, …)</string>
     <string name="community_duplicate_config">Этот конфиг уже есть в списке</string>
     <string name="community_limit_reached">Достигнут лимит публикаций. Сначала удалите один из своих конфигов</string>
+    <string name="title_pref_kill_switch_enabled">Аварийный выключатель</string>
+    <string name="summary_pref_kill_switch_enabled">Блокировать весь трафик при разрыве туннеля</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">Аварийный выключатель активен — интернет-трафик заблокирован до переподключения</string>
+    <string name="stats_today_title">Сегодня</string>
+    <string name="stats_month_title">За месяц</string>
+    <string name="stats_total">Итого</string>
+    <string name="stats_reset">Сбросить статистику</string>
+    <string name="stats_reset_confirm">Стереть счётчики трафика за сегодня и за месяц?</string>
+    <string name="speed_test_button">Тест скорости</string>
+    <string name="speed_test_title">Тест скорости</string>
+    <string name="speed_test_result">Скорость загрузки: %1$s МБ/с</string>
+    <string name="speed_test_failed">Не удалось выполнить тест скорости. Проверьте подключение.</string>
+    <string name="community_like">Нравится</string>
+    <string name="community_cannot_self_like">Нельзя оценить собственный конфиг</string>
+    <string name="community_like_failed">Не удалось обновить оценку</string>
 </resources>

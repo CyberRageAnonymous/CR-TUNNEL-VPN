@@ -51,6 +51,9 @@ class MainViewModel(
     private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
     private val connectedText: String = dataSource.getString(R.string.connection_connected)
 
+    private val CONNECT_WATCHDOG_MS = 10_000L
+    private var connectWatchdogJob: Job? = null
+
     private var trafficPollJob: Job? = null
     private var lastTrafficQueryTime = 0L
     private var prevTrafficUplink = 0L
@@ -234,6 +237,10 @@ init {
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
+            MainAction.RunSpeedTest -> runSpeedTest()
+            MainAction.DismissSpeedTestResult -> {
+                _uiState.update { it.copy(speedTestResult = null) }
+            }
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
@@ -256,6 +263,30 @@ init {
             is MainAction.ShareClipboard,
             is MainAction.ShareFullContent -> {
                 // Handled by Activity via its onAction lambda
+            }
+        }
+    }
+
+    // ---------- Speed test ----------
+    fun runSpeedTest() {
+        if (_uiState.value.speedTesting) return
+        if (_uiState.value.speedTestResult != null) {
+            _uiState.update { it.copy(speedTestResult = null) }
+        }
+        _uiState.update { it.copy(speedTesting = true) }
+        viewModelScope.launch {
+            try {
+                val (httpPort, socksUser, socksPass) = dataSource.getSpeedtestRuntime()
+                val result = withContext(ioDispatcher) {
+                    dataSource.measureDownloadSpeed(httpPort, socksUser, socksPass)
+                }
+                _uiState.update { it.copy(speedTesting = false, speedTestResult = result) }
+            } catch (cancelled: CancellationException) {
+                _uiState.update { it.copy(speedTesting = false) }
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Speed test failed", e)
+                _uiState.update { it.copy(speedTesting = false, speedTestResult = -1.0) }
             }
         }
     }
@@ -867,9 +898,29 @@ init {
                 statusText = dataSource.getString(R.string.connection_connecting)
             )
         }
+        startConnectWatchdog()
+    }
+
+    private fun startConnectWatchdog() {
+        connectWatchdogJob?.cancel()
+        connectWatchdogJob = viewModelScope.launch(defaultDispatcher) {
+            delay(CONNECT_WATCHDOG_MS)
+            val snapshot = _uiState.value
+            if (snapshot.isConnecting && !snapshot.isRunning) {
+                _uiState.update {
+                    it.copy(
+                        isConnecting = false,
+                        statusText = disconnectedText
+                    )
+                }
+                toastError(dataSource.getString(R.string.connection_timeout))
+            }
+        }
     }
 
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
+        connectWatchdogJob?.cancel()
+        connectWatchdogJob = null
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
@@ -910,6 +961,7 @@ init {
     }
 
     override fun onCleared() {
+        connectWatchdogJob?.cancel()
         setupGroupJob?.cancel()
         preloadJob?.cancel()
         selectedGroupLoadJob?.cancel()

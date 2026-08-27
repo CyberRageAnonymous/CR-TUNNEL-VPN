@@ -21,6 +21,7 @@
     <string name="toast_services_start">بدء الخدمات</string>
     <string name="toast_services_stop">إيقاف الخدمات</string>
     <string name="toast_services_success">نجاح بدء الخدمات</string>
+    <string name="toast_vpn_setup_failure">فشل إنشاء نفق VPN</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">اتصال تلقائي</string>
     <string name="connection_quality_excellent">اتصال ممتاز</string>
     <string name="connected_status">متصل</string>
+    <string name="connection_timeout">انتهت مهلة الاتصال. تحقق من إعداداتك وحاول مرة أخرى</string>
     <string name="connection_connecting">جارٍ الاتصال…</string>
 
     <string name="community_title">إعدادات المجتمع</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">فقط روابط إعدادات VPN الحقيقية مسموح بها (vless، vmess، trojan، ss، …)</string>
     <string name="community_duplicate_config">هذا الإعداد موجود بالفعل في القائمة</string>
     <string name="community_limit_reached">تم الوصول إلى حد المشاركة. احذف أحد إعداداتك أولاً</string>
+    <string name="title_pref_kill_switch_enabled">قاطع الفصل</string>
+    <string name="summary_pref_kill_switch_enabled">احظر كل حركة المرور عند انقطاع الاتصال</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">قاطع الفصل مفعّل — حركة الإنترنت محظورة حتى تعيد الاتصال</string>
+    <string name="stats_today_title">اليوم</string>
+    <string name="stats_month_title">هذا الشهر</string>
+    <string name="stats_total">الإجمالي</string>
+    <string name="stats_reset">إعادة ضبط الإحصائيات</string>
+    <string name="stats_reset_confirm">مسح عدّادات حركة المرور لليوم وهذا الشهر؟</string>
+    <string name="speed_test_button">اختبار السرعة</string>
+    <string name="speed_test_title">اختبار السرعة</string>
+    <string name="speed_test_result">سرعة التنزيل: %1$s ميجابايت/ثانية</string>
+    <string name="speed_test_failed">فشل اختبار السرعة. تحقق من اتصالك.</string>
+    <string name="community_like">إعجاب</string>
+    <string name="community_cannot_self_like">لا يمكنك الإعجاب بكونفيغك الخاص</string>
+    <string name="community_like_failed">فشل تحديث الإعجاب</string>
 </resources>

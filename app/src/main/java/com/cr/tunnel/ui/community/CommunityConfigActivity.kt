@@ -140,7 +140,8 @@ fun CommunityScreen(
                                 context.toastSuccess(R.string.community_copied)
                             },
                             onPing = { viewModel.pingRow(row.config.id) },
-                            onDelete = { viewModel.deleteRow(row.config.id) }
+                            onDelete = { viewModel.deleteRow(row.config.id) },
+                            onLike = { viewModel.likeRow(row.config.id) }
                         )
                     }
                 }
@@ -180,7 +181,8 @@ private fun CommunityCard(
     row: CommunityRow,
     onCopy: () -> Unit,
     onPing: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onLike: () -> Unit
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val config = row.config
@@ -203,6 +205,32 @@ private fun CommunityCard(
                 modifier = Modifier.weight(1f)
             )
             PingText(row = row)
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(enabled = !row.isMine, onClick = onLike)
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(
+                        if (row.isLiked) R.drawable.ic_heart_filled_24dp
+                        else R.drawable.ic_heart_24dp
+                    ),
+                    contentDescription = stringResource(R.string.community_like),
+                    tint = if (row.isLiked) Color(0xFFFF2D78)
+                    else if (row.isMine) Color(0x44FFFFFF)
+                    else Color(0xFF00B8D4),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = row.config.likes.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (row.isLiked) Color(0xFFFF2D78)
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             if (row.isMine) {
                 IconButton(onClick = { showDeleteConfirm = true }) {
                     Icon(

@@ -21,6 +21,7 @@
     <string name="toast_services_start">啟動服務</string>
     <string name="toast_services_stop">停止服務</string>
     <string name="toast_services_success">啟動服務成功</string>
+    <string name="toast_vpn_setup_failure">無法建立 VPN 隧道</string>
     <string name="toast_services_failure">啟動服務失敗</string>
 
     <!--ServerActivity-->
@@ -580,6 +581,7 @@
     <string name="auto_connect_label">自動連線</string>
     <string name="connection_quality_excellent">極佳連線</string>
     <string name="connected_status">已連線</string>
+    <string name="connection_timeout">連線逾時。請檢查設定後重試</string>
     <string name="connection_connecting">連線中…</string>
 
     <string name="community_title">社群設定檔</string>
@@ -610,4 +612,20 @@
     <string name="community_link_not_supported">僅允許真實的VPN設定檔連結（vless、vmess、trojan、ss等）</string>
     <string name="community_duplicate_config">此設定檔已在清單中</string>
     <string name="community_limit_reached">已達分享上限，請先刪除您的一個設定檔</string>
+    <string name="title_pref_kill_switch_enabled">緊急停止開關</string>
+    <string name="summary_pref_kill_switch_enabled">隧道斷線時封鎖所有流量</string>
+    <string name="kill_switch_title">CR TUNNEL</string>
+    <string name="kill_switch_engaged">緊急停止開關已啟用 — 重新連線前網際網路流量被封鎖</string>
+    <string name="stats_today_title">今天</string>
+    <string name="stats_month_title">本月</string>
+    <string name="stats_total">總計</string>
+    <string name="stats_reset">重設統計</string>
+    <string name="stats_reset_confirm">清除今天與本月的流量計數？</string>
+    <string name="speed_test_button">測速</string>
+    <string name="speed_test_title">測速</string>
+    <string name="speed_test_result">下載速度：%1$s MB/s</string>
+    <string name="speed_test_failed">測速失敗，請檢查網路連線。</string>
+    <string name="community_like">讚</string>
+    <string name="community_cannot_self_like">不能對自己的設定按讚</string>
+    <string name="community_like_failed">更新按讚失敗</string>
 </resources>

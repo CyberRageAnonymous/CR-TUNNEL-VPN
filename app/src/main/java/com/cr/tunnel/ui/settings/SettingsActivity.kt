@@ -82,6 +82,7 @@ fun SettingsScreen(
     var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
     var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
     var appendHttpProxy by rememberMmkvBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
+    var killSwitch by rememberMmkvBool(AppConfig.PREF_KILL_SWITCH, false)
     var vpnDns by rememberMmkvString(AppConfig.PREF_VPN_DNS, "")
     var vpnBypassLan by rememberMmkvString(AppConfig.PREF_VPN_BYPASS_LAN, "0")
     var vpnInterfaceAddress by rememberMmkvString(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX, "0")
@@ -293,6 +294,13 @@ fun SettingsScreen(
                     checked = appendHttpProxy,
                     enabled = effectiveLocalProxy,
                     onCheckedChange = { appendHttpProxy = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_pref_kill_switch_enabled),
+                    summary = stringResource(R.string.summary_pref_kill_switch_enabled),
+                    checked = killSwitch,
+                    enabled = isVpn,
+                    onCheckedChange = { killSwitch = it }
                 )
                 SettingsListItem(
                     title = stringResource(R.string.title_pref_vpn_bypass_lan),

@@ -14,12 +14,14 @@ import com.cr.tunnel.dto.entities.ProfileItem
 import com.cr.tunnel.dto.entities.ServerAffiliationInfo
 import com.cr.tunnel.dto.entities.SubscriptionCache
 import com.cr.tunnel.dto.entities.SubscriptionItem
+import com.cr.tunnel.dto.UrlContentRequest
 import com.cr.tunnel.handler.AngConfigManager
 import com.cr.tunnel.handler.AppLocaleManager
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.SettingsManager
 import com.cr.tunnel.handler.SubscriptionUpdater
 import com.cr.tunnel.helper.MessageHelper
+import com.cr.tunnel.util.HttpUtil
 import com.cr.tunnel.util.LogUtil
 import com.cr.tunnel.util.Utils
 import kotlinx.coroutines.channels.BufferOverflow
@@ -240,5 +242,33 @@ class MainRepository(
 
     override fun initAssets() {
         SettingsManager.initAssets(app, app.assets)
+    }
+
+    override fun getSpeedtestRuntime(): Triple<Int, String?, String?> {
+        val httpPort = SettingsManager.getHttpPort()
+        val socksUser = SettingsManager.getSocksUsername()
+        val socksPass = SettingsManager.getSocksPassword()
+        return Triple(httpPort, socksUser, socksPass)
+    }
+
+    override fun measureDownloadSpeed(
+        httpPort: Int,
+        proxyUsername: String?,
+        proxyPassword: String?
+    ): Double {
+        val url = AppConfig.SPEED_TEST_URL
+        if (url.isBlank()) return -1.0
+        val bytesPerSec = HttpUtil.measureDownloadSpeed(
+            UrlContentRequest(
+                url = url,
+                timeout = (AppConfig.SPEED_TEST_DURATION_MS + 5000).toInt(),
+                httpPort = httpPort,
+                proxyUsername = proxyUsername,
+                proxyPassword = proxyPassword
+            ),
+            AppConfig.SPEED_TEST_DURATION_MS,
+            maxBytes = 100L * 1024 * 1024
+        )
+        return if (bytesPerSec <= 0L) -1.0 else bytesPerSec / 1024.0 / 1024.0
     }
 }

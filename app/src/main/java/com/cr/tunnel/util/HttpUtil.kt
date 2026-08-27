@@ -18,6 +18,7 @@ import java.net.Proxy
 import java.net.URI
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlin.io.DEFAULT_BUFFER_SIZE
 
 object HttpUtil {
 
@@ -203,6 +204,54 @@ object HttpUtil {
             }
         }
         throw IOException("Too many redirects")
+    }
+
+    fun measureDownloadSpeed(
+        request: UrlContentRequest,
+        durationMs: Long,
+        maxBytes: Long
+    ): Long {
+        val url = request.url ?: return -1L
+        val client = buildOkHttpClient(
+            request.timeout,
+            request.httpPort,
+            request.proxyUsername,
+            request.proxyPassword,
+            followRedirects = false
+        )
+        val requestBuilder = Request.Builder()
+            .url(url)
+            .get()
+            .header("Connection", "close")
+            .header("Accept", "application/octet-stream")
+        if (request.httpPort != 0 && !request.proxyUsername.isNullOrBlank() && !request.proxyPassword.isNullOrBlank()) {
+            requestBuilder.header("Proxy-Authorization", Credentials.basic(request.proxyUsername, request.proxyPassword))
+        }
+
+        return try {
+            client.newCall(requestBuilder.build()).execute().use { response ->
+                if (!response.isSuccessful) {
+                    LogUtil.w(AppConfig.TAG, "Speed test failed, code=${response.code}")
+                    return -1L
+                }
+                val body = response.body ?: return -1L
+                val deadline = System.currentTimeMillis() + durationMs
+                var received = 0L
+                body.byteStream().use { input ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    while (received < maxBytes) {
+                        if (System.currentTimeMillis() >= deadline) break
+                        val read = input.read(buffer)
+                        if (read < 0) break
+                        received += read
+                    }
+                }
+                if (received <= 0L) -1L else received * 1000L / durationMs
+            }
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Speed test failed", e)
+            -1L
+        }
     }
 
     private fun applyEmbeddedBasicAuthHeader(rawUrl: String, requestBuilder: Request.Builder) {

@@ -16,12 +16,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cr.tunnel.R
+import com.cr.tunnel.handler.StatsManager
 import com.cr.tunnel.ui.compose.LocalDarkTheme
 
 enum class MainTab(@androidx.annotation.DrawableRes val iconRes: Int, @androidx.annotation.StringRes val labelRes: Int) {
@@ -185,6 +189,58 @@ fun StatsPage(
             ),
             isDarkTheme = isDarkTheme
         )
+
+        val snapshot = StatsManager.snapshot()
+        StatCard(
+            title = stringResource(R.string.stats_today_title),
+            items = listOf(
+                stringResource(R.string.stats_downlink) to StatsManager.formatBytes(snapshot.todayDown),
+                stringResource(R.string.stats_uplink) to StatsManager.formatBytes(snapshot.todayUp),
+                stringResource(R.string.stats_total) to StatsManager.formatBytes(snapshot.todayDown + snapshot.todayUp)
+            ),
+            isDarkTheme = isDarkTheme
+        )
+
+        StatCard(
+            title = stringResource(R.string.stats_month_title),
+            items = listOf(
+                stringResource(R.string.stats_downlink) to StatsManager.formatBytes(snapshot.monthDown),
+                stringResource(R.string.stats_uplink) to StatsManager.formatBytes(snapshot.monthUp),
+                stringResource(R.string.stats_total) to StatsManager.formatBytes(snapshot.monthDown + snapshot.monthUp)
+            ),
+            isDarkTheme = isDarkTheme
+        )
+
+        var showResetConfirm by androidx.compose.runtime.remember {
+            androidx.compose.runtime.mutableStateOf(false)
+        }
+        Button(
+            onClick = { showResetConfirm = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.stats_reset))
+        }
+
+        if (showResetConfirm) {
+            AlertDialog(
+                onDismissRequest = { showResetConfirm = false },
+                title = { Text(stringResource(R.string.stats_reset)) },
+                text = { Text(stringResource(R.string.stats_reset_confirm)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        StatsManager.reset()
+                        showResetConfirm = false
+                    }) {
+                        Text(stringResource(R.string.action_ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showResetConfirm = false }) {
+                        Text(stringResource(R.string.action_cancel))
+                    }
+                }
+            )
+        }
     }
 }
 
