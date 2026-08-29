@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">憑證指紋 (SHA-256)</string>
     <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">僅支援 xhttp (packet-up) 和 ws 出站；與 TLS 相關的設定可能會被忽略或發生衝突</string>
-    <string name="toast_allow_insecure_deprecated">目前節點使用未加密連線，您的通訊可能會被威權政府掌控的網路中間設施直接查看\n為了安全，此類節點無法使用 26.2.6+ 版本的 Xray 核心連線\n如果是自建節點，請啟用 TLS 等安全加密，或固定憑證 pinnedCA256\n如果是服務供應商的節點，請聯絡供應商完成技術升級。若供應商拒絕配合，建議改用更重視使用者安全的供應商\n如需更多資訊，請造訪 https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">目前節點使用未加密連線，您的通訊可能會被威權政府掌控的網路中間設施直接查看\n為了安全，此類節點無法使用 26.2.6+ 版本的 Xray 核心連線\n如果是自建節點，請啟用 TLS 等安全加密，或固定憑證 pinnedCA256\n如果是服務供應商的節點，請聯絡供應商完成技術升級。若供應商拒絕配合，建議改用更重視使用者安全的供應商\n如需更多資訊，請造訪 https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">取得憑證指紋</string>
     <string name="toast_fetch_cert_sha256_success">已成功取得憑證指紋</string>
     <string name="toast_fetch_cert_sha256_failed">無法取得憑證指紋</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
     <string name="per_app_proxy_settings">個別應用程式設定</string>
     <string name="per_app_proxy_settings_enable">啟用個別應用程式代理</string>
+    <string name="per_app_focus_all">全部</string>
+    <string name="per_app_focus_favorites">收藏</string>
+    <string name="per_app_mode_proxy">代理</string>
+    <string name="per_app_mode_direct">直連</string>
+    <string name="per_app_mode_default">預設</string>
+    <string name="per_app_mode_info">依應用程式：預設遵循一般設定，代理經由 VPN，直連保留原始連線</string>
+    <string name="acc_per_app_favorite">切換收藏</string>
     <string name="app_picker_unknown_app">未知應用程式（無法識別 UID）</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS 主機對應（格式：domain:address,…）</string>
+
+    <string name="title_pref_dns_custom">自訂 DNS</string>
+    <string name="title_settings_dns_custom">自訂 DNS</string>
+    <string name="dns_editor_remote_servers">遠端 DNS 伺服器</string>
+    <string name="dns_editor_domestic_servers">直連 DNS 伺服器</string>
+    <string name="dns_editor_dns_hosts">DNS 主機對應</string>
+    <string name="dns_editor_placeholder_server">伺服器位址</string>
+    <string name="dns_editor_add_server">伺服器位址</string>
+    <string name="dns_editor_add">新增</string>
+    <string name="dns_editor_domain">網域</string>
+    <string name="dns_editor_address">位址</string>
+    <string name="dns_editor_add_host">新增</string>
+    <string name="dns_editor_invalid_dns">DNS 伺服器位址無效</string>
+    <string name="dns_editor_invalid_host">網域或位址無效</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">真實延遲測試 URL</string>

@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">Dấu vân tay chứng chỉ (SHA-256)</string>
     <string name="server_lab_browser_dialer">Bật Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Chỉ hỗ trợ đầu ra xhttp (packet-up) và ws; các cài đặt liên quan đến TLS có thể bị bỏ qua hoặc xung đột</string>
-    <string name="toast_allow_insecure_deprecated">Nút hiện tại sử dụng kết nối không mã hóa. Hạ tầng trung gian mạng do các chính phủ độc tài kiểm soát có thể xem trực tiếp nội dung liên lạc của bạn.\nVì lý do bảo mật, không thể kết nối đến các nút như vậy bằng Xray core phiên bản 26.2.6 trở lên.\nNếu đây là nút do bạn tự dựng, hãy bật mã hóa an toàn như TLS hoặc ghim dấu vân tay chứng chỉ pinnedCA256.\nNếu đây là nút của nhà cung cấp dịch vụ, hãy liên hệ với họ để hoàn tất nâng cấp kỹ thuật. Nếu nhà cung cấp từ chối hợp tác, bạn nên chuyển sang nhà cung cấp coi trọng bảo mật người dùng hơn.\nĐể biết thêm thông tin, hãy truy cập https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">Nút hiện tại sử dụng kết nối không mã hóa. Hạ tầng trung gian mạng do các chính phủ độc tài kiểm soát có thể xem trực tiếp nội dung liên lạc của bạn.\nVì lý do bảo mật, không thể kết nối đến các nút như vậy bằng Xray core phiên bản 26.2.6 trở lên.\nNếu đây là nút do bạn tự dựng, hãy bật mã hóa an toàn như TLS hoặc ghim dấu vân tay chứng chỉ pinnedCA256.\nNếu đây là nút của nhà cung cấp dịch vụ, hãy liên hệ với họ để hoàn tất nâng cấp kỹ thuật. Nếu nhà cung cấp từ chối hợp tác, bạn nên chuyển sang nhà cung cấp coi trọng bảo mật người dùng hơn.\nĐể biết thêm thông tin, hãy truy cập https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">Lấy dấu vân tay chứng chỉ</string>
     <string name="toast_fetch_cert_sha256_success">Đã lấy dấu vân tay chứng chỉ thành công</string>
     <string name="toast_fetch_cert_sha256_failed">Không thể lấy dấu vân tay chứng chỉ</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">Nhập từ bảng tạm</string>
     <string name="per_app_proxy_settings">Cài đặt theo ứng dụng</string>
     <string name="per_app_proxy_settings_enable">Bật cài đặt theo ứng dụng</string>
+    <string name="per_app_focus_all">Tất cả</string>
+    <string name="per_app_focus_favorites">Yêu thích</string>
+    <string name="per_app_mode_proxy">Proxy</string>
+    <string name="per_app_mode_direct">Trực tiếp</string>
+    <string name="per_app_mode_default">Mặc định</string>
+    <string name="per_app_mode_info">Theo ứng dụng: Mặc định tuân theo cài đặt chung, Proxy đi qua VPN, Trực tiếp giữ kết nối gốc</string>
+    <string name="acc_per_app_favorite">Bật/tắt yêu thích</string>
     <string name="app_picker_unknown_app">Ứng dụng không xác định (không nhận dạng được UID)</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">Ánh xạ máy chủ DNS (định dạng: domain:address,…)</string>
+
+    <string name="title_pref_dns_custom">DNS tùy chỉnh</string>
+    <string name="title_settings_dns_custom">DNS tùy chỉnh</string>
+    <string name="dns_editor_remote_servers">Máy chủ DNS từ xa</string>
+    <string name="dns_editor_domestic_servers">Máy chủ DNS trực tiếp</string>
+    <string name="dns_editor_dns_hosts">Ánh xạ máy chủ DNS</string>
+    <string name="dns_editor_placeholder_server">Địa chỉ máy chủ</string>
+    <string name="dns_editor_add_server">Địa chỉ máy chủ</string>
+    <string name="dns_editor_add">Thêm</string>
+    <string name="dns_editor_domain">Tên miền</string>
+    <string name="dns_editor_address">Địa chỉ</string>
+    <string name="dns_editor_add_host">Thêm</string>
+    <string name="dns_editor_invalid_dns">Địa chỉ máy chủ DNS không hợp lệ</string>
+    <string name="dns_editor_invalid_host">Tên miền hoặc địa chỉ không hợp lệ</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực</string>

@@ -1,5 +1,6 @@
 package com.cr.tunnel.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ import com.cr.tunnel.ui.compose.SettingsMenuItem
 import com.cr.tunnel.ui.compose.SettingsSwitchItem
 import com.cr.tunnel.ui.compose.ThemeManager
 import com.cr.tunnel.ui.compose.verticalScrollbar
+import com.cr.tunnel.ui.dnssettings.DnsCustomActivity
 import com.cr.tunnel.util.Utils
 
 class SettingsActivity : BaseComponentActivity() {
@@ -69,6 +72,7 @@ fun SettingsScreen(
     onModeHelpClicked: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -135,9 +139,6 @@ fun SettingsScreen(
     var preferIpv6 by rememberMmkvBool(AppConfig.PREF_PREFER_IPV6, false)
     var sniffingEnabled by rememberMmkvBool(AppConfig.PREF_SNIFFING_ENABLED, true)
     var routeOnlyEnabled by rememberMmkvBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
-    var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
-    var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
-    var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
     var coreLogLevel by rememberMmkvString(AppConfig.PREF_LOGLEVEL, "warning")
     var outboundResolveMethod by rememberMmkvString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "0")
 
@@ -427,20 +428,11 @@ fun SettingsScreen(
                     enabled = effectiveLocalProxy,
                     onCheckedChange = { socksEnableUdp = it }
                 )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_remote_dns),
-                    value = remoteDns,
-                    onValueChanged = { remoteDns = it }
-                )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_domestic_dns),
-                    value = domesticDns,
-                    onValueChanged = { domesticDns = it }
-                )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_dns_hosts),
-                    value = dnsHosts,
-                    onValueChanged = { dnsHosts = it }
+                SettingsMenuItem(
+                    title = stringResource(R.string.title_pref_dns_custom),
+                    onClick = {
+                        context.startActivity(Intent(context, DnsCustomActivity::class.java))
+                    }
                 )
                 SettingsListItem(
                     title = stringResource(R.string.title_core_loglevel),

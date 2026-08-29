@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">اثر انگشت گواهی (SHA-256)</string>
     <string name="server_lab_browser_dialer">فعال‌سازی Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">فقط خروجی‌های xhttp (packet-up) و ws پشتیبانی می‌شوند؛ تنظیمات مرتبط با TLS ممکن است نادیده گرفته شوند یا تداخل داشته باشند</string>
-    <string name="toast_allow_insecure_deprecated">گره فعلی از اتصال رمزنگاری‌نشده استفاده می‌کند. زیرساخت‌های واسط شبکه که در کنترل حکومت‌های اقتدارگرا هستند ممکن است ارتباطات شما را مستقیماً مشاهده کنند.\nبه‌دلایل امنیتی، اتصال به چنین گره‌هایی با هسته Xray نسخه 26.2.6 و بالاتر امکان‌پذیر نیست.\nاگر گره را خودتان راه‌اندازی کرده‌اید، رمزنگاری امنی مانند TLS را فعال کنید یا اثر انگشت گواهی pinnedCA256 را پین کنید.\nاگر گره متعلق به ارائه‌دهنده خدمات است، برای ارتقای فنی با آن‌ها تماس بگیرید. اگر ارائه‌دهنده همکاری نمی‌کند، توصیه می‌شود به ارائه‌دهنده‌ای بروید که برای امنیت کاربران اهمیت بیشتری قائل است.\nبرای اطلاعات بیشتر به https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues مراجعه کنید</string>
+    <string name="toast_allow_insecure_deprecated">گره فعلی از اتصال رمزنگاری‌نشده استفاده می‌کند. زیرساخت‌های واسط شبکه که در کنترل حکومت‌های اقتدارگرا هستند ممکن است ارتباطات شما را مستقیماً مشاهده کنند.\nبه‌دلایل امنیتی، اتصال به چنین گره‌هایی با هسته Xray نسخه 26.2.6 و بالاتر امکان‌پذیر نیست.\nاگر گره را خودتان راه‌اندازی کرده‌اید، رمزنگاری امنی مانند TLS را فعال کنید یا اثر انگشت گواهی pinnedCA256 را پین کنید.\nاگر گره متعلق به ارائه‌دهنده خدمات است، برای ارتقای فنی با آن‌ها تماس بگیرید. اگر ارائه‌دهنده همکاری نمی‌کند، توصیه می‌شود به ارائه‌دهنده‌ای بروید که برای امنیت کاربران اهمیت بیشتری قائل است.\nبرای اطلاعات بیشتر به https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues مراجعه کنید</string>
     <string name="pinned_ca256_action_fetch">دریافت اثر انگشت گواهی</string>
     <string name="toast_fetch_cert_sha256_success">اثر انگشت گواهی با موفقیت دریافت شد</string>
     <string name="toast_fetch_cert_sha256_failed">دریافت اثر انگشت گواهی ناموفق بود</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
     <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>
     <string name="per_app_proxy_settings_enable">فعال‌سازی به تفکیک برنامه</string>
+    <string name="per_app_focus_all">همه</string>
+    <string name="per_app_focus_favorites">علاقه‌مندی‌ها</string>
+    <string name="per_app_mode_proxy">پروکسی</string>
+    <string name="per_app_mode_direct">مستقیم</string>
+    <string name="per_app_mode_default">پیش‌فرض</string>
+    <string name="per_app_mode_info">به تفکیک برنامه: پیش‌فرض از تنظیم کلی پیروی می‌کند، پروکسی از VPN عبور می‌کند، مستقیم اتصال اصلی را حفظ می‌کند</string>
+    <string name="acc_per_app_favorite">تغییر وضعیت علاقه‌مندی</string>
     <string name="app_picker_unknown_app">برنامه ناشناس (UID شناسایی‌نشده)</string>
 
     <!-- Preferences -->
@@ -233,6 +240,20 @@
 
     <string name="title_pref_dns_hosts">نگاشت‌های میزبان DNS (قالب: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
+
+    <string name="title_pref_dns_custom">DNS سفارشی</string>
+    <string name="title_settings_dns_custom">DNS سفارشی</string>
+    <string name="dns_editor_remote_servers">سرورهای DNS از راه دور</string>
+    <string name="dns_editor_domestic_servers">سرورهای DNS مستقیم</string>
+    <string name="dns_editor_dns_hosts">نگاشت‌های میزبان DNS</string>
+    <string name="dns_editor_placeholder_server">آدرس سرور</string>
+    <string name="dns_editor_add_server">آدرس سرور</string>
+    <string name="dns_editor_add">افزودن</string>
+    <string name="dns_editor_domain">دامنه</string>
+    <string name="dns_editor_address">آدرس</string>
+    <string name="dns_editor_add_host">افزودن</string>
+    <string name="dns_editor_invalid_dns">آدرس سرور DNS نامعتبر است</string>
+    <string name="dns_editor_invalid_host">دامنه یا آدرس نامعتبر است</string>
 
     <string name="title_pref_delay_test_url">URL آزمایش تأخیر واقعی</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>

@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Включить Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
-    <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются ядром Xray версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своём сервере или используйте отпечаток сертификата (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуется сменить его на более безопасный.\nПодробнее: https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются ядром Xray версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своём сервере или используйте отпечаток сертификата (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуется сменить его на более безопасный.\nПодробнее: https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">Получить отпечаток сертификата</string>
     <string name="toast_fetch_cert_sha256_success">Отпечаток сертификата успешно получен</string>
     <string name="toast_fetch_cert_sha256_failed">Отпечаток сертификата не получен</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
     <string name="per_app_proxy_settings">Выбор приложений</string>
     <string name="per_app_proxy_settings_enable">Использовать выбор приложений</string>
+    <string name="per_app_focus_all">Все</string>
+    <string name="per_app_focus_favorites">Избранное</string>
+    <string name="per_app_mode_proxy">Прокси</string>
+    <string name="per_app_mode_direct">Прямой</string>
+    <string name="per_app_mode_default">По умолчанию</string>
+    <string name="per_app_mode_info">По приложениям: «По умолчанию» — общая настройка, «Прокси» — через VPN, «Прямой» — исходное соединение</string>
+    <string name="acc_per_app_favorite">Переключить избранное</string>
     <string name="app_picker_unknown_app">Неизвестное приложение (неопознанный UID)</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">Сопоставления DNS (формат: domain:address,…)</string>
+
+    <string name="title_pref_dns_custom">Пользовательский DNS</string>
+    <string name="title_settings_dns_custom">Пользовательский DNS</string>
+    <string name="dns_editor_remote_servers">Удалённые DNS-серверы</string>
+    <string name="dns_editor_domestic_servers">Прямые DNS-серверы</string>
+    <string name="dns_editor_dns_hosts">Сопоставления хостов DNS</string>
+    <string name="dns_editor_placeholder_server">Адрес сервера</string>
+    <string name="dns_editor_add_server">Адрес сервера</string>
+    <string name="dns_editor_add">Добавить</string>
+    <string name="dns_editor_domain">Домен</string>
+    <string name="dns_editor_address">Адрес</string>
+    <string name="dns_editor_add_host">Добавить</string>
+    <string name="dns_editor_invalid_dns">Неверный адрес DNS-сервера</string>
+    <string name="dns_editor_invalid_host">Неверный домен или адрес</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
 
     <string name="title_pref_delay_test_url">Сервис проверки задержки</string>

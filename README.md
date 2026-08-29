@@ -6,9 +6,9 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0D1117,100:39FF14&height=200&section=header&text=CR%20TUNNEL&fontSize=68&fontColor=FFFFFF&fontAlignY=38&animation=fadeIn&desc=Powered%20by%20Xray-core&descAlignY=62&descSize=18&descColor=FFFFFF" width="100%"/>
 
-[![Stars](https://img.shields.io/github/stars/CyebRageAnonymuos/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/stargazers)
-[![License](https://img.shields.io/github/license/CyebRageAnonymuos/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/CyebRageAnonymuos/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/commits/main)
+[![Stars](https://img.shields.io/github/stars/CyberRageAnonymous/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/stargazers)
+[![License](https://img.shields.io/github/license/CyberRageAnonymous/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/CyberRageAnonymous/CR-TUNNEL-VPN?style=for-the-badge&color=39FF14&labelColor=0d1117)](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/commits/main)
 [![Platform](https://img.shields.io/badge/platform-Android-39FF14?style=for-the-badge&labelColor=0d1117&logo=android&logoColor=39FF14)](#-download)
 [![Core](https://img.shields.io/badge/core-Xray--core-39FF14?style=for-the-badge&labelColor=0d1117)](https://github.com/XTLS/Xray-core)
 
@@ -25,7 +25,7 @@
 
 <div align="center">
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=39FF14&center=true&vCenter=true&width=600&lines=Fast.+Free.+Open+Source.;VLESS%2C+VMess%2C+Trojan%2C+Shadowsocks;Powered+by+Xray-core;Zero+Ads.+Zero+Tracking.)](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=39FF14&center=true&vCenter=true&width=600&lines=Fast.+Free.+Open+Source.;VLESS%2C+VMess%2C+Trojan%2C+Shadowsocks;Powered+by+Xray-core;Zero+Ads.+Zero+Tracking.)](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN)
 
 </div>
 
@@ -75,13 +75,13 @@ CR TUNNEL runs on two engines working together:
 > Direct download (no login required):
 
 ```
-https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/releases/tag/v1.0.0
+https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/releases/tag/v1.0.0
 ```
 
 > Or grab the latest build from the **Actions** tab of this repo:
 
 ```
-https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/actions
+https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/actions
 ```
 
 | File | Use |
@@ -112,7 +112,7 @@ Tap the **⚡ button** on the main screen and CR TUNNEL will:
 ## 🛠 Build From Source
 
 ```bash
-git clone --recursive https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN.git
+git clone --recursive https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN.git
 cd CR-TUNNEL-VPN
 
 # Open the CR-TUNNEL/ folder in Android Studio, or build headlessly:
@@ -169,7 +169,7 @@ Built by **Cyber-Rage** — an open-source security & dev crew.
   ```
   05fd51ac639edc257133f9364529eff3af1d69c5c18b31f321ba466b3823a0a805
   ```
-- Issues & PRs: [GitHub Issues](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues)
+- Issues & PRs: [GitHub Issues](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues)
 
 ## ⚠️ Disclaimer
 
@@ -237,13 +237,13 @@ CR TUNNEL روی دو موتور کار می‌کنه:
 > دانلود مستقیم (بدون نیاز به ورود):
 
 ```
-https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/releases/tag/v1.0.0
+https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/releases/tag/v1.0.0
 ```
 
 > یا آخرین نسخه رو از تب **Actions** همین ریپو بردار:
 
 ```
-https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/actions
+https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/actions
 ```
 
 | فایل | کاربرد |
@@ -270,7 +270,7 @@ https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/actions
 ## 🛠 ساخت از سورس
 
 ```bash
-git clone --recursive https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN.git
+git clone --recursive https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN.git
 cd CR-TUNNEL-VPN
 
 # پوشه‌ی CR-TUNNEL/ رو تو Android Studio باز کن، یا بدون رابط گرافیکی بساز:
@@ -327,7 +327,7 @@ CR TUNNEL روی شونه‌ی چند تا پروژه‌ی متن‌باز عا�
   ```
   05fd51ac639edc257133f9364529eff3af1d69c5c18b31f321ba466b3823a0a805
   ```
-- ایشو و پول‌ریکوئست: [GitHub Issues](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues)
+- ایشو و پول‌ریکوئست: [GitHub Issues](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues)
 
 ## ⚠️ سلب مسئولیت
 

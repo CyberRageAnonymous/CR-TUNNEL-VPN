@@ -115,11 +115,17 @@ object RootProxyManager {
         val lanShare = forceLanShare || MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
         val corePid = Process.myPid()
 
-        // Per-app proxy/bypass selection.
+        // Per-app proxy/bypass selection. Proxy and Direct sets are per-app modes:
+        // proxy-mode default captures the Proxy apps, bypass-mode default keeps the
+        // Direct apps on their own network and captures everything else.
         val perAppEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY)
         val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS)
         val selectedUids = if (perAppEnabled) {
-            val pkgs = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)?.toList().orEmpty()
+            val pkgs = if (bypassApps) {
+                MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_DIRECT)
+            } else {
+                MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)
+            }?.toList().orEmpty()
             if (pkgs.isNotEmpty()) PackageUidResolver.packageNamesToUids(context, pkgs) else emptyList()
         } else {
             emptyList()

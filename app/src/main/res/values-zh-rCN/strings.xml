@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">证书指纹 (SHA-256)</string>
     <string name="server_lab_browser_dialer">启用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">仅支持 xhttp（packet-up）和 ws 出站；TLS 相关设置可能会被忽略或产生冲突</string>
-    <string name="toast_allow_insecure_deprecated">当前节点使用未加密连接，您的通信可能被威权政府控制的网络中间设施直接查看。\n出于安全考虑，此类节点无法使用 26.2.6+ 版本的 Xray 核心连接。\n如为自建节点，请启用 TLS 等安全加密，或固定证书 pinnedCA256。\n如节点由服务商提供，请联系服务商完成技术升级。若服务商拒绝配合，建议改用更重视用户安全的服务商。\n更多信息请访问 https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">当前节点使用未加密连接，您的通信可能被威权政府控制的网络中间设施直接查看。\n出于安全考虑，此类节点无法使用 26.2.6+ 版本的 Xray 核心连接。\n如为自建节点，请启用 TLS 等安全加密，或固定证书 pinnedCA256。\n如节点由服务商提供，请联系服务商完成技术升级。若服务商拒绝配合，建议改用更重视用户安全的服务商。\n更多信息请访问 https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">获取证书指纹</string>
     <string name="toast_fetch_cert_sha256_success">证书指纹获取成功</string>
     <string name="toast_fetch_cert_sha256_failed">获取证书指纹失败</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
     <string name="per_app_proxy_settings">分应用设置</string>
     <string name="per_app_proxy_settings_enable">启用分应用</string>
+    <string name="per_app_focus_all">全部</string>
+    <string name="per_app_focus_favorites">收藏</string>
+    <string name="per_app_mode_proxy">代理</string>
+    <string name="per_app_mode_direct">直连</string>
+    <string name="per_app_mode_default">默认</string>
+    <string name="per_app_mode_info">分应用：默认遵循通用设置，代理通过 VPN 转发，直连保持原始连接</string>
+    <string name="acc_per_app_favorite">切换收藏</string>
     <string name="app_picker_unknown_app">未知应用（无法识别 UID）</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS 主机映射（格式：domain:address,…）</string>
+
+    <string name="title_pref_dns_custom">自定义 DNS</string>
+    <string name="title_settings_dns_custom">自定义 DNS</string>
+    <string name="dns_editor_remote_servers">远程 DNS 服务器</string>
+    <string name="dns_editor_domestic_servers">直连 DNS 服务器</string>
+    <string name="dns_editor_dns_hosts">DNS 主机映射</string>
+    <string name="dns_editor_placeholder_server">服务器地址</string>
+    <string name="dns_editor_add_server">服务器地址</string>
+    <string name="dns_editor_add">添加</string>
+    <string name="dns_editor_domain">域名</string>
+    <string name="dns_editor_address">地址</string>
+    <string name="dns_editor_add_host">添加</string>
+    <string name="dns_editor_invalid_dns">DNS 服务器地址无效</string>
+    <string name="dns_editor_invalid_host">域名或地址无效</string>
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
     <string name="title_pref_delay_test_url">真实延迟测试 URL</string>

@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
     <string name="server_lab_browser_dialer">Enable Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Only supports xhttp (packet-up) and ws outbound; TLS-related settings may be ignored or conflict</string>
-    <string name="toast_allow_insecure_deprecated">Current node uses an unencrypted connection. Your communication may be directly viewed by network intermediate facilities controlled by authoritarian governments.\nFor security reasons, such nodes cannot be connected via Xray core version 26.2.6+.\nIf it is a self-built node, please enable security encryption such as TLS, or pin the certificate pinnedCA256.\nIf it is a provider node, please contact the service provider to complete the technical upgrade. If the service provider refuses to cooperate, it is recommended to switch to a provider that pays more attention to user security.\nFor more information, please visit https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">Current node uses an unencrypted connection. Your communication may be directly viewed by network intermediate facilities controlled by authoritarian governments.\nFor security reasons, such nodes cannot be connected via Xray core version 26.2.6+.\nIf it is a self-built node, please enable security encryption such as TLS, or pin the certificate pinnedCA256.\nIf it is a provider node, please contact the service provider to complete the technical upgrade. If the service provider refuses to cooperate, it is recommended to switch to a provider that pays more attention to user security.\nFor more information, please visit https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">Fetch certificate fingerprint</string>
     <string name="toast_fetch_cert_sha256_success">Certificate fingerprint fetched successfully</string>
     <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
     <string name="per_app_proxy_settings">Per-app settings</string>
     <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <string name="per_app_focus_all">All</string>
+    <string name="per_app_focus_favorites">Favorites</string>
+    <string name="per_app_mode_proxy">Proxy</string>
+    <string name="per_app_mode_direct">Direct</string>
+    <string name="per_app_mode_default">Default</string>
+    <string name="per_app_mode_info">Per-app: Default follows the general setting, Proxy routes through the VPN, Direct keeps the original connection</string>
+    <string name="acc_per_app_favorite">Toggle favorite</string>
     <string name="app_picker_unknown_app">Unknown app (UID not recognized)</string>
 
     <!-- Preferences -->
@@ -233,6 +240,20 @@
 
     <string name="title_pref_dns_hosts">DNS host mappings (format: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
+
+    <string name="title_pref_dns_custom">Custom DNS</string>
+    <string name="title_settings_dns_custom">Custom DNS</string>
+    <string name="dns_editor_remote_servers">Remote DNS servers</string>
+    <string name="dns_editor_domestic_servers">Direct DNS servers</string>
+    <string name="dns_editor_dns_hosts">DNS host mappings</string>
+    <string name="dns_editor_placeholder_server">Server address</string>
+    <string name="dns_editor_add_server">Server address</string>
+    <string name="dns_editor_add">Add</string>
+    <string name="dns_editor_domain">Domain</string>
+    <string name="dns_editor_address">Address</string>
+    <string name="dns_editor_add_host">Add</string>
+    <string name="dns_editor_invalid_dns">Invalid DNS server address</string>
+    <string name="dns_editor_invalid_host">Invalid domain or address</string>
 
     <string name="title_pref_delay_test_url">Real delay test URL</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>

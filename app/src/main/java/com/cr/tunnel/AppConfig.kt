@@ -24,6 +24,9 @@ object AppConfig {
     const val PREF_ROUTE_ONLY_ENABLED = "pref_route_only_enabled"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
     const val PREF_PER_APP_PROXY_SET = "pref_per_app_proxy_set"
+    const val PREF_PER_APP_PROXY_DIRECT = "pref_per_app_proxy_direct"
+    const val PREF_PER_APP_PROXY_FAVORITE = "pref_per_app_proxy_favorite"
+    const val PREF_PER_APP_PROXY_MODES_MIGRATED = "pref_per_app_proxy_modes_migrated"
     const val PREF_BYPASS_APPS = "pref_bypass_apps"
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
@@ -135,15 +138,15 @@ object AppConfig {
     const val GITHUB_URL = "https://github.com"
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com"
     const val GITHUB_DOWNLOAD_URL = "$GITHUB_URL/%s/releases/latest/download"
-    const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/CyebRageAnonymuos/CR-TUNNEL-VPN/main/proxy.txt"
-    const val APP_URL = "$GITHUB_URL/CyebRageAnonymuos/CR-TUNNEL-VPN"
-    const val APP_API_URL = "https://api.github.com/repos/CyebRageAnonymuos/CR-TUNNEL-VPN/releases"
+    const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/CyberRageAnonymous/CR-TUNNEL-VPN/main/proxy.txt"
+    const val APP_URL = "$GITHUB_URL/CyberRageAnonymous/CR-TUNNEL-VPN"
+    const val APP_API_URL = "https://api.github.com/repos/CyberRageAnonymous/CR-TUNNEL-VPN/releases"
     const val APP_ISSUES_URL = "$APP_URL/issues"
-    const val APP_WIKI_MODE = "$GITHUB_RAW_URL/CyebRageAnonymuos/CR-TUNNEL-VPN/main/docs/mode.md"
-    const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/CyebRageAnonymuos/CR-TUNNEL-VPN/main/CR.md"
+    const val APP_WIKI_MODE = "$GITHUB_RAW_URL/CyberRageAnonymous/CR-TUNNEL-VPN/main/docs/mode.md"
+    const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/CyberRageAnonymous/CR-TUNNEL-VPN/main/CR.md"
     const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
 
-    const val COMMUNITY_REPO = "CyebRageAnonymuos/CR-TUNNEL-COMMUNITY"
+    const val COMMUNITY_REPO = "CyberRageAnonymous/CR-TUNNEL-COMMUNITY"
     const val COMMUNITY_BRANCH = "main"
     const val COMMUNITY_CONFIGS_PATH = "configs.json"
     const val COMMUNITY_RAW_URL = "https://raw.githubusercontent.com/$COMMUNITY_REPO/$COMMUNITY_BRANCH/$COMMUNITY_CONFIGS_PATH"
@@ -303,6 +306,20 @@ object AppConfig {
     val DNS_QUAD9_ADDRESSES = arrayListOf("9.9.9.9", "149.112.112.112", "2620:fe::fe", "2620:fe::9")
     val DNS_SB_ADDRESSES = arrayListOf("45.11.45.11", "185.222.222.222", "2a09::", "2a11::")
     val DNS_YANDEX_ADDRESSES = arrayListOf("77.88.8.8", "77.88.8.1", "2a02:6b8::feed:0ff", "2a02:6b8:0:1::feed:0ff")
+
+    val DNS_PRESET_SERVERS = arrayListOf(
+        "https://cloudflare-dns.com/dns-query",
+        "tls://1.1.1.1",
+        "https://dns.google/dns-query",
+        "tls://8.8.8.8",
+        "https://unfiltered.adguard-dns.com/dns-query",
+        "tls://unfiltered.adguard-dns.com",
+        "https://dns.quad9.net/dns-query",
+        "1.1.1.1",
+        "8.8.8.8",
+        "223.5.5.5",
+        "localhost"
+    )
 
     //minimum list https://serverfault.com/a/304791
     val ROUTED_IP_LIST = arrayListOf(

@@ -26,7 +26,7 @@
 <li>possible to use third party dat file in the same folder</li>
 </ul>
 
-<h3>More in our <a href="https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN">repository</a></h3>
+<h3>More in our <a href="https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN">repository</a></h3>
 
 <h3>Development guide</h3>
 

@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>
     <string name="server_lab_browser_dialer">تمكين Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">يدعم فقط اتصالات xhttp (packet-up) وws الصادرة؛ قد يتم تجاهل الإعدادات المتعلقة بـ TLS أو قد تتعارض</string>
-    <string name="toast_allow_insecure_deprecated">تستخدم العقدة الحالية اتصالاً غير مشفر. قد تتمكن تجهيزات الشبكة الوسيطة الخاضعة لسيطرة حكومات استبدادية من الاطلاع مباشرةً على اتصالاتك.\nلأسباب أمنية، لا يمكن الاتصال بهذه العقد عبر نواة Xray الإصدار 26.2.6 أو أحدث.\nإذا كانت العقدة من إعدادك، ففعّل تشفيراً آمناً مثل TLS أو ثبّت بصمة الشهادة pinnedCA256.\nإذا كانت العقدة تابعة لمزوّد خدمة، فتواصل معه لإكمال الترقية التقنية. إذا رفض المزوّد التعاون، فنوصي بالانتقال إلى مزوّد يهتم أكثر بأمان المستخدمين.\nلمزيد من المعلومات، تفضل بزيارة https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">تستخدم العقدة الحالية اتصالاً غير مشفر. قد تتمكن تجهيزات الشبكة الوسيطة الخاضعة لسيطرة حكومات استبدادية من الاطلاع مباشرةً على اتصالاتك.\nلأسباب أمنية، لا يمكن الاتصال بهذه العقد عبر نواة Xray الإصدار 26.2.6 أو أحدث.\nإذا كانت العقدة من إعدادك، ففعّل تشفيراً آمناً مثل TLS أو ثبّت بصمة الشهادة pinnedCA256.\nإذا كانت العقدة تابعة لمزوّد خدمة، فتواصل معه لإكمال الترقية التقنية. إذا رفض المزوّد التعاون، فنوصي بالانتقال إلى مزوّد يهتم أكثر بأمان المستخدمين.\nلمزيد من المعلومات، تفضل بزيارة https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">جلب بصمة الشهادة</string>
     <string name="toast_fetch_cert_sha256_success">تم جلب بصمة الشهادة بنجاح</string>
     <string name="toast_fetch_cert_sha256_failed">فشل جلب بصمة الشهادة</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
     <string name="per_app_proxy_settings">إعدادات كل تطبيق</string>
     <string name="per_app_proxy_settings_enable">تمكين الإعدادات لكل تطبيق</string>
+    <string name="per_app_focus_all">الكل</string>
+    <string name="per_app_focus_favorites">المفضلة</string>
+    <string name="per_app_mode_proxy">وكيل</string>
+    <string name="per_app_mode_direct">مباشر</string>
+    <string name="per_app_mode_default">الافتراضي</string>
+    <string name="per_app_mode_info">لكل تطبيق: الافتراضي يتبع الإعداد العام، والوكيل يمر عبر VPN، والمباشر يحافظ على الاتصال الأصلي</string>
+    <string name="acc_per_app_favorite">تبديل المفضلة</string>
     <string name="app_picker_unknown_app">تطبيق غير معروف (UID غير محدد)</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address,…)</string>
+
+    <string name="title_pref_dns_custom">DNS مخصص</string>
+    <string name="title_settings_dns_custom">DNS مخصص</string>
+    <string name="dns_editor_remote_servers">خوادم DNS البعيدة</string>
+    <string name="dns_editor_domestic_servers">خوادم DNS المباشرة</string>
+    <string name="dns_editor_dns_hosts">تعيينات مضيفي DNS</string>
+    <string name="dns_editor_placeholder_server">عنوان الخادم</string>
+    <string name="dns_editor_add_server">عنوان الخادم</string>
+    <string name="dns_editor_add">إضافة</string>
+    <string name="dns_editor_domain">النطاق</string>
+    <string name="dns_editor_address">العنوان</string>
+    <string name="dns_editor_add_host">إضافة</string>
+    <string name="dns_editor_invalid_dns">عنوان خادم DNS غير صالح</string>
+    <string name="dns_editor_invalid_host">نطاق أو عنوان غير صالح</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>

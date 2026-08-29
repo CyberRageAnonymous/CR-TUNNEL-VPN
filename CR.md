@@ -41,7 +41,7 @@ CR TUNNEL is a *client*. The servers behind the configs you add are operated by 
 
 ## 6. Open Source Verifiability
 
-Every claim above is verifiable: CR TUNNEL is fully open source under GPL-3.0. Read, audit, or rebuild the code yourself at [github.com/CyebRageAnonymuos/CR-TUNNEL-VPN](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN).
+Every claim above is verifiable: CR TUNNEL is fully open source under GPL-3.0. Read, audit, or rebuild the code yourself at [github.com/CyberRageAnonymous/CR-TUNNEL-VPN](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN).
 
 ## 7. Children's Privacy
 
@@ -56,7 +56,7 @@ If this policy changes, the update will be committed directly to this file in th
 Questions about this policy or the app itself:
 
 - Telegram: [t.me/R4G3_2024](https://t.me/R4G3_2024)
-- GitHub: [github.com/CyebRageAnonymuos/CR-TUNNEL-VPN](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN)
+- GitHub: [github.com/CyberRageAnonymous/CR-TUNNEL-VPN](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN)
 - WhatsApp: **CyberRageAnonymuos**
 - Session:
   ```
@@ -94,7 +94,7 @@ CR TUNNEL یک *کلاینته*. سرورهای پشتِ کانفیگ‌هایی
 
 ## ۶. قابل‌راستی‌آزمایی چون متن‌بازه
 
-هر ادعایی که بالا نوشته شد قابل بررسیه: CR TUNNEL کاملاً متن‌باز و تحت لایسنس GPL-3.0 منتشر شده. کد رو خودت بخون، بررسی کن یا حتی از اول بسازش: [github.com/CyebRageAnonymuos/CR-TUNNEL-VPN](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN)
+هر ادعایی که بالا نوشته شد قابل بررسیه: CR TUNNEL کاملاً متن‌باز و تحت لایسنس GPL-3.0 منتشر شده. کد رو خودت بخون، بررسی کن یا حتی از اول بسازش: [github.com/CyberRageAnonymous/CR-TUNNEL-VPN](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN)
 
 ## ۷. حریم خصوصی کودکان
 
@@ -109,7 +109,7 @@ CR TUNNEL یک ابزار شبکه‌ی عمومیه و از هیچ‌کسی، �
 سؤال درباره‌ی این سیاست یا خود اپ:
 
 - تلگرام: [t.me/R4G3_2024](https://t.me/R4G3_2024)
-- گیت‌هاب: [github.com/CyebRageAnonymuos/CR-TUNNEL-VPN](https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN)
+- گیت‌هاب: [github.com/CyberRageAnonymous/CR-TUNNEL-VPN](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN)
 - واتساپ: **CyberRageAnonymuos**
 - Session:
   ```

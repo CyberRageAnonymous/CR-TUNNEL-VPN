@@ -130,6 +130,10 @@
             android:name=".ui.perappproxy.PerAppProxyActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.dnssettings.DnsCustomActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" />
+        <activity
             android:name=".ui.apppicker.AppPickerActivity"
             android:exported="false" />
         <activity

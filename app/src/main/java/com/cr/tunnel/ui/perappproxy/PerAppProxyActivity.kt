@@ -3,6 +3,7 @@ package com.cr.tunnel.ui.perappproxy
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,12 +11,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,10 +39,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.cr.tunnel.R
 import com.cr.tunnel.dto.AppInfo
 import com.cr.tunnel.extension.toastInfo
@@ -46,11 +54,11 @@ import com.cr.tunnel.extension.toastSuccess
 import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.compose.AppDivider
 import com.cr.tunnel.ui.compose.AppDropdownMenuItems
-import com.cr.tunnel.ui.compose.AppListItem
 import com.cr.tunnel.ui.compose.AppTopBar
 import com.cr.tunnel.ui.compose.ItemDivider
 import com.cr.tunnel.ui.compose.colorFabActive
 import com.cr.tunnel.ui.compose.verticalScrollbar
+import com.cr.tunnel.util.AppIconFetcher
 import com.cr.tunnel.util.Utils
 
 private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
@@ -74,14 +82,20 @@ class PerAppProxyActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-        val blacklist by viewModel.blacklist.collectAsStateWithLifecycle()
+        val proxySet by viewModel.proxySet.collectAsStateWithLifecycle()
+        val directSet by viewModel.directSet.collectAsStateWithLifecycle()
+        val favorites by viewModel.favorites.collectAsStateWithLifecycle()
+        val favoritesOnly by viewModel.favoritesOnly.collectAsStateWithLifecycle()
         val perAppProxyEnabled by viewModel.perAppProxyEnabled.collectAsStateWithLifecycle()
         val bypassApps by viewModel.bypassApps.collectAsStateWithLifecycle()
 
         PerAppProxyScreen(
             apps = apps,
             isLoading = isLoading,
-            blacklist = blacklist,
+            proxySet = proxySet,
+            directSet = directSet,
+            favorites = favorites,
+            favoritesOnly = favoritesOnly,
             perAppProxyEnabled = perAppProxyEnabled,
             bypassApps = bypassApps,
             onBackClick = { finish() },
@@ -90,7 +104,9 @@ class PerAppProxyActivity : BaseComponentActivity() {
             onInfoClick = {
                 toastInfo(R.string.summary_pref_per_app_proxy)
             },
-            onToggleApp = { viewModel.toggle(it) },
+            onAppModeChange = { packageName, mode -> viewModel.setAppMode(packageName, mode) },
+            onFavoriteChange = { packageName, favorite -> viewModel.setFavorite(packageName, favorite) },
+            onFavoritesOnlyChanged = { viewModel.setFavoritesOnly(it) },
             onSearch = { viewModel.filterApps(it) },
             onSelectAll = { viewModel.selectAll() },
             onInvertSelection = { viewModel.invertSelection() },
@@ -112,14 +128,19 @@ class PerAppProxyActivity : BaseComponentActivity() {
 fun PerAppProxyScreen(
     apps: List<AppInfo>,
     isLoading: Boolean,
-    blacklist: Set<String>,
+    proxySet: Set<String>,
+    directSet: Set<String>,
+    favorites: Set<String>,
+    favoritesOnly: Boolean,
     perAppProxyEnabled: Boolean,
     bypassApps: Boolean,
     onBackClick: () -> Unit,
     onPerAppProxyChanged: (Boolean) -> Unit,
     onBypassAppsChanged: (Boolean) -> Unit,
     onInfoClick: () -> Unit,
-    onToggleApp: (String) -> Unit,
+    onAppModeChange: (String, PerAppMode) -> Unit,
+    onFavoriteChange: (String, Boolean) -> Unit,
+    onFavoritesOnlyChanged: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
     onSelectAll: () -> Unit,
     onInvertSelection: () -> Unit,
@@ -201,59 +222,81 @@ fun PerAppProxyScreen(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surface
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Text(
-                            text = stringResource(R.string.per_app_proxy_settings_enable),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = perAppProxyEnabled,
-                            modifier = Modifier.scale(0.65f),
-                            onCheckedChange = onPerAppProxyChanged,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = colorFabActive
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.per_app_proxy_settings_enable),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                        )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Switch(
+                                checked = perAppProxyEnabled,
+                                modifier = Modifier.scale(0.65f),
+                                onCheckedChange = onPerAppProxyChanged,
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                    checkedTrackColor = colorFabActive
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.switch_bypass_apps_mode),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Switch(
+                                checked = bypassApps,
+                                modifier = Modifier.scale(0.65f),
+                                onCheckedChange = onBypassAppsChanged,
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                    checkedTrackColor = colorFabActive
+                                )
+                            )
+                        }
+                        IconButton(onClick = onInfoClick) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_about_24dp),
+                                contentDescription = stringResource(R.string.acc_per_app_proxy_information),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
+
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.switch_bypass_apps_mode),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                        AppFilterChip(
+                            label = stringResource(R.string.per_app_focus_all),
+                            selected = !favoritesOnly,
+                            onClick = { onFavoritesOnlyChanged(false) }
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = bypassApps,
-                            modifier = Modifier.scale(0.65f),
-                            onCheckedChange = onBypassAppsChanged,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = colorFabActive
-                            )
-                        )
-                    }
-                    IconButton(onClick = onInfoClick) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_about_24dp),
-                            contentDescription = stringResource(R.string.acc_per_app_proxy_information),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        AppFilterChip(
+                            label = stringResource(R.string.per_app_focus_favorites),
+                            selected = favoritesOnly,
+                            onClick = { onFavoritesOnlyChanged(true) }
                         )
                     }
                 }
@@ -267,17 +310,161 @@ fun PerAppProxyScreen(
                     .verticalScrollbar(listState)
             ) {
                 items(items = apps, key = { it.packageName }) { app ->
-                    val checked = blacklist.contains(app.packageName)
-                    AppListItem(
+                    val mode = when {
+                        app.packageName in directSet -> PerAppMode.DIRECT
+                        app.packageName in proxySet -> PerAppMode.PROXY
+                        else -> PerAppMode.DEFAULT
+                    }
+                    AppProxyItemRow(
                         appName = app.appName,
                         packageName = app.packageName,
-                        icon = null,
-                        checked = checked,
-                        onCheckedChange = { onToggleApp(app.packageName) }
+                        mode = mode,
+                        favorite = app.packageName in favorites,
+                        onModeChange = { onAppModeChange(app.packageName, it) },
+                        onFavoriteChange = { onFavoriteChange(app.packageName, it) }
                     )
                     ItemDivider()
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AppFilterChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val background = if (selected) colorFabActive else Color.Transparent
+    val contentColor = if (selected) MaterialTheme.colorScheme.onSecondary
+    else MaterialTheme.colorScheme.onSurfaceVariant
+    Surface(
+        color = background,
+        contentColor = contentColor,
+        shape = MaterialTheme.shapes.small,
+        modifier = modifier.clickable(onClick = onClick)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+        )
+    }
+}
+
+@Composable
+fun AppProxyItemRow(
+    appName: String,
+    packageName: String,
+    mode: PerAppMode,
+    favorite: Boolean,
+    onModeChange: (PerAppMode) -> Unit,
+    onFavoriteChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var showModeMenu by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val model = remember(packageName) {
+            val data = "appicon:$packageName"
+            ImageRequest.Builder(context)
+                .data(data)
+                .fetcherFactory(AppIconFetcher.Factory(context))
+                .build()
+        }
+        AsyncImage(
+            model = model,
+            contentDescription = null,
+            modifier = Modifier.size(40.dp),
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            error = painterResource(R.drawable.ic_image_24dp),
+            fallback = painterResource(R.drawable.ic_image_24dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = appName,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = packageName,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        IconButton(onClick = { onFavoriteChange(!favorite) }) {
+            Icon(
+                painter = painterResource(
+                    if (favorite) R.drawable.ic_star_24dp else R.drawable.ic_star_border_24dp
+                ),
+                contentDescription = stringResource(R.string.acc_per_app_favorite),
+                tint = if (favorite) colorFabActive else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Box {
+            Surface(
+                onClick = { showModeMenu = true },
+                color = modeColor(mode).copy(alpha = 0.15f),
+                contentColor = modeColor(mode),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = stringResource(modeLabelRes(mode)),
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = showModeMenu,
+                onDismissRequest = { showModeMenu = false },
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                PerAppMode.entries.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(stringResource(modeLabelRes(item))) },
+                        onClick = {
+                            showModeMenu = false
+                            if (mode != item) {
+                                onModeChange(item)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun modeColor(mode: PerAppMode): Color {
+    return when (mode) {
+        PerAppMode.PROXY -> colorFabActive
+        PerAppMode.DIRECT -> MaterialTheme.colorScheme.error
+        PerAppMode.DEFAULT -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+}
+
+@StringRes
+private fun modeLabelRes(mode: PerAppMode): Int {
+    return when (mode) {
+        PerAppMode.PROXY -> R.string.per_app_mode_proxy
+        PerAppMode.DIRECT -> R.string.per_app_mode_direct
+        PerAppMode.DEFAULT -> R.string.per_app_mode_default
     }
 }

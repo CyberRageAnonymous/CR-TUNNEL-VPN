@@ -22,17 +22,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.text.Collator
 
-/**
- * ViewModel for PerAppProxy screen.
- * Holds all UI state and business logic.
- */
+enum class PerAppMode { DEFAULT, PROXY, DIRECT }
+
 class PerAppProxyViewModel(application: Application) : BaseViewModel(application) {
 
-    // Blacklist (apps to be proxied or bypassed)
-    private val _blacklist = MutableStateFlow(loadBlacklist())
-    val blacklist: StateFlow<Set<String>> = _blacklist.asStateFlow()
+    private val _proxySet = MutableStateFlow(loadProxySet())
+    val proxySet: StateFlow<Set<String>> = _proxySet.asStateFlow()
 
-    // UI states
+    private val _directSet = MutableStateFlow(loadDirectSet())
+    val directSet: StateFlow<Set<String>> = _directSet.asStateFlow()
+
+    private val _favorites = MutableStateFlow(loadFavorites())
+    val favorites: StateFlow<Set<String>> = _favorites.asStateFlow()
+
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
 
@@ -46,35 +48,104 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     )
     val bypassApps: StateFlow<Boolean> = _bypassApps.asStateFlow()
 
-    // Cached full list for filtering
+    private val _favoritesOnly = MutableStateFlow(false)
+    val favoritesOnly: StateFlow<Boolean> = _favoritesOnly.asStateFlow()
+
     private var appsAll: List<AppInfo>? = null
     private var currentQuery = ""
     private var isAppListLoading = false
 
-    // Blacklist operations
-    fun toggle(packageName: String) {
-        val currentSelection = _blacklist.value
-        val newSelection = if (packageName in currentSelection) {
-            currentSelection - packageName
-        } else {
-            currentSelection + packageName
+    init {
+        ensureModesMigrated()
+    }
+
+    fun modeOf(packageName: String): PerAppMode {
+        return when {
+            packageName in _directSet.value -> PerAppMode.DIRECT
+            packageName in _proxySet.value -> PerAppMode.PROXY
+            else -> PerAppMode.DEFAULT
         }
-        replaceBlacklist(newSelection)
+    }
+
+    fun setAppMode(packageName: String, mode: PerAppMode) {
+        val newProxy = _proxySet.value.toMutableSet()
+        val newDirect = _directSet.value.toMutableSet()
+        when (mode) {
+            PerAppMode.PROXY -> {
+                newProxy.add(packageName)
+                newDirect.remove(packageName)
+            }
+
+            PerAppMode.DIRECT -> {
+                newDirect.add(packageName)
+                newProxy.remove(packageName)
+            }
+
+            PerAppMode.DEFAULT -> {
+                newProxy.remove(packageName)
+                newDirect.remove(packageName)
+            }
+        }
+        replaceSelection(newProxy, newDirect)
         SettingsChangeManager.makeRestartService()
     }
 
-    private fun loadBlacklist(): Set<String> {
+    fun setFavorite(packageName: String, favorite: Boolean) {
+        val newFavorites = _favorites.value.toMutableSet()
+        if (favorite) {
+            newFavorites.add(packageName)
+        } else {
+            newFavorites.remove(packageName)
+        }
+        _favorites.value = newFavorites
+        MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_FAVORITE, newFavorites)
+        applyCurrentFilter()
+    }
+
+    fun setFavoritesOnly(favoritesOnly: Boolean) {
+        if (_favoritesOnly.value != favoritesOnly) {
+            _favoritesOnly.value = favoritesOnly
+            applyCurrentFilter()
+        }
+    }
+
+    private fun loadProxySet(): Set<String> {
         return MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)?.toSet() ?: emptySet()
     }
 
-    private fun replaceBlacklist(newBlacklist: Set<String>) {
-        if (newBlacklist == _blacklist.value) return
-
-        _blacklist.value = newBlacklist
-        MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, newBlacklist.toMutableSet())
+    private fun loadDirectSet(): Set<String> {
+        return MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_DIRECT)?.toSet() ?: emptySet()
     }
 
-    // Per‑app proxy switch
+    private fun loadFavorites(): Set<String> {
+        return MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_FAVORITE)?.toSet() ?: emptySet()
+    }
+
+    private fun replaceSelection(newProxy: Set<String>, newDirect: Set<String>) {
+        if (newProxy != _proxySet.value || newDirect != _directSet.value) {
+            _proxySet.value = newProxy
+            _directSet.value = newDirect
+            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, newProxy.toMutableSet())
+            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_DIRECT, newDirect.toMutableSet())
+            applyCurrentFilter()
+        }
+    }
+
+    private fun ensureModesMigrated() {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY_MODES_MIGRATED, false)) return
+
+        val legacy = loadProxySet()
+        val bypassApps = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
+        if (bypassApps && legacy.isNotEmpty()) {
+            val mergedDirect = (loadDirectSet() + legacy).toMutableSet()
+            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_DIRECT, mergedDirect)
+            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, mutableSetOf())
+            _proxySet.value = emptySet()
+            _directSet.value = mergedDirect
+        }
+        MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_MODES_MIGRATED, true)
+    }
+
     fun setPerAppProxyEnabled(enabled: Boolean) {
         if (_perAppProxyEnabled.value != enabled) {
             _perAppProxyEnabled.value = enabled
@@ -86,10 +157,10 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         if (_bypassApps.value != enabled) {
             _bypassApps.value = enabled
             MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, enabled)
+            SettingsChangeManager.makeRestartService()
         }
     }
 
-    // Load and filter apps
     fun loadApps(context: Context) {
         if (appsAll != null || isAppListLoading) return
 
@@ -102,7 +173,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
                     sortApps(list)
                 }
                 appsAll = apps
-                _displayedApps.value = applyFilter(currentQuery)
+                applyCurrentFilter()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -115,28 +186,41 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
 
     fun filterApps(query: String) {
         currentQuery = query
-        _displayedApps.value = applyFilter(query)
+        applyCurrentFilter()
     }
 
-    private fun applyFilter(query: String): List<AppInfo> {
-        val apps = appsAll ?: return emptyList()
-        if (query.isEmpty()) return apps
+    private fun applyCurrentFilter() {
+        val apps = appsAll ?: return
+        _displayedApps.value = filterList(apps)
+    }
 
-        return apps.filter {
-            it.appName.contains(query, ignoreCase = true) ||
-                it.packageName.contains(query, ignoreCase = true)
+    private fun filterList(apps: List<AppInfo>): List<AppInfo> {
+        val filterByQuery = currentQuery.isNotEmpty()
+        val favorites = _favorites.value
+        return apps.filter { app ->
+            val matchesQuery = !filterByQuery ||
+                app.appName.contains(currentQuery, ignoreCase = true) ||
+                app.packageName.contains(currentQuery, ignoreCase = true)
+            val matchesFavorites = !_favoritesOnly.value || app.packageName in favorites
+            matchesQuery && matchesFavorites
         }
     }
 
     private fun sortApps(apps: List<AppInfo>): List<AppInfo> {
         val collator = Collator.getInstance()
-        val selectedPackages = _blacklist.value
+        val favorites = _favorites.value
+        val proxySet = _proxySet.value
+        val directSet = _directSet.value
         return apps.sortedWith { p1, p2 ->
-            val s1 = p1.packageName in selectedPackages
-            val s2 = p2.packageName in selectedPackages
+            val favorite1 = p1.packageName in favorites
+            val favorite2 = p2.packageName in favorites
+            val marked1 = p1.packageName in proxySet || p1.packageName in directSet
+            val marked2 = p2.packageName in proxySet || p2.packageName in directSet
             when {
-                s1 && !s2 -> -1
-                !s1 && s2 -> 1
+                favorite1 && !favorite2 -> -1
+                !favorite1 && favorite2 -> 1
+                marked1 && !marked2 -> -1
+                !marked1 && marked2 -> 1
                 p1.isSystemApp && !p2.isSystemApp -> 1
                 !p1.isSystemApp && p2.isSystemApp -> -1
                 else -> collator.compare(p1.appName, p2.appName)
@@ -144,23 +228,31 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         }
     }
 
-    // Bulk actions
     fun selectAll() {
         val displayedApps = _displayedApps.value
-        val currentSelection = _blacklist.value
+        val currentSelection = _proxySet.value
         val allSelected = displayedApps.all { it.packageName in currentSelection }
-        val newSelection = currentSelection.toMutableSet().apply {
-            displayedApps.forEach { app ->
-                if (allSelected) remove(app.packageName) else add(app.packageName)
+        val newProxy = _proxySet.value.toMutableSet()
+        displayedApps.forEach { app ->
+            if (allSelected) {
+                newProxy.remove(app.packageName)
+            } else {
+                newProxy.add(app.packageName)
             }
         }
-        replaceBlacklist(newSelection)
+        replaceSelection(newProxy, _directSet.value)
         enablePerAppProxyAndRestart()
     }
 
     fun invertSelection() {
         val packageNames = _displayedApps.value.map { it.packageName }
-        replaceBlacklist(AppSelection.invert(_blacklist.value, packageNames))
+        val newProxy = _proxySet.value.toMutableSet()
+        packageNames.forEach { packageName ->
+            if (!newProxy.remove(packageName)) {
+                newProxy.add(packageName)
+            }
+        }
+        replaceSelection(newProxy, _directSet.value)
         enablePerAppProxyAndRestart()
     }
 
@@ -222,7 +314,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     fun exportProxyApp(): String {
         return buildString {
             append(_bypassApps.value)
-            _blacklist.value.forEach { packageName ->
+            _proxySet.value.forEach { packageName ->
                 append(System.lineSeparator())
                 append(packageName)
             }
@@ -241,7 +333,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
             if (proxyAppList.isNullOrEmpty()) return false
 
             val bypassApps = _bypassApps.value
-            val newBlacklist = withContext(Dispatchers.Default) {
+            val newProxy = withContext(Dispatchers.Default) {
                 AppSelection.fromProxyList(
                     packageNames = installedApps.map { it.packageName },
                     proxyAppList = proxyAppList,
@@ -249,7 +341,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
                     forceGoogleApps = forceGoogleApps
                 )
             }
-            replaceBlacklist(newBlacklist)
+            replaceSelection(newProxy, _directSet.value)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

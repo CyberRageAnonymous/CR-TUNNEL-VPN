@@ -133,7 +133,7 @@
     <string name="server_lab_pinned_ca256">সার্টিফিকেট ফিঙ্গারপ্রিন্ট (SHA-256)</string>
     <string name="server_lab_browser_dialer">Browser Dialer চালু করুন</string>
     <string name="server_lab_browser_dialer_tip">শুধু xhttp (packet-up) ও ws আউটবাউন্ড সমর্থিত; TLS-সংক্রান্ত সেটিং উপেক্ষিত হতে পারে বা পরস্পরের সঙ্গে বিরোধ করতে পারে</string>
-    <string name="toast_allow_insecure_deprecated">বর্তমান নোডটি এনক্রিপশনবিহীন সংযোগ ব্যবহার করে। কর্তৃত্ববাদী সরকারের নিয়ন্ত্রণাধীন মধ্যবর্তী নেটওয়ার্ক অবকাঠামো আপনার যোগাযোগ সরাসরি দেখতে পারে।\nনিরাপত্তার কারণে Xray কোরের 26.2.6 বা পরবর্তী সংস্করণ দিয়ে এ ধরনের নোডে সংযোগ করা যায় না।\nনোডটি নিজে তৈরি করে থাকলে TLS-এর মতো নিরাপদ এনক্রিপশন চালু করুন অথবা pinnedCA256 সার্টিফিকেট ফিঙ্গারপ্রিন্ট পিন করুন।\nনোডটি কোনো সেবা প্রদানকারীর হলে প্রযুক্তিগত আপগ্রেডের জন্য তাদের সঙ্গে যোগাযোগ করুন। তারা সহযোগিতা না করলে ব্যবহারকারীর নিরাপত্তাকে বেশি গুরুত্ব দেয় এমন প্রদানকারীর কাছে যাওয়ার পরামর্শ দেওয়া হয়।\nআরও তথ্যের জন্য দেখুন https://github.com/CyebRageAnonymuos/CR-TUNNEL-VPN/issues</string>
+    <string name="toast_allow_insecure_deprecated">বর্তমান নোডটি এনক্রিপশনবিহীন সংযোগ ব্যবহার করে। কর্তৃত্ববাদী সরকারের নিয়ন্ত্রণাধীন মধ্যবর্তী নেটওয়ার্ক অবকাঠামো আপনার যোগাযোগ সরাসরি দেখতে পারে।\nনিরাপত্তার কারণে Xray কোরের 26.2.6 বা পরবর্তী সংস্করণ দিয়ে এ ধরনের নোডে সংযোগ করা যায় না।\nনোডটি নিজে তৈরি করে থাকলে TLS-এর মতো নিরাপদ এনক্রিপশন চালু করুন অথবা pinnedCA256 সার্টিফিকেট ফিঙ্গারপ্রিন্ট পিন করুন।\nনোডটি কোনো সেবা প্রদানকারীর হলে প্রযুক্তিগত আপগ্রেডের জন্য তাদের সঙ্গে যোগাযোগ করুন। তারা সহযোগিতা না করলে ব্যবহারকারীর নিরাপত্তাকে বেশি গুরুত্ব দেয় এমন প্রদানকারীর কাছে যাওয়ার পরামর্শ দেওয়া হয়।\nআরও তথ্যের জন্য দেখুন https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues</string>
     <string name="pinned_ca256_action_fetch">সার্টিফিকেট ফিঙ্গারপ্রিন্ট আনুন</string>
     <string name="toast_fetch_cert_sha256_success">সার্টিফিকেট ফিঙ্গারপ্রিন্ট সফলভাবে আনা হয়েছে</string>
     <string name="toast_fetch_cert_sha256_failed">সার্টিফিকেট ফিঙ্গারপ্রিন্ট আনা ব্যর্থ হয়েছে</string>
@@ -164,6 +164,13 @@
     <string name="menu_item_import_proxy_app">ক্লিপবোর্ড থেকে আমদানি করুন</string>
     <string name="per_app_proxy_settings">অ্যাপভিত্তিক সেটিংস</string>
     <string name="per_app_proxy_settings_enable">অ্যাপভিত্তিক সেটিংস চালু করুন</string>
+    <string name="per_app_focus_all">সব</string>
+    <string name="per_app_focus_favorites">পছন্দ</string>
+    <string name="per_app_mode_proxy">প্রক্সি</string>
+    <string name="per_app_mode_direct">সরাসরি</string>
+    <string name="per_app_mode_default">ডিফল্ট</string>
+    <string name="per_app_mode_info">অ্যাপভিত্তিক: ডিফল্ট সাধারণ সেটিং অনুসরণ করে, প্রক্সি VPN দিয়ে যায়, সরাসরি মূল সংযোগ রাখে</string>
+    <string name="acc_per_app_favorite">পছন্দ পরিবর্তন করুন</string>
     <string name="app_picker_unknown_app">অজানা অ্যাপ (UID শনাক্ত করা যায়নি)</string>
 
     <!-- Preferences -->
@@ -232,6 +239,20 @@
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS হোস্ট ম্যাপিং (বিন্যাস: domain:address,…)</string>
+
+    <string name="title_pref_dns_custom">কাস্টম DNS</string>
+    <string name="title_settings_dns_custom">কাস্টম DNS</string>
+    <string name="dns_editor_remote_servers">দূরবর্তী DNS সার্ভার</string>
+    <string name="dns_editor_domestic_servers">সরাসরি DNS সার্ভার</string>
+    <string name="dns_editor_dns_hosts">DNS হোস্ট ম্যাপিং</string>
+    <string name="dns_editor_placeholder_server">সার্ভার ঠিকানা</string>
+    <string name="dns_editor_add_server">সার্ভার ঠিকানা</string>
+    <string name="dns_editor_add">যোগ করুন</string>
+    <string name="dns_editor_domain">ডোমেইন</string>
+    <string name="dns_editor_address">ঠিকানা</string>
+    <string name="dns_editor_add_host">যোগ করুন</string>
+    <string name="dns_editor_invalid_dns">অবৈধ DNS সার্ভার ঠিকানা</string>
+    <string name="dns_editor_invalid_host">অবৈধ ডোমেইন বা ঠিকানা</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">প্রকৃত বিলম্ব পরীক্ষার URL</string>
