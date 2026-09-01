@@ -1,16 +1,13 @@
 package com.cr.tunnel.ui.main
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -297,30 +294,14 @@ fun MainScreen(
         floatingActionButton = {},
     ) { innerPadding ->
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        AnimatedContent(
-            targetState = selectedTab,
-            transitionSpec = {
-                val forward = targetState.ordinal > initialState.ordinal
-                // Mirror the slide direction in RTL locales so pages always
-                // move toward the reading side of the user.
-                val enterFromEnd = if (isRtl) !forward else forward
-                if (enterFromEnd) {
-                    (slideInHorizontally(tween(160, easing = FastOutSlowInEasing)) { it / 4 } +
-                        fadeIn(tween(160))) togetherWith
-                        (slideOutHorizontally(tween(160, easing = FastOutSlowInEasing)) { -it / 4 } +
-                            fadeOut(tween(160)))
-                } else {
-                    (slideInHorizontally(tween(160, easing = FastOutSlowInEasing)) { -it / 4 } +
-                        fadeIn(tween(160))) togetherWith
-                        (slideOutHorizontally(tween(160, easing = FastOutSlowInEasing)) { it / 4 } +
-                            fadeOut(tween(160)))
-                }
-            },
+        val saveableStateHolder = rememberSaveableStateHolder()
+        
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) { tab ->
-            when (tab) {
+        ) {
+            when (selectedTab) {
                 MainTab.Home -> HomeTab(
                     mainViewModel = mainViewModel,
                     uiState = uiState,
