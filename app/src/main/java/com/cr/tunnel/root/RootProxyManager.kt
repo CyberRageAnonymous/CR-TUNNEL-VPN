@@ -13,16 +13,6 @@ import com.cr.tunnel.util.PackageUidResolver
 import com.cr.tunnel.util.Utils
 import java.io.File
 
-/**
- * Installs and removes the iptables / ip-rule routing that pushes system-wide traffic
- * into a tun device (root mode, and LAN/tethering sharing for VPN mode).
- *
- * A bundled hev-socks5-tunnel binary (run as root) creates the tun and forwards it to
- * the in-process core's SOCKS inbound; a mangle MARK chain plus a dedicated routing
- * table and ip rule steer traffic into the tun. Rules live in dedicated chains/tables
- * so teardown is a bounded flush, and teardown runs before every setup and on every
- * stop path so no stale rule can break connectivity.
- */
 object RootProxyManager {
 
     private const val CHAIN = AppConfig.ROOT_IPTABLES_CHAIN
@@ -56,11 +46,6 @@ object RootProxyManager {
         return true
     }
 
-    /**
-     * LAN/tethering sharing while the device itself stays on VPN mode: a client tun2socks
-     * forwards tethered clients into the core's SOCKS inbound without touching the
-     * device's own traffic. Requires root.
-     */
     fun startClientSharing(context: Context): Boolean {
         teardown(context)
         val script = buildTun2socksSetup(context, captureDeviceTraffic = false, forceLanShare = true)
@@ -75,7 +60,6 @@ object RootProxyManager {
         return true
     }
 
-    /** Remove all rules and stop helper processes. Safe to call repeatedly. */
     fun stop(context: Context) {
         teardown(context)
         LogUtil.i(AppConfig.TAG, "RootProxyManager: rules removed")
@@ -87,11 +71,6 @@ object RootProxyManager {
 
     // --------------------------------------------------------------- TUN2SOCKS
 
-    /**
-     * @param captureDeviceTraffic Root mode: capture the device's own OUTPUT traffic.
-     *   VPN-mode sharing: only forwarded clients are routed into the tun.
-     * @param forceLanShare Force the LAN forward rules regardless of the preference.
-     */
     private fun buildTun2socksSetup(
         context: Context,
         captureDeviceTraffic: Boolean = true,
@@ -186,11 +165,6 @@ object RootProxyManager {
         }
     }
 
-    /**
-     * hev-socks5-tunnel YAML config. hev creates the tun named [TUN], assigns it the
-     * addresses, and forwards everything it receives to the core's SOCKS inbound on
-     * loopback (TCP + UDP). MTU comes from the existing VPN MTU setting.
-     */
     private fun buildHevConfig(socksUsername: String?, socksPassword: String?, socksPort: Int, ipv6: Boolean): String {
         val v4 = AppConfig.ROOT_TUN_ADDR_V4.substringBefore("/")
         val v6 = AppConfig.ROOT_TUN_ADDR_V6.substringBefore("/")
@@ -213,11 +187,6 @@ object RootProxyManager {
         }
     }
 
-    /**
-     * mangle OUTPUT marking chain (ipv4/ipv6), mirroring VpnService capture behavior:
-     * all-apps mode marks every remaining uid; bypass mode keeps the selected apps
-     * direct and captures everything else; proxy mode captures only the selected apps.
-     */
     private fun buildMangleMarking(
         cmd: String,
         appUid: Int,
@@ -260,16 +229,6 @@ object RootProxyManager {
         }
     }
 
-    /**
-     * Reject native IPv6 egress for the captured apps when IPv6 is not routed into the
-     * tun. A v4-only VpnService has no v6 route, so the kernel rejects apps' v6 and they
-     * fall back to IPv4; root mode must reproduce that explicitly or v6-capable apps
-     * reach destinations natively, bypassing the proxy. REJECT (not DROP) fails fast so
-     * happy-eyeballs falls back to v4 without a timeout.
-     *
-     * Exemptions mirror the v4 chain (helper fwmark, app core uid, loopback,
-     * link-local/multicast, ULA/LAN) and per-app selection is honored.
-     */
     private fun buildV6Blackhole(
         appUid: Int,
         perAppEnabled: Boolean,
@@ -307,12 +266,6 @@ object RootProxyManager {
 
     // -------------------------------------------------- LAN / tethering sharing
 
-    /**
-     * Route Wi-Fi-hotspot / USB-tethered clients through the tun (ipv4). Best-effort:
-     * wrapped in `set +e` so a failure here never breaks the working proxy. Mirrors
-     * Magic_V2Ray's hotspot rules (FORWARD accept, DNS DNAT, source-based policy
-     * routing for private client ranges, MSS clamp).
-     */
     private fun buildLanShareSetup(captureDeviceTraffic: Boolean, ipv6: Boolean): String {
         val fwd = AppConfig.ROOT_FWD_CHAIN
         val dnsChain = AppConfig.ROOT_DNS_CHAIN

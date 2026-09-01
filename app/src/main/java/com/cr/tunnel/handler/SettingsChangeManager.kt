@@ -3,10 +3,6 @@ package com.cr.tunnel.handler
 import com.cr.tunnel.AppConfig
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Manages global flags for actions triggered by setting changes.
- * Uses AtomicBoolean for thread-safe consume operations.
- */
 object SettingsChangeManager {
 
     private val restartService = AtomicBoolean(false)
@@ -22,10 +18,6 @@ object SettingsChangeManager {
         AppConfig.PREF_IS_BOOTED,
     )
 
-    /**
-     * Called when a setting value changes.
-     * Triggers service restart if the key is not UI-only, and always refreshes UI tabs.
-     */
     fun notifySettingChanged(key: String) {
         if (key !in uiOnlyKeys) {
             makeRestartService()
@@ -37,10 +29,6 @@ object SettingsChangeManager {
         restartService.set(true)
     }
 
-    /**
-     * Atomically consumes the restart flag.
-     * @return true if a restart was requested, false otherwise.
-     */
     fun consumeRestartService(): Boolean =
         restartService.compareAndSet(true, false)
 
@@ -48,10 +36,6 @@ object SettingsChangeManager {
         setupGroupTab.set(true)
     }
 
-    /**
-     * Atomically consumes the setup-group-tab flag.
-     * @return true if UI refresh was requested, false otherwise.
-     */
     fun consumeSetupGroupTab(): Boolean =
         setupGroupTab.compareAndSet(true, false)
 }

@@ -47,7 +47,6 @@ fun GlassBackground(
     }
 }
 
-/** Frosted glass tile: rounded translucent fill with a specular top highlight and a thin gradient edge. */
 fun Modifier.glassSurface(
     darkTheme: Boolean,
     cornerRadius: Dp = 18.dp,
@@ -87,7 +86,6 @@ fun Modifier.glassSurface(
         }
     }
 
-/** Soft frosted fill without an edge, used behind form fields where the outline is drawn by the field itself. */
 fun Modifier.glassFill(
     darkTheme: Boolean,
     cornerRadius: Dp = 14.dp,

@@ -36,11 +36,6 @@ object NotificationManager {
 
     private var lastQueryTime = 0L
 
-    /**
-     * Authoritative session totals, accumulated inside the always-alive service
-     * process and mirrored to the UI as absolute values. Broadcasts may be
-     * dropped while the UI is backgrounded; absolute values make that lossless.
-     */
     @Volatile
     var sessionUplink = 0L
         private set
@@ -53,13 +48,6 @@ object NotificationManager {
     private var mNotificationManager: NotificationManager? = null
     private var uiTrafficStatsJob: Job? = null
 
-    /**
-     * Starts the unified traffic loop: the single reader of the core counters.
-     * Computes per-tag deltas (safe for both cumulative and reset-on-read
-     * counter semantics), broadcasts them to the UI and updates the speed
-     * notification from the very same numbers, so no traffic is ever split
-     * between competing pollers.
-     */
     fun startUiTrafficStatsBroadcast() {
         if (uiTrafficStatsJob != null) return
         val service = getService() ?: return
@@ -139,9 +127,6 @@ object NotificationManager {
         }
     }
 
-    /**
-     * Stops the UI traffic stats broadcast and ends the traffic session.
-     */
     fun stopUiTrafficStatsBroadcast() {
         uiTrafficStatsJob?.cancel()
         uiTrafficStatsJob = null
@@ -151,10 +136,6 @@ object NotificationManager {
         MmkvManager.encodeSettings(AppConfig.PREF_SESSION_DOWNLINK, 0L)
     }
 
-    /**
-     * Pushes the current absolute session totals to the UI. Used when a UI
-     * process (re)attaches so it immediately mirrors the service numbers.
-     */
     fun pushSessionTotalsToUi(service: Service) {
         MessageHelper.sendMsg2UI(
             service, AppConfig.MSG_TRAFFIC_STATS,
@@ -162,10 +143,6 @@ object NotificationManager {
         )
     }
 
-    /**
-     * Shows the notification.
-     * @param currentConfig The current profile configuration.
-     */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
 
@@ -217,20 +194,12 @@ object NotificationManager {
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
     }
 
-    /**
-     * Fulfills or refreshes the foreground-service contract before a start command can
-     * return early. A duplicate startForegroundService call still requires the service
-     * to enter foreground state promptly, even when the core is already running.
-     */
     fun ensureForeground() {
         val service = getService() ?: return
         val notification = mBuilder?.build()
         if (notification == null) showNotification(null) else service.startForeground(NOTIFICATION_ID, notification)
     }
 
-    /**
-     * Cancels the notification.
-     */
     fun cancelNotification() {
         val service = getService() ?: return
         service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
@@ -239,11 +208,6 @@ object NotificationManager {
         mNotificationManager = null
     }
 
-    /**
-     * Shows the kill switch standby notification. Kept as the foreground-service
-     * notification while the tunnel stays up without a running core, otherwise the
-     * process would be killed and traffic could escape.
-     */
     fun showKillSwitchNotification() {
         val service = getService() ?: return
         val channelId =
@@ -273,18 +237,10 @@ object NotificationManager {
         mBuilder = null
     }
 
-    /**
-     * Resets the speed section of the notification. The unified traffic loop in
-     * startUiTrafficStatsBroadcast keeps it updated afterwards.
-     */
     fun stopSpeedNotification() {
         updateNotification("", 0, 0)
     }
 
-    /**
-     * Creates a notification channel for Android O and above.
-     * @return The channel ID.
-     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
         val channelId = AppConfig.RAY_NG_CHANNEL_ID
@@ -297,12 +253,6 @@ object NotificationManager {
         return channelId
     }
 
-    /**
-     * Updates the notification with the given content text and traffic data.
-     * @param contentText The content text.
-     * @param proxyTraffic The proxy traffic.
-     * @param directTraffic The direct traffic.
-     */
     private fun updateNotification(contentText: String?, proxyTraffic: Long, directTraffic: Long) {
         if (mBuilder != null) {
             if (proxyTraffic < NOTIFICATION_ICON_THRESHOLD && directTraffic < NOTIFICATION_ICON_THRESHOLD) {
@@ -318,10 +268,6 @@ object NotificationManager {
         }
     }
 
-    /**
-     * Gets the notification manager.
-     * @return The notification manager.
-     */
     private fun getNotificationManager(): NotificationManager? {
         if (mNotificationManager == null) {
             val service = getService() ?: return null
@@ -330,13 +276,6 @@ object NotificationManager {
         return mNotificationManager
     }
 
-    /**
-     * Appends the speed string to the given text.
-     * @param text The text to append to.
-     * @param name The name of the tag.
-     * @param up The uplink speed.
-     * @param down The downlink speed.
-     */
     private fun appendSpeedString(text: StringBuilder, name: String?, up: Double, down: Double) {
         var n = name ?: "no tag"
         n = n.take(min(n.length, 6))
@@ -347,10 +286,6 @@ object NotificationManager {
         text.append("•  ${up.toLong().toSpeedString()}↑  ${down.toLong().toSpeedString()}↓\n")
     }
 
-    /**
-     * Gets the service instance.
-     * @return The service instance.
-     */
     private fun getService(): Service? {
         return CoreServiceManager.serviceControl?.get()?.getService()
     }

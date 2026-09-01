@@ -188,11 +188,6 @@ fun QRCodeDialog(
     )
 }
 
-/**
- * When showRadio is true, displays RadioButton (single selection mode);
- * otherwise, plain clickable list mode.
- * The selectedOption parameter is used to highlight the selected item only when showRadio is true.
- */
 @Composable
 fun <T> SelectListDialog(
     options: List<T>,

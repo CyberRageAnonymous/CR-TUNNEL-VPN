@@ -19,11 +19,6 @@ object WebDavManager {
     private var cfg: WebDavConfig? = null
     private var client: OkHttpClient? = null
 
-    /**
-     * Initialize the WebDAV manager with a configuration and build an OkHttp client.
-     *
-     * @param config WebDavConfig containing baseUrl, credentials, remoteBasePath and timeoutSeconds.
-     */
     fun init(config: WebDavConfig) {
         cfg = config
         client = OkHttpClient.Builder()
@@ -34,15 +29,6 @@ object WebDavManager {
             .build()
     }
 
-    /**
-     * Upload a local file to a remote file name under the configured remoteBasePath.
-     * The provided `remoteFileName` should be a file name (e.g. "backup_ng.zip").
-     * The method will attempt to create parent directories via MKCOL before PUT.
-     *
-     * @param localFile File to upload.
-     * @param remoteFileName Remote file name relative to configured remoteBasePath.
-     * @return true if upload succeeded (HTTP 2xx), false otherwise.
-     */
     suspend fun uploadFile(localFile: File, remoteFileName: String): Boolean = withContext(Dispatchers.IO) {
         val remote = buildRemoteUrl(remoteFileName)
         try {
@@ -79,13 +65,6 @@ object WebDavManager {
         }
     }
 
-    /**
-     * Download a remote file (relative to configured remoteBasePath) into a local file.
-     *
-     * @param remoteFileName Remote file name relative to configured remoteBasePath.
-     * @param destFile Local destination file to write to.
-     * @return true if download and write succeeded, false otherwise.
-     */
     suspend fun downloadFile(remoteFileName: String, destFile: File): Boolean = withContext(Dispatchers.IO) {
         val remote = buildRemoteUrl(remoteFileName)
         try {
@@ -113,16 +92,6 @@ object WebDavManager {
         }
     }
 
-    /**
-     * Build a full remote URL by combining the configured base URL, the configured
-     * remote base path and a file name provided by the caller.
-     *
-     * Example: baseUrl="https://example.com/remote.php/dav", remoteBasePath="backups",
-     * remoteFileName="backup_ng.zip" => "https://example.com/remote.php/dav/backups/backup_ng.zip"
-     *
-     * @param remoteFileName A file name relative to the configured remoteBasePath (no leading slash required).
-     * @return Full URL string used for HTTP operations.
-     */
     private fun buildRemoteUrl(remoteFileName: String): String {
         val base = cfg?.baseUrl?.trimEnd('/') ?: ""
         // Use configured remoteBasePath when not empty; otherwise fallback to AppConfig.WEBDAV_BACKUP_DIR
@@ -132,13 +101,6 @@ object WebDavManager {
         return if (basePath.isEmpty()) "$base/$rel" else "$base/$basePath/$rel"
     }
 
-    /**
-     * Apply HTTP Basic authentication headers to the given request builder when
-     * username is configured in `cfg`.
-     *
-     * @param builder OkHttp Request.Builder to modify.
-     * @return The same builder instance with Authorization header applied if credentials exist.
-     */
     private fun applyAuth(builder: Request.Builder): Request.Builder {
         val username = cfg?.username
         val password = cfg?.password
@@ -148,13 +110,6 @@ object WebDavManager {
         return builder
     }
 
-    /**
-     * Ensure that each directory segment in the given directory URL exists on the
-     * WebDAV server. This issues MKCOL requests for each segment in a best-effort
-     * manner and ignores errors for segments that already exist.
-     *
-     * @param dirUrl Absolute URL to the directory that should exist (e.g. https://.../backups)
-     */
     private fun ensureRemoteDirs(dirUrl: String) {
         try {
             val cl = client ?: return

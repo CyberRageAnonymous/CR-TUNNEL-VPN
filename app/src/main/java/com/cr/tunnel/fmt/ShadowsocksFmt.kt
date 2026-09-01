@@ -10,22 +10,11 @@ import com.cr.tunnel.util.Utils
 import java.net.URI
 
 object ShadowsocksFmt : FmtBase() {
-    /**
-     * Parses a Shadowsocks URI string into a ProfileItem object.
-     *
-     * @param str the Shadowsocks URI string to parse
-     * @return the parsed ProfileItem object, or null if parsing fails
-     */
+    
     fun parse(str: String): ProfileItem? {
         return parseSip002(str) ?: parseLegacy(str)
     }
 
-    /**
-     * Parses a SIP002 Shadowsocks URI string into a ProfileItem object.
-     *
-     * @param str the SIP002 Shadowsocks URI string to parse
-     * @return the parsed ProfileItem object, or null if parsing fails
-     */
     fun parseSip002(str: String): ProfileItem? {
         val config = ProfileItem.create(EConfigType.SHADOWSOCKS)
 
@@ -68,12 +57,6 @@ object ShadowsocksFmt : FmtBase() {
         return config
     }
 
-    /**
-     * Parses a legacy Shadowsocks URI string into a ProfileItem object.
-     *
-     * @param str the legacy Shadowsocks URI string to parse
-     * @return the parsed ProfileItem object, or null if parsing fails
-     */
     fun parseLegacy(str: String): ProfileItem? {
         val config = ProfileItem.create(EConfigType.SHADOWSOCKS)
         var result = str.replace(EConfigType.SHADOWSOCKS.protocolScheme, "")
@@ -111,12 +94,6 @@ object ShadowsocksFmt : FmtBase() {
         return config
     }
 
-    /**
-     * Converts a ProfileItem object to a URI string.
-     *
-     * @param config the ProfileItem object to convert
-     * @return the converted URI string
-     */
     fun toUri(config: ProfileItem): String {
         val pw = "${config.method}:${config.password}"
 

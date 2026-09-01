@@ -22,15 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.SoftReference
 
-/**
- * Foreground service for the root (system-wide) run modes. Unlike [CoreVpnService] it
- * does not use Android VpnService — traffic is routed by iptables instead
- * (see [RootProxyManager]).
- *
- * The in-process core is started first (so its listener is up and the foreground
- * notification is posted promptly), then the root routing rules are installed off the
- * main thread. On teardown the rules are removed before the core stops.
- */
 class CoreRootService : Service(), ServiceControl {
 
     private var setupJob: Job? = null

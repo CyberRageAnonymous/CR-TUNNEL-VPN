@@ -24,11 +24,7 @@ class DialerWebviewService : IDialerService {
         }
     }
 
-
-    /**
-     * Starts the WebView.
-     * @param context Service context
-     */
+    
     @SuppressLint("SetJavaScriptEnabled")
     override fun start(context: Context, dialerAddr: String) {
         if (webView != null) stop()

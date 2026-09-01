@@ -154,10 +154,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         super.attachBaseContext(context)
     }
 
-    /**
-     * Sets up the VPN service.
-     * Prepares the VPN and configures it if preparation is successful.
-     */
     private fun setupVpnService(): Boolean {
         val prepare = prepare(this)
         if (prepare != null) {
@@ -174,10 +170,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         return true
     }
 
-    /**
-     * Configures the VPN service.
-     * @return True if the VPN service was configured successfully, false otherwise.
-     */
     private fun configureVpnService(): Boolean {
         val builder = Builder()
 
@@ -211,12 +203,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         return false
     }
 
-    /**
-     * Configures the basic network settings for the VPN.
-     * This includes IP addresses, routing rules, and DNS servers.
-     *
-     * @param builder The VPN Builder to configure
-     */
     private fun configureNetworkSettings(builder: Builder) {
         val vpnConfig = SettingsManager.getCurrentVpnInterfaceAddressConfig()
         val bypassLan = SettingsManager.routingRulesetsBypassLan()
@@ -259,11 +245,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         //builder.setSession(V2RayServiceManager.getRunningServerName())
     }
 
-    /**
-     * Configures platform-specific VPN features for different Android versions.
-     *
-     * @param builder The VPN Builder to configure
-     */
     private fun configurePlatformFeatures(builder: Builder) {
         // Android Q (API 29) and above: Configure metering and HTTP proxy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -274,18 +255,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
     }
 
-    /**
-     * Configures per-app proxy rules for the VPN builder.
-     *
-     * - If per-app proxy is not enabled, disallow the VPN service's own package.
-     * - Apps explicitly set to Direct are always disallowed (they keep their own network).
-     * - Apps explicitly set to Proxy are allowed into the tunnel.
-     * - Apps without an explicit mode follow the default: with bypass mode enabled the
-     *   default is proxied (disallowed list only excludes the Direct apps), otherwise only
-     *   the Proxy apps are allowed into the tunnel.
-     *
-     * @param builder The VPN Builder to configure.
-     */
     private fun configurePerAppProxy(builder: Builder) {
         val selfPackageName = BuildConfig.APPLICATION_ID
 
@@ -337,10 +306,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
     }
 
-    /**
-     * Runs the tun2socks process.
-     * Starts the tun2socks process with the appropriate parameters.
-     */
     private fun runTun2socks() {
         if (SettingsManager.isUsingHevTun()) {
             tun2SocksService = TProxyService(

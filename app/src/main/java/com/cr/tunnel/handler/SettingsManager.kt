@@ -45,10 +45,6 @@ object SettingsManager {
         migrateHysteria2PinSHA256()
     }
 
-    /**
-     * Initialize routing rulesets.
-     * @param context The application context.
-     */
     private fun initRoutingRulesets(context: Context) {
         val exist = MmkvManager.decodeRoutingRulesets()
         if (exist.isNullOrEmpty()) {
@@ -57,12 +53,6 @@ object SettingsManager {
         }
     }
 
-    /**
-     * Get preset routing rulesets.
-     * @param context The application context.
-     * @param type The routing preset type.
-     * @return A mutable list of RulesetItem.
-     */
     private fun getPresetRoutingRulesets(context: Context, type: RoutingType = RoutingType.WHITE): MutableList<RulesetItem>? {
         val assets = Utils.readTextFromAssets(context, type.fileName)
         if (TextUtils.isEmpty(assets)) {
@@ -72,21 +62,11 @@ object SettingsManager {
         return JsonUtil.fromJsonSafe(assets, Array<RulesetItem>::class.java)?.toMutableList()
     }
 
-    /**
-     * Reset routing rulesets from presets.
-     * @param context The application context.
-     * @param type The routing preset type.
-     */
     fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType) {
         val rulesetList = getPresetRoutingRulesets(context, type) ?: return
         resetRoutingRulesetsCommon(rulesetList)
     }
 
-    /**
-     * Reset routing rulesets.
-     * @param content The content of the rulesets.
-     * @return True if successful, false otherwise.
-     */
     fun resetRoutingRulesets(content: String?): Boolean {
         if (content.isNullOrEmpty()) {
             return false
@@ -106,10 +86,6 @@ object SettingsManager {
         }
     }
 
-    /**
-     * Common method to reset routing rulesets.
-     * @param rulesetList The list of rulesets.
-     */
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
         val rulesetNew: MutableList<RulesetItem> = mutableListOf()
         MmkvManager.decodeRoutingRulesets()?.forEach { key ->
@@ -122,11 +98,6 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
-    /**
-     * Get a routing ruleset by index.
-     * @param index The index of the ruleset.
-     * @return The RulesetItem.
-     */
     fun getRoutingRuleset(index: Int): RulesetItem? {
         if (index < 0) return null
 
@@ -136,11 +107,6 @@ object SettingsManager {
         return rulesetList[index]
     }
 
-    /**
-     * Save a routing ruleset.
-     * @param index The index of the ruleset.
-     * @param ruleset The RulesetItem to save.
-     */
     fun saveRoutingRuleset(index: Int, ruleset: RulesetItem?) {
         if (ruleset == null) return
 
@@ -157,10 +123,6 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
-    /**
-     * Remove a routing ruleset by index.
-     * @param index The index of the ruleset.
-     */
     fun removeRoutingRuleset(index: Int) {
         if (index < 0) return
 
@@ -171,10 +133,6 @@ object SettingsManager {
         MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
-    /**
-     * Check if routing rulesets bypass LAN.
-     * @return True if bypassing LAN, false otherwise.
-     */
     fun routingRulesetsBypassLan(): Boolean {
         val vpnBypassLan = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_BYPASS_LAN) ?: "1"
         if (vpnBypassLan == "1") {
@@ -201,11 +159,6 @@ object SettingsManager {
         return exist == true
     }
 
-    /**
-     * Get server via remarks.
-     * @param remarks The remarks of the server.
-     * @return The ProfileItem.
-     */
     fun getServerViaRemarks(remarks: String?): ProfileItem? {
         if (remarks.isNullOrEmpty()) {
             return null
@@ -216,9 +169,6 @@ object SettingsManager {
             .firstOrNull { it.remarks == remarks }
     }
 
-    /**
-     * Collects non-empty profile remarks while excluding specific config types.
-     */
     fun getProfileRemarks(excludeConfigTypes: Set<EConfigType> = setOf(EConfigType.CUSTOM)): List<String> {
         return decodeAllServerList()
             .asSequence()
@@ -230,11 +180,6 @@ object SettingsManager {
             .toList()
     }
 
-    /**
-     * Removes the subscription.
-     * If there are no remaining subscriptions,
-     * it creates a new default subscription to ensure that ungroup
-     **/
     fun removeSubscriptionWithDefault(subid: String) {
         SubscriptionUpdater.cancelOne(subId = subid)
         // Remove the subscription
@@ -252,10 +197,6 @@ object SettingsManager {
         encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
     }
 
-    /**
-     * Get the SOCKS port.
-     * @return The SOCKS port.
-     */
     fun getSocksPort(): Int {
         val port =
             if (IsDynamicSocksPort()) {
@@ -283,10 +224,6 @@ object SettingsManager {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_SOCKS_PASSWORD)?.trim()?.takeIf { it.isNotEmpty() }
     }
 
-    /**
-     * Get the HTTP port.
-     * @return The HTTP port.
-     */
     fun getHttpPort(): Int {
         return getSocksPort() + if (Utils.isXray()) 0 else 1
     }
@@ -299,11 +236,6 @@ object SettingsManager {
         return Random.nextInt(10000, 65535)
     }
 
-    /**
-     * Initialize assets.
-     * @param context The application context.
-     * @param assets The AssetManager.
-     */
     fun initAssets(context: Context, assets: AssetManager) {
         val extFolder = Utils.userAssetPath(context)
 
@@ -326,10 +258,6 @@ object SettingsManager {
         }
     }
 
-    /**
-     * Get domestic DNS servers from preference.
-     * @return A list of domestic DNS servers.
-     */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns =
             MmkvManager.decodeSettingsString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
@@ -340,10 +268,6 @@ object SettingsManager {
         return ret
     }
 
-    /**
-     * Get remote DNS servers from preference.
-     * @return A list of remote DNS servers.
-     */
     fun getRemoteDnsServers(): List<String> {
         val remoteDns =
             MmkvManager.decodeSettingsString(AppConfig.PREF_REMOTE_DNS) ?: AppConfig.DNS_PROXY
@@ -354,20 +278,11 @@ object SettingsManager {
         return ret
     }
 
-    /**
-     * Get VPN DNS servers from preference.
-     * @return A list of VPN DNS servers.
-     */
     fun getVpnDnsServers(): List<String> {
         val vpnDns = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_DNS) ?: AppConfig.DNS_VPN
         return vpnDns.split(",").filter { Utils.isPureIpAddress(it) }
     }
 
-    /**
-     * Get delay test URL.
-     * @param second Whether to use the second URL.
-     * @return The delay test URL.
-     */
     fun getDelayTestUrl(second: Boolean = false): String {
         return if (second) {
             AppConfig.DELAY_TEST_URL2
@@ -377,39 +292,20 @@ object SettingsManager {
         }
     }
 
-    /**
-     * Get real ping concurrency.
-     * @return The number of concurrent real-ping tests (clamped to 1..64).
-     */
     fun getRealPingConcurrency(): Int {
         val value = MmkvManager.decodeSettingsString(AppConfig.PREF_REAL_PING_CONCURRENCY)?.toIntOrNull() ?: 16
         return value.coerceIn(1, 128)
     }
 
-    /**
-     * Retrieves the currently selected VPN interface address configuration.
-     * This method reads the user's preference for VPN interface addressing and returns
-     * the corresponding configuration containing IPv4 and IPv6 addresses.
-     *
-     * @return The selected VpnInterfaceAddressConfig instance, or the default configuration
-     *         if no valid selection is found or if the stored index is invalid.
-     */
     fun getCurrentVpnInterfaceAddressConfig(): VpnInterfaceAddressConfig {
         val selectedIndex = MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX, "0")?.toInt()
         return VpnInterfaceAddressConfig.getConfigByIndex(selectedIndex ?: 0)
     }
 
-    /**
-     * Get the VPN MTU from settings, defaulting to AppConfig.VPN_MTU.
-     */
     fun getVpnMtu(): Int {
         return Utils.parseInt(MmkvManager.decodeSettingsString(AppConfig.PREF_VPN_MTU), AppConfig.VPN_MTU)
     }
 
-    /**
-     * Check if HEV TUN is being used.
-     * @return True if HEV TUN is used, false otherwise.
-     */
     fun isUsingHevTun(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, false) &&
             isHevTunLibraryAvailable()
@@ -431,33 +327,19 @@ object SettingsManager {
         return result
     }
 
-    /**
-     * Check if VPN mode is enabled.
-     * @return True if VPN mode is enabled, false otherwise.
-     */
     fun isVpnMode(): Boolean {
         val mode = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE)
         return mode == null || mode == VPN
     }
 
-    /**
-     * Check if root (system-wide) run mode is selected.
-     */
     fun isRootMode(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
     }
 
-    /**
-     * Check if the kill switch is enabled. When active, a disconnect leaves the
-     * VPN tunnel up with no working upstream so no traffic can leak outside it.
-     */
     fun isKillSwitchEnabled(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_KILL_SWITCH, false)
     }
 
-    /**
-     *  Check if process routing can be used.
-     */
     fun canUseProcessRouting(): Boolean {
         // Android 10+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
@@ -477,9 +359,6 @@ object SettingsManager {
         return true
     }
 
-    /**
-     * Ensure default settings are present in MMKV.
-     */
     private fun ensureDefaultSettings() {
         // Write defaults in the exact order requested by the user
         ensureDefaultValue(AppConfig.PREF_MODE, VPN)
@@ -534,13 +413,6 @@ object SettingsManager {
         MmkvManager.encodeSettings(migrationKey, true)
     }
 
-    /**
-     * Migrates server list from legacy KEY_ANG_CONFIGS to subscription-based storage.
-     * This method should be called once during app initialization after the storage structure change.
-     * Servers are grouped by their subscriptionId into respective subscription's serverList.
-     * Servers without subscription are moved to the default subscription.
-     * After migration, KEY_ANG_CONFIGS is removed.
-     */
     private fun migrateServerListToSubscriptions() {
         // Check if migration has already been done
         val migrationKey = "server_list_to_subscriptions_migrated"
@@ -579,16 +451,10 @@ object SettingsManager {
             MmkvManager.encodeServerList(serverGuids, subId)
         }
 
-
         // Mark migration as complete
         MmkvManager.encodeSettings(migrationKey, true)
     }
 
-    /**
-     * Ensures the default subscription exists for ungrouped servers.
-     * This subscription is used internally to store servers without a subscription.
-     * Made public for migration in SettingsManager.
-     */
     private fun ensureDefaultSubscription() {
         if (decodeSubscription(DEFAULT_SUBSCRIPTION_ID) == null) {
             val defaultSub = SubscriptionItem(

@@ -10,10 +10,6 @@ import kotlinx.coroutines.withContext
 
 class SettingsViewModel(application: Application) : BaseViewModel(application) {
 
-    /**
-     * Checks for root access and requests it if necessary.
-     * Updates [isLoading] during the process.
-     */
     fun checkAndRequestRoot(onSuccess: () -> Unit) {
         launchLoading {
             val hasRoot = withContext(Dispatchers.IO) {
@@ -27,11 +23,6 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    /**
-     * Validates if the given string is a valid observatory duration.
-     * Shows error toast if invalid.
-     * @return The trimmed value if valid, null otherwise.
-     */
     fun validateObservatoryDuration(value: String): String? {
         val duration = value.trim()
         return if (AppConfig.OBSERVATORY_DURATION_PATTERN.matches(duration)) {
@@ -42,11 +33,6 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    /**
-     * Validates if the given string is a valid observatory sampling value.
-     * Shows error toast if invalid.
-     * @return The value if valid, null otherwise.
-     */
     fun validateObservatorySampling(value: String): String? {
         val sampling = value.trim().toIntOrNull()?.takeIf { it > 0 }
         return if (sampling != null) {

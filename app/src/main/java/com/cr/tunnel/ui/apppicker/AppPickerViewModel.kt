@@ -17,9 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.text.Collator
 
-/**
- * ViewModel for AppPicker screen.
- */
 class AppPickerViewModel(application: Application) : BaseViewModel(application) {
 
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())

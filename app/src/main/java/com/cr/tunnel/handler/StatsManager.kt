@@ -5,10 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Per-day and per-month traffic totals, accumulated in the service process
- * and read by the statistics screen.
- */
 object StatsManager {
 
     private val dayFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)

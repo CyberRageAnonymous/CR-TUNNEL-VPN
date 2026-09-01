@@ -3,9 +3,6 @@ package com.cr.tunnel.ui.main
 import com.cr.tunnel.dto.GroupMapItem
 import com.cr.tunnel.dto.LocateTarget
 
-/**
- * Main UI state
- */
 data class MainUiState(
     val groups: List<GroupMapItem> = emptyList(),
     val selectedGroupId: String = "",
@@ -26,9 +23,6 @@ data class MainUiState(
     val totalDownlink: String = "0 B"
 )
 
-/**
- * All possible user interaction intents
- */
 sealed interface MainAction {
     data object Initialize : MainAction
     data object RefreshGroups : MainAction

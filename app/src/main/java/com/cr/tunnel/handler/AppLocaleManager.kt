@@ -12,14 +12,8 @@ import androidx.core.os.ConfigurationCompat
 import com.cr.tunnel.AppConfig
 import com.cr.tunnel.enums.Language
 
-/**
- * Keeps the legacy in-app language preference synchronized with Android's per-app locale APIs.
- */
 object AppLocaleManager {
 
-    /**
-     * Migrates the existing MMKV language preference and restores it before the first activity.
-     */
     fun initialize(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Api33.prepareMigration(context)
@@ -28,9 +22,6 @@ object AppLocaleManager {
         }
     }
 
-    /**
-     * Completes the one-time handoff after AppCompat has attached the activity context.
-     */
     fun onActivityCreated(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Api33.completeMigration(context)
@@ -39,18 +30,12 @@ object AppLocaleManager {
         }
     }
 
-    /**
-     * Applies a language selected in the app and lets AppCompat recreate the current activity.
-     */
     fun setApplicationLanguage(languageCode: String) {
         val language = Language.fromCode(languageCode)
         persistLegacyPreference(language)
         AppCompatDelegate.setApplicationLocales(language.toLocaleList())
     }
 
-    /**
-     * Returns a context suitable for resource access outside AppCompatActivity.
-     */
     fun localizedContext(context: Context): Context {
         val localizedContext = ContextCompat.getContextForLanguage(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || localizedContext !== context) {

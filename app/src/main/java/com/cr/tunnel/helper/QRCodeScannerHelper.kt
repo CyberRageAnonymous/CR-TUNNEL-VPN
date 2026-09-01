@@ -7,12 +7,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.cr.tunnel.ui.ScannerActivity
 
-/**
- * Helper for scanning QR codes.
- *
- * This class encapsulates the logic for launching the QR code scanner activity
- * and handling the scan result.
- */
 class QRCodeScannerHelper(private val activity: ComponentActivity) {
     private var scanCallback: ((String?) -> Unit)? = null
 
@@ -27,11 +21,6 @@ class QRCodeScannerHelper(private val activity: ComponentActivity) {
             scanCallback = null
         }
 
-    /**
-     * Launch the QR code scanner activity.
-     *
-     * @param onResult Callback invoked with the scan result (null if cancelled or failed)
-     */
     fun launch(onResult: (String?) -> Unit) {
         scanCallback = onResult
         scanLauncher.launch(Intent(activity, ScannerActivity::class.java))

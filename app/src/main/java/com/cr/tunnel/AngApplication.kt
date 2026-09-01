@@ -16,10 +16,6 @@ class AngApplication : Application() {
         lateinit var application: AngApplication
     }
 
-    /**
-     * Attaches the base context to the application.
-     * @param base The base context.
-     */
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base?.let(ContextCompat::getContextForLanguage))
         application = this
@@ -29,9 +25,6 @@ class AngApplication : Application() {
         .setDefaultProcessName("${ANG_PACKAGE}:bg")
         .build()
 
-    /**
-     * Initializes the application.
-     */
     override fun onCreate() {
         super.onCreate()
 

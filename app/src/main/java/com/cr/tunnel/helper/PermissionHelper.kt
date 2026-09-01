@@ -9,9 +9,6 @@ import com.cr.tunnel.R
 import com.cr.tunnel.enums.PermissionType
 import com.cr.tunnel.extension.toast
 
-/**
- * Helper for requesting permissions.
- */
 class PermissionHelper(private val activity: ComponentActivity) {
     private var permissionCallback: ((Boolean) -> Unit)? = null
 
@@ -21,12 +18,6 @@ class PermissionHelper(private val activity: ComponentActivity) {
             permissionCallback = null
         }
 
-    /**
-     * Check the permission and request it if not granted.
-     *
-     * @param permissionType the type of permission
-     * @param onGranted called when permission is granted (called immediately if already granted)
-     */
     fun request(permissionType: PermissionType, onGranted: () -> Unit) {
         val permission = permissionType.getPermission()
         if (ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED) {

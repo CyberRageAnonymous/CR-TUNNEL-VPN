@@ -1,9 +1,5 @@
 package com.cr.tunnel.enums
 
-/**
- * Enum defining different notification channels.
- * Each channel has a unique channelId, notificationId, and display name.
- */
 enum class NotificationChannelType(
     val channelId: String,
     val channelName: String,

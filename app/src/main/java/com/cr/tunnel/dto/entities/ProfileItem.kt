@@ -87,20 +87,6 @@ data class ProfileItem(
         return "${Utils.getIpv6Address(server)}:$serverPort"
     }
 
-    /**
-     * Dedicated identity for "remove duplicate configurations".
-     *
-     * Ignores metadata that does not affect connection:
-     * - configVersion
-     * - subscriptionId
-     * - addedTime
-     * - remarks
-     * - description
-     *
-     * All other fields, including configType, are included in the comparison.
-     *
-     * Returns a copy; the caller must not modify it further.
-     */
     fun duplicateIdentity(): ProfileItem =
         copy(
             configVersion = 0,

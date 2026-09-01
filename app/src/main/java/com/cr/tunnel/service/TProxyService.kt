@@ -9,9 +9,6 @@ import com.cr.tunnel.handler.SettingsManager
 import com.cr.tunnel.util.LogUtil
 import java.io.File
 
-/**
- * Manages the tun2socks process that handles VPN traffic
- */
 class TProxyService(
     private val context: Context,
     private val vpnInterface: ParcelFileDescriptor,
@@ -40,9 +37,6 @@ class TProxyService(
         }
     }
 
-    /**
-     * Starts the tun2socks process with the appropriate parameters.
-     */
     override fun startTun2Socks() {
 //        LogUtil.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
 
@@ -101,9 +95,6 @@ class TProxyService(
         }
     }
 
-    /**
-     * Stops the tun2socks process
-     */
     override fun stopTun2Socks() {
         try {
             LogUtil.i(AppConfig.TAG, "TProxyStopService...")

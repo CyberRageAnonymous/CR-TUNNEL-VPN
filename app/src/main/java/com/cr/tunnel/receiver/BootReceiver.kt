@@ -11,14 +11,7 @@ import com.cr.tunnel.handler.SubscriptionUpdater
 import com.cr.tunnel.util.LogUtil
 
 class BootReceiver : BroadcastReceiver() {
-    /**
-     * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-     * It handles BOOT_COMPLETED, LOCKED_BOOT_COMPLETED, and MY_PACKAGE_REPLACED.
-     * If the conditions are met, it starts the V2Ray service.
-     *
-     * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
-     */
+    
     override fun onReceive(context: Context?, intent: Intent?) {
         val action = intent?.action ?: return
         if (context == null) return

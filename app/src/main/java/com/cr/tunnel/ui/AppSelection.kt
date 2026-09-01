@@ -1,10 +1,5 @@
 package com.cr.tunnel.ui
 
-/**
- * Pure selection operations shared by application-list screens.
- *
- * Keeping the calculations separate lets bulk actions build one result before it is published.
- */
 internal object AppSelection {
 
     fun invert(currentSelection: Set<String>, packageNames: Collection<String>): Set<String> {
@@ -17,12 +12,6 @@ internal object AppSelection {
         }
     }
 
-    /**
-     * Builds the selected package set while preserving the legacy list matching behavior.
-     *
-     * The full list text is searched for each installed package name. This is intentionally not
-     * exact line matching; changing that behavior should be handled separately.
-     */
     fun fromProxyList(
         packageNames: Collection<String>,
         proxyAppList: String,
