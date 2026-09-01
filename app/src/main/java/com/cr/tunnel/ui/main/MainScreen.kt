@@ -322,6 +322,7 @@ fun MainScreen(
         ) { tab ->
             when (tab) {
                 MainTab.Home -> HomeTab(
+                    mainViewModel = mainViewModel,
                     uiState = uiState,
                     displayText = displayText,
                     isDarkTheme = isDarkTheme,
@@ -344,13 +345,9 @@ fun MainScreen(
                     removeServer = removeServer
                 )
 
-                MainTab.Stats -> StatsPage(
+                MainTab.Stats -> StatsTab(
+                    mainViewModel = mainViewModel,
                     isRunning = isRunning,
-                    uplinkSpeed = uiState.uplinkSpeed,
-                    downlinkSpeed = uiState.downlinkSpeed,
-                    totalUplink = uiState.totalUplink,
-                    totalDownlink = uiState.totalDownlink,
-                    connectedAtMs = uiState.connectedAtMs,
                     statusText = displayText
                 )
 
@@ -362,11 +359,13 @@ fun MainScreen(
 
 @Composable
 private fun HomeTab(
+    mainViewModel: MainViewModel,
     uiState: MainUiState,
     displayText: String,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
 ) {
+    val trafficState by mainViewModel.trafficState.collectAsStateWithLifecycle()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -395,11 +394,11 @@ private fun HomeTab(
                 isConnecting = uiState.isConnecting,
                 isAutoOptimizing = uiState.isAutoOptimizing,
             isDarkTheme = isDarkTheme,
-            connectedAtMs = uiState.connectedAtMs,
-            uplinkSpeed = uiState.uplinkSpeed,
-            downlinkSpeed = uiState.downlinkSpeed,
-            totalUplink = uiState.totalUplink,
-            totalDownlink = uiState.totalDownlink,
+            connectedAtMs = trafficState.connectedAtMs,
+            uplinkSpeed = trafficState.uplinkSpeed,
+            downlinkSpeed = trafficState.downlinkSpeed,
+            totalUplink = trafficState.totalUplink,
+            totalDownlink = trafficState.totalDownlink,
             onToggle = { onAction(MainAction.ToggleService) },
             onTest = { onAction(MainAction.TestCurrentServer) },
             onAutoOptimize = { onAction(MainAction.AutoOptimize) },
@@ -522,4 +521,22 @@ fun OptimizeBanner(onCancel: () -> Unit) {
                 .padding(5.dp)
         )
     }
+}
+
+@androidx.compose.runtime.Composable
+private fun StatsTab(
+    mainViewModel: MainViewModel,
+    isRunning: Boolean,
+    statusText: String,
+) {
+    val traffic by mainViewModel.trafficState.collectAsStateWithLifecycle()
+    StatsPage(
+        isRunning = isRunning,
+        uplinkSpeed = traffic.uplinkSpeed,
+        downlinkSpeed = traffic.downlinkSpeed,
+        totalUplink = traffic.totalUplink,
+        totalDownlink = traffic.totalDownlink,
+        connectedAtMs = traffic.connectedAtMs,
+        statusText = statusText
+    )
 }

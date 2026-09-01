@@ -16,6 +16,9 @@ data class MainUiState(
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
     val shareQRCodeBitmap: android.graphics.Bitmap? = null,
+)
+
+data class TrafficUiState(
     val connectedAtMs: Long? = null,
     val uplinkSpeed: String = "0 B/s",
     val downlinkSpeed: String = "0 B/s",

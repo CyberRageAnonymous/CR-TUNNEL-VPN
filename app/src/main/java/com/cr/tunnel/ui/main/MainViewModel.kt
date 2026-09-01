@@ -80,6 +80,9 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    private val _trafficState = MutableStateFlow(TrafficUiState())
+    val trafficState: StateFlow<TrafficUiState> = _trafficState.asStateFlow()
+
     // ---------- Keyword filtering ----------
     @Volatile
     private var keywordFilter: String = ""
@@ -198,7 +201,7 @@ init {
                 prevTrafficUplink = event.uplink
                 prevTrafficDownlink = event.downlink
                 hasPrevTraffic = true
-                _uiState.update { state ->
+                _trafficState.update { state ->
                     state.copy(
                         uplinkSpeed = formatSpeed((upDelta / elapsedSec).toLong()),
                         downlinkSpeed = formatSpeed((downDelta / elapsedSec).toLong()),
@@ -912,10 +915,12 @@ init {
             state.copy(
                 isRunning = running,
                 isConnecting = false,
-                connectedAtMs = if (running) System.currentTimeMillis() else null,
                 statusText = if (!clearTestingText && state.isTesting) state.statusText
                 else if (running) connectedText else disconnectedText
             )
+        }
+        _trafficState.update {
+            it.copy(connectedAtMs = if (running) System.currentTimeMillis() else null)
         }
         if (running) {
             prevTrafficUplink = 0L
