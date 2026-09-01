@@ -147,7 +147,13 @@ init {
             is MainServiceEvent.StateStartFailure -> {
                 val error = event.errorMessage
                 if (error.isNotBlank()) {
-                    toastError(error)
+                    if (error.contains("without TLS", ignoreCase = true) ||
+                        error.contains("prohibited", ignoreCase = true)
+                    ) {
+                        toastError(R.string.toast_vless_security_required)
+                    } else {
+                        toastError(error)
+                    }
                 } else {
                     toastError(R.string.toast_services_failure)
                 }

@@ -22,6 +22,7 @@
     <string name="toast_services_stop">Stopping service</string>
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
+    <string name="toast_vless_security_required">Config requires TLS/REALITY or a private server — this server connects without encryption (not supported by this Xray version)</string>
     <string name="toast_vpn_setup_failure">Failed to establish VPN tunnel</string>
 
     <!--ServerActivity-->

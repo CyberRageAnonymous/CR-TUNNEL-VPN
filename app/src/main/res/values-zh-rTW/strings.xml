@@ -23,6 +23,7 @@
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_vpn_setup_failure">無法建立 VPN 隧道</string>
     <string name="toast_services_failure">啟動服務失敗</string>
+    <string name="toast_vless_security_required">配置需要 TLS/REALITY 或專用伺服器 — 此伺服器無加密連線（此 Xray 版本不支援）</string>
 
     <!--ServerActivity-->
     <string name="title_server">設定檔</string>

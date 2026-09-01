@@ -305,15 +305,15 @@ fun MainScreen(
                 // move toward the reading side of the user.
                 val enterFromEnd = if (isRtl) !forward else forward
                 if (enterFromEnd) {
-                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
-                        fadeIn(tween(280))) togetherWith
-                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
-                            fadeOut(tween(280)))
+                    (slideInHorizontally(tween(160, easing = FastOutSlowInEasing)) { it / 4 } +
+                        fadeIn(tween(160))) togetherWith
+                        (slideOutHorizontally(tween(160, easing = FastOutSlowInEasing)) { -it / 4 } +
+                            fadeOut(tween(160)))
                 } else {
-                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
-                        fadeIn(tween(280))) togetherWith
-                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
-                            fadeOut(tween(280)))
+                    (slideInHorizontally(tween(160, easing = FastOutSlowInEasing)) { -it / 4 } +
+                        fadeIn(tween(160))) togetherWith
+                        (slideOutHorizontally(tween(160, easing = FastOutSlowInEasing)) { it / 4 } +
+                            fadeOut(tween(160)))
                 }
             },
             modifier = Modifier

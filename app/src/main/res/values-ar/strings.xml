@@ -23,6 +23,7 @@
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_vpn_setup_failure">فشل إنشاء نفق VPN</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
+    <string name="toast_vless_security_required">يتطلب التكوين TLS/REALITY أو خادمًا خاصًا — هذا الخادم يتصل بدون تشفير (غير مدعوم في إصدار Xray هذا)</string>
 
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>

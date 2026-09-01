@@ -23,6 +23,7 @@
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
     <string name="toast_vpn_setup_failure">راه‌اندازی تونل VPN ناموفق بود</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
+    <string name="toast_vless_security_required">این کانفیگ نیاز به TLS/REALITY یا سرور خصوصی دارد — این سرور بدون رمزنگاری وصل می‌شود (در این نسخه Xray پشتیبانی نمی‌شود)</string>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>

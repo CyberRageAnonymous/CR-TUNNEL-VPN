@@ -23,6 +23,7 @@
     <string name="toast_services_success">Đã khởi động CR TUNNEL!</string>
     <string name="toast_vpn_setup_failure">Không thể thiết lập đường hầm VPN</string>
     <string name="toast_services_failure">Không thể khởi động CR TUNNEL, kiểm tra lại cấu hình!</string>
+    <string name="toast_vless_security_required">Cấu hình yêu cầu TLS/REALITY hoặc máy chủ riêng — máy chủ này kết nối không mã hóa (không được hỗ trợ trong phiên bản Xray này)</string>
 
     <!--ServerActivity-->
     <string name="title_server">CR TUNNEL</string>

@@ -23,6 +23,7 @@
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_vpn_setup_failure">Не удалось создать VPN-туннель</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
+    <string name="toast_vless_security_required">Конфиг требует TLS/REALITY или приватный сервер — этот сервер подключается без шифрования (не поддерживается этой версией Xray)</string>
 
     <!--ServerActivity-->
     <string name="title_server">Профиль</string>
