@@ -1,10 +1,13 @@
 package com.cr.tunnel.ui.main
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,8 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.R
@@ -289,55 +294,62 @@ fun MainScreen(
         },
         floatingActionButton = {},
     ) { innerPadding ->
-        val saveableStateHolder = rememberSaveableStateHolder()
-
-        // Ultra-light tab switch: fade only (no slide/layout), 150ms.
-        // Both tabs exist only during the short crossfade; state kept via SaveableStateProvider.
-        androidx.compose.animation.AnimatedContent(
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+        AnimatedContent(
             targetState = selectedTab,
             transitionSpec = {
-                androidx.compose.animation.fadeIn(tween(150)) togetherWith
-                    androidx.compose.animation.fadeOut(tween(150))
+                val forward = targetState.ordinal > initialState.ordinal
+                // Mirror the slide direction in RTL locales so pages always
+                // move toward the reading side of the user.
+                val enterFromEnd = if (isRtl) !forward else forward
+                if (enterFromEnd) {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
+                        fadeIn(tween(280))) togetherWith
+                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
+                            fadeOut(tween(280)))
+                } else {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
+                        fadeIn(tween(280))) togetherWith
+                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
+                            fadeOut(tween(280)))
+                }
             },
-            label = "mainTabSwitch",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) { tab ->
-            saveableStateHolder.SaveableStateProvider(tab.name) {
-                when (tab) {
-                    MainTab.Home -> HomeTab(
-                        mainViewModel = mainViewModel,
-                        uiState = uiState,
-                        displayText = displayText,
-                        isDarkTheme = isDarkTheme,
-                        onAction = onAction
-                    )
+            when (tab) {
+                MainTab.Home -> HomeTab(
+                    mainViewModel = mainViewModel,
+                    uiState = uiState,
+                    displayText = displayText,
+                    isDarkTheme = isDarkTheme,
+                    onAction = onAction
+                )
 
-                    MainTab.Configs -> ConfigsTab(
-                        mainViewModel = mainViewModel,
-                        groups = groups,
-                        selectedGuid = selectedGuid,
-                        doubleColumnDisplay = doubleColumnDisplay,
-                        confirmRemove = confirmRemove,
-                        searchQuery = searchQuery,
-                        pagerState = pagerState,
-                        lazyListStates = lazyListStates,
-                        lazyGridStates = lazyGridStates,
-                        scope = scope,
-                        onAction = onAction,
-                        shareTarget = { guid, profile, more -> shareTarget = Triple(guid, profile, more) },
-                        removeServer = removeServer
-                    )
+                MainTab.Configs -> ConfigsTab(
+                    mainViewModel = mainViewModel,
+                    groups = groups,
+                    selectedGuid = selectedGuid,
+                    doubleColumnDisplay = doubleColumnDisplay,
+                    confirmRemove = confirmRemove,
+                    searchQuery = searchQuery,
+                    pagerState = pagerState,
+                    lazyListStates = lazyListStates,
+                    lazyGridStates = lazyGridStates,
+                    scope = scope,
+                    onAction = onAction,
+                    shareTarget = { guid, profile, more -> shareTarget = Triple(guid, profile, more) },
+                    removeServer = removeServer
+                )
 
-                    MainTab.Stats -> StatsTab(
-                        mainViewModel = mainViewModel,
-                        isRunning = isRunning,
-                        statusText = displayText
-                    )
+                MainTab.Stats -> StatsTab(
+                    mainViewModel = mainViewModel,
+                    isRunning = isRunning,
+                    statusText = displayText
+                )
 
-                    MainTab.Settings -> SettingsPage(onNavigate = onNavigate)
-                }
+                MainTab.Settings -> SettingsPage(onNavigate = onNavigate)
             }
         }
     }
