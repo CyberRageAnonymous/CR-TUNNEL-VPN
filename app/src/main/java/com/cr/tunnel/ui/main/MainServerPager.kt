@@ -251,16 +251,24 @@ private fun ServerItemRow(
     onRemoveServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
-    val subRemarks = if (subscriptionId.isEmpty()) {
-        MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks?.firstOrNull()
-            ?.toString() ?: ""
-    } else ""
+    val subId = profile.subscriptionId
+    // Cached: MMKV read + Gson parse must not run on every recomposition
+    val subRemarks = remember(subscriptionId, subId) {
+        if (subscriptionId.isEmpty()) {
+            MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()
+                ?.toString() ?: ""
+        } else ""
+    }
+    val statistics = remember(profile) {
+        profile.description.nullIfBlank()
+            ?: AngConfigManager.generateDescription(profile)
+    }
+    val typeDescription = remember(profile) { getProtocolDescription(profile) }
 
     ServerListItem(
         remarks = profile.remarks,
-        statistics = profile.description.nullIfBlank()
-            ?: AngConfigManager.generateDescription(profile),
-        typeDescription = getProtocolDescription(profile),
+        statistics = statistics,
+        typeDescription = typeDescription,
         testResult = serverCache.testDelayString,
         testDelayMillis = serverCache.testDelayMillis,
         isSelected = serverCache.guid == selectedGuid,
@@ -287,15 +295,23 @@ private fun ServerItemColumn(
     onRemoveServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
-    val subRemarks = if (subscriptionId.isEmpty()) {
-        MmkvManager.decodeSubscription(profile.subscriptionId)?.remarks?.firstOrNull()?.toString() ?: ""
-    } else ""
+    val subId = profile.subscriptionId
+    // Cached: MMKV read + Gson parse must not run on every recomposition
+    val subRemarks = remember(subscriptionId, subId) {
+        if (subscriptionId.isEmpty()) {
+            MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()?.toString() ?: ""
+        } else ""
+    }
+    val statistics = remember(profile) {
+        profile.description.nullIfBlank() ?: AngConfigManager.generateDescription(profile)
+    }
+    val typeDescription = remember(profile) { getProtocolDescription(profile) }
 
     Column {
         ServerListItem(
             remarks = profile.remarks,
-            statistics = profile.description.nullIfBlank() ?: AngConfigManager.generateDescription(profile),
-            typeDescription = getProtocolDescription(profile),
+            statistics = statistics,
+            typeDescription = typeDescription,
             testResult = serverCache.testDelayString,
             testDelayMillis = serverCache.testDelayMillis,
             isSelected = serverCache.guid == selectedGuid,
@@ -329,16 +345,21 @@ fun ServerListItem(
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
-    val glassBg = Brush.linearGradient(
-        listOf(
-            if (isSelected) Color(0x6600E5FF).copy(alpha = 0.25f) else Color(0x1400E5FF),
-            if (isSelected) Color(0x66A855F7).copy(alpha = 0.22f) else Color(0x14A855F7)
+    // Cached: shader objects must not be reallocated on every recomposition
+    val glassBg = remember(isSelected) {
+        Brush.linearGradient(
+            listOf(
+                if (isSelected) Color(0x6600E5FF).copy(alpha = 0.25f) else Color(0x1400E5FF),
+                if (isSelected) Color(0x66A855F7).copy(alpha = 0.22f) else Color(0x14A855F7)
+            )
         )
-    )
-    val borderBrush = if (isSelected) {
-        Brush.linearGradient(listOf(Color(0x9900E5FF), Color(0x99A855F7)))
-    } else {
-        Brush.linearGradient(listOf(Color(0x2200E5FF), Color(0x22A855F7)))
+    }
+    val borderBrush = remember(isSelected) {
+        if (isSelected) {
+            Brush.linearGradient(listOf(Color(0x9900E5FF), Color(0x99A855F7)))
+        } else {
+            Brush.linearGradient(listOf(Color(0x2200E5FF), Color(0x22A855F7)))
+        }
     }
 
     var pressed by remember { mutableStateOf(false) }
