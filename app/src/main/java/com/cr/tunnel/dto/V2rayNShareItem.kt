@@ -7,14 +7,11 @@ import com.cr.tunnel.enums.NetworkType
 
 @Suppress("PropertyName")
 data class V2rayNShareItem(
-    // val IndexId: String?,
     val ConfigType: Int?,
-    // val CoreType: Int?,
     val ConfigVersion: Int?,
     val Subid: String?,
     val IsSub: Boolean?,
     val PreSocksPort: Int?,
-    // val DisplayLog: Boolean?,
     val Remarks: String?,
     val Address: String?,
     val Port: Int?,
@@ -30,8 +27,6 @@ data class V2rayNShareItem(
     val ShortId: String?,
     val SpiderX: String?,
     val Mldsa65Verify: String?,
-    // val MuxEnabled: Boolean?,
-    // val Cert: String?,
     val CertSha: String?,
     val EchConfigList: String?,
     val VerifyPeerCertByName: String?,
@@ -160,9 +155,7 @@ data class V2rayNShareItem(
             policyGroupSubscriptionId = if (ProtoExtraObj?.SubChildItems == "self") "self" else null,
             policyGroupFilter = ProtoExtraObj?.Filter,
             // NOTE: proxyChainProfiles stores remarks, not IndexId
-            // proxyChainProfiles = ProtoExtraObj?.ChildItems,
         )
-        // profile.description =
         return profile
     }
 }

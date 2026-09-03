@@ -49,11 +49,6 @@ class CoreVpnService : VpnService(), ServiceControl {
         stopAllService()
     }
 
-//    override fun onLowMemory() {
-//        stopV2Ray()
-//        super.onLowMemory()
-//    }
-
     override fun onDestroy() {
         super.onDestroy()
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service destroyed")
@@ -233,16 +228,11 @@ class CoreVpnService : VpnService(), ServiceControl {
         }
 
         // Configure DNS servers
-        //if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true) {
-        //  builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
-        //} else {
         SettingsManager.getVpnDnsServers().forEach {
             if (Utils.isPureIpAddress(it)) {
                 builder.addDnsServer(it)
             }
         }
-
-        //builder.setSession(V2RayServiceManager.getRunningServerName())
     }
 
     private fun configurePlatformFeatures(builder: Builder) {
@@ -322,10 +312,6 @@ class CoreVpnService : VpnService(), ServiceControl {
     }
 
     private fun stopAllService(isForced: Boolean = true) {
-//        val configName = defaultDPreference.getPrefString(PREF_CURR_CONFIG_GUID, "")
-//        val emptyInfo = VpnNetworkInfo()
-//        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)
-//        saveVpnNetworkInfo(configName, info)
         unlockStart()
         isRunning = false
 

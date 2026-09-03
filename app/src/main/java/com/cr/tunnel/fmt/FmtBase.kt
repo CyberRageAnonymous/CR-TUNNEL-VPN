@@ -130,12 +130,6 @@ open class FmtBase {
                 config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
             }
 
-//            NetworkType.QUIC -> {
-//                dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
-//                config.quicSecurity?.nullIfBlank()?.let { dicQuery["quicSecurity"] = it }
-//                config.quicKey?.nullIfBlank()?.let { dicQuery["key"] = it }
-//            }
-
             NetworkType.GRPC -> {
                 config.mode?.nullIfBlank()?.let { dicQuery["mode"] = it }
                 config.authority?.nullIfBlank()?.let { dicQuery["authority"] = it }

@@ -129,7 +129,6 @@ fun SubEditScreen(
     onSave: (SubscriptionItem) -> Boolean,
     onDelete: () -> Unit
 ) {
-    //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }

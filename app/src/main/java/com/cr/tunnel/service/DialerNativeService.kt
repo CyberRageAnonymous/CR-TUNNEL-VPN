@@ -665,7 +665,6 @@ class DialerNativeService : IDialerService {
 
         private fun buildRequest(task: BrowserDialerTask, payload: ByteArray?): Request {
             val requestBuilder = Request.Builder().url(task.url)
-            // task.extra.headers.forEach { (key, value) -> requestBuilder.header(key, value) }
             // Just set no cache headers
             requestBuilder.header("Cache-Control", "no-cache, no-store, must-revalidate")
             task.extra.referrer?.takeIf { it.isNotBlank() }
@@ -709,7 +708,6 @@ class DialerNativeService : IDialerService {
     ) {
         data class Extra(
             val headers: Map<String, String> = emptyMap(),
-            // val cookies: Map<String, String> = emptyMap(),
             val protocols: List<String> = emptyList(),
             val referrer: String? = null
         )
@@ -725,7 +723,6 @@ class DialerNativeService : IDialerService {
                     val streamResponse = root.optBoolean("streamResponse", false)
                     val extraObject = root.optJSONObject("extra")
                     val headers = extraObject.optStringMap("headers")
-                    // val cookies = extraObject.optStringMap("cookies")
                     val referrer = extraObject?.optString("referrer")?.takeIf { it.isNotBlank() }
                     val protocols = extraObject.optProtocols()
 

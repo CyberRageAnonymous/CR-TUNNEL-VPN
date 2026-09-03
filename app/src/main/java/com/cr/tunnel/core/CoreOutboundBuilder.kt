@@ -312,8 +312,6 @@ object CoreOutboundBuilder {
         val host = profileItem.host
         val path = profileItem.path
         val seed = profileItem.seed
-//        val quicSecurity = profileItem.quicSecurity
-//        val key = profileItem.quicKey
         val mode = profileItem.mode
         val serviceName = profileItem.serviceName
         val authority = profileItem.authority
@@ -419,14 +417,6 @@ object CoreOutboundBuilder {
                 h2Setting.path = path ?: "/"
                 streamSettings.httpSettings = h2Setting
             }
-
-//                    "quic" -> {
-//                        val quicsetting = QuicSettingBean()
-//                        quicsetting.security = quicSecurity ?: "none"
-//                        quicsetting.key = key.orEmpty()
-//                        quicsetting.header.type = headerType ?: "none"
-//                        quicSettings = quicsetting
-//                    }
 
             NetworkType.GRPC.type -> {
                 val grpcSetting = OutboundBean.StreamSettingsBean.GrpcSettingsBean()

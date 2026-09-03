@@ -39,7 +39,6 @@ object SettingsManager {
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
-        //ensureDefaultSubscription()
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()

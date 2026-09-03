@@ -386,7 +386,6 @@ object CoreServiceManager {
                     InetSocketAddress(destIP, destPort.toInt())
                 ).toLong()
                 LogUtil.d(AppConfig.TAG, "ProcessFinder: Find $network connection from $srcIP:$srcPort to $destIP:$destPort, uid=$uid")
-                //LogUtil.d(AppConfig.TAG, "ProcessFinder: Find $network connection from $srcIP:$srcPort to $destIP:$destPort, uid=$uid,${PackageUidResolver.uidToPackageName(uid.toString())}")
 
                 uid
             } catch (_: Exception) {
