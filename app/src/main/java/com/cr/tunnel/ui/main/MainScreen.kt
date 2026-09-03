@@ -2,12 +2,10 @@ package com.cr.tunnel.ui.main
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,10 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.R
@@ -293,46 +289,55 @@ fun MainScreen(
         },
         floatingActionButton = {},
     ) { innerPadding ->
-        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val saveableStateHolder = rememberSaveableStateHolder()
-        
-        Column(
+
+        // Ultra-light tab switch: fade only (no slide/layout), 150ms.
+        // Both tabs exist only during the short crossfade; state kept via SaveableStateProvider.
+        androidx.compose.animation.AnimatedContent(
+            targetState = selectedTab,
+            transitionSpec = {
+                androidx.compose.animation.fadeIn(tween(150)) togetherWith
+                    androidx.compose.animation.fadeOut(tween(150))
+            },
+            label = "mainTabSwitch",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            when (selectedTab) {
-                MainTab.Home -> HomeTab(
-                    mainViewModel = mainViewModel,
-                    uiState = uiState,
-                    displayText = displayText,
-                    isDarkTheme = isDarkTheme,
-                    onAction = onAction
-                )
+        ) { tab ->
+            saveableStateHolder.SaveableStateProvider(tab.name) {
+                when (tab) {
+                    MainTab.Home -> HomeTab(
+                        mainViewModel = mainViewModel,
+                        uiState = uiState,
+                        displayText = displayText,
+                        isDarkTheme = isDarkTheme,
+                        onAction = onAction
+                    )
 
-                MainTab.Configs -> ConfigsTab(
-                    mainViewModel = mainViewModel,
-                    groups = groups,
-                    selectedGuid = selectedGuid,
-                    doubleColumnDisplay = doubleColumnDisplay,
-                    confirmRemove = confirmRemove,
-                    searchQuery = searchQuery,
-                    pagerState = pagerState,
-                    lazyListStates = lazyListStates,
-                    lazyGridStates = lazyGridStates,
-                    scope = scope,
-                    onAction = onAction,
-                    shareTarget = { guid, profile, more -> shareTarget = Triple(guid, profile, more) },
-                    removeServer = removeServer
-                )
+                    MainTab.Configs -> ConfigsTab(
+                        mainViewModel = mainViewModel,
+                        groups = groups,
+                        selectedGuid = selectedGuid,
+                        doubleColumnDisplay = doubleColumnDisplay,
+                        confirmRemove = confirmRemove,
+                        searchQuery = searchQuery,
+                        pagerState = pagerState,
+                        lazyListStates = lazyListStates,
+                        lazyGridStates = lazyGridStates,
+                        scope = scope,
+                        onAction = onAction,
+                        shareTarget = { guid, profile, more -> shareTarget = Triple(guid, profile, more) },
+                        removeServer = removeServer
+                    )
 
-                MainTab.Stats -> StatsTab(
-                    mainViewModel = mainViewModel,
-                    isRunning = isRunning,
-                    statusText = displayText
-                )
+                    MainTab.Stats -> StatsTab(
+                        mainViewModel = mainViewModel,
+                        isRunning = isRunning,
+                        statusText = displayText
+                    )
 
-                MainTab.Settings -> SettingsPage(onNavigate = onNavigate)
+                    MainTab.Settings -> SettingsPage(onNavigate = onNavigate)
+                }
             }
         }
     }
@@ -360,12 +365,8 @@ private fun HomeTab(
         ) {
             AnimatedVisibility(
                 visible = uiState.isAutoOptimizing,
-                enter = expandVertically(
-                    animationSpec = tween(280, easing = FastOutSlowInEasing)
-                ) + fadeIn(tween(280)),
-                exit = shrinkVertically(
-                    animationSpec = tween(220, easing = FastOutSlowInEasing)
-                ) + fadeOut(tween(220))
+                enter = fadeIn(tween(150)),
+                exit = fadeOut(tween(150))
             ) {
                 OptimizeBanner(onCancel = { onAction(MainAction.CancelAutoOptimize) })
             }

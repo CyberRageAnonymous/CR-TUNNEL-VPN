@@ -378,17 +378,16 @@ private fun ConnectionCircle(
                 }
         )
 
-        // Expanding pulse rings while running
+        // Expanding pulse rings while running (reads inside graphicsLayer: no recomposition)
         if (isRunning) {
-            val pulseScale = 1f + pulse * 0.4f
-            val pulseAlpha = (1f - pulse) * 0.45f
             Box(
                 modifier = Modifier
                     .size(190.dp)
                     .graphicsLayer {
-                        scaleX = pulseScale
-                        scaleY = pulseScale
-                        alpha = pulseAlpha
+                        val p = pulse
+                        scaleX = 1f + p * 0.4f
+                        scaleY = 1f + p * 0.4f
+                        alpha = (1f - p) * 0.45f
                     }
                     .border(2.dp, glowColor.copy(alpha = 0.6f), CircleShape)
             )
@@ -396,9 +395,10 @@ private fun ConnectionCircle(
                 modifier = Modifier
                     .size(190.dp)
                     .graphicsLayer {
-                        scaleX = pulseScale + 0.15f
-                        scaleY = pulseScale + 0.15f
-                        alpha = pulseAlpha * 0.5f
+                        val p = pulse
+                        scaleX = 1f + p * 0.4f + 0.15f
+                        scaleY = 1f + p * 0.4f + 0.15f
+                        alpha = (1f - p) * 0.45f * 0.5f
                     }
                     .border(1.5.dp, NeonPurple.copy(alpha = 0.5f), CircleShape)
             )
