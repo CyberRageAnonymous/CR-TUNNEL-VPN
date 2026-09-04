@@ -92,7 +92,6 @@ fun MainScreen(
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    // Stable across recompositions so the server list can skip unchanged rows.
     val removeServer: (String) -> Unit = remember(confirmRemove) { { guid ->
         if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
     } }
@@ -418,7 +417,7 @@ private fun ConfigsTab(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
             userScrollEnabled = true,
-            beyondViewportPageCount = 1,
+            beyondViewportPageCount = 0,
             key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
         ) { page ->
             val group = groups.getOrNull(page) ?: return@HorizontalPager

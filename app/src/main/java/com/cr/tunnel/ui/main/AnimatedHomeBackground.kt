@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import kotlin.math.PI
 import kotlin.math.sin
 
-// Ultra-light Home background: 2 phase drivers only, no per-frame allocation,
-// no huge radial-gradient Box layers. Positions derived with trig in draw phase.
 @Composable
 fun AnimatedHomeBackground(isDarkTheme: Boolean) {
     val transition = rememberInfiniteTransition(label = "homeBackground")

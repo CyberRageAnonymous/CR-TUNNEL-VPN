@@ -378,7 +378,7 @@ private fun ConnectionCircle(
                 }
         )
 
-        // Expanding pulse rings while running (reads inside graphicsLayer: no recomposition)
+        // Expanding pulse rings while running
         if (isRunning) {
             Box(
                 modifier = Modifier

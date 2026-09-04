@@ -252,7 +252,6 @@ private fun ServerItemRow(
 ) {
     val profile = serverCache.profile
     val subId = profile.subscriptionId
-    // Cached: MMKV read + Gson parse must not run on every recomposition
     val subRemarks = remember(subscriptionId, subId) {
         if (subscriptionId.isEmpty()) {
             MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()
@@ -296,7 +295,6 @@ private fun ServerItemColumn(
 ) {
     val profile = serverCache.profile
     val subId = profile.subscriptionId
-    // Cached: MMKV read + Gson parse must not run on every recomposition
     val subRemarks = remember(subscriptionId, subId) {
         if (subscriptionId.isEmpty()) {
             MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()?.toString() ?: ""
@@ -345,7 +343,6 @@ fun ServerListItem(
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
-    // Cached: shader objects must not be reallocated on every recomposition
     val glassBg = remember(isSelected) {
         Brush.linearGradient(
             listOf(
