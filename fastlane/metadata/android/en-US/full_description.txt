@@ -31,7 +31,7 @@
 <h3>Development guide</h3>
 
 <p>The Android project at the repository root can be compiled directly in Android Studio, or using the Gradle wrapper:
-<code>./gradlew assemblePlaystoreRelease</code></p>
+<code>./gradlew assembleRelease</code></p>
 
 <p>CR TUNNEL can run on Android Emulators. For WSA, VPN permission need to be granted via
 <code>appops set [package name] ACTIVATE_VPN allow</code></p>

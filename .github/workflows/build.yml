@@ -43,13 +43,13 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew :app:assemblePlaystoreRelease --no-daemon --stacktrace
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
 
       - name: Upload APKs as artifacts
         uses: actions/upload-artifact@v7
         with:
           name: crtunnel-apks
-          path: app/build/outputs/apk/playstore/release/*.apk
+          path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
 
       - name: Determine release tag
@@ -89,7 +89,7 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/$RELEASE_TAG" | \
             python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))")
           echo "release id: $RELEASE_ID"
-          for apk in app/build/outputs/apk/playstore/release/*.apk; do
+          for apk in app/build/outputs/apk/release/*.apk; do
             echo "uploading: $apk"
             curl -s -X POST \
               -H "Authorization: token $GITHUB_TOKEN" \

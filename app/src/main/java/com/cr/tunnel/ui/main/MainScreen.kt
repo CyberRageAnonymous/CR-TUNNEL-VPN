@@ -92,9 +92,10 @@ fun MainScreen(
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    val removeServer: (String) -> Unit = { guid ->
+    // Stable across recompositions so the server list can skip unchanged rows.
+    val removeServer: (String) -> Unit = remember(confirmRemove) { { guid ->
         if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
-    }
+    } }
 
     val pagerState = rememberPagerState(
         initialPage = 0,

@@ -79,11 +79,8 @@ Separate server lists for remote and domestic DNS, plus custom per-domain host m
 git clone --recursive https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN.git
 cd CR-TUNNEL-VPN
 
-# Play Store build
-./gradlew assemblePlaystoreRelease
-
-# F-Droid build
-./gradlew assembleFdroidRelease
+# Release build
+./gradlew assembleRelease
 ```
 
 Rebuilding the native `hev-socks5-tunnel` libraries requires the Android NDK with `$NDK_HOME` set:
@@ -197,11 +194,8 @@ Xray-core از طریق پل AndroidLibXrayLite به اپ وصله و پروتک
 git clone --recursive https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN.git
 cd CR-TUNNEL-VPN
 
-# ساخت نسخه پلیاستور
-./gradlew assemblePlaystoreRelease
-
-# ساخت نسخه اف-درید
-./gradlew assembleFdroidRelease
+# ساخت نسخه ریلیز
+./gradlew assembleRelease
 ```
 
 برای بازسازی کتابخانههای نیتیو `hev-socks5-tunnel` به Android NDK و متغیر `$NDK_HOME` نیازه:
