@@ -276,7 +276,8 @@ init {
         viewModelScope.launch(preloadDispatcher) {
             try {
                 initialPageReady.await()
-                delay(32L)
+                // Grace period: let entry composition/JIT settle before heavy startup work.
+                delay(4000L)
                 dataSource.initAssets()
                 dataSource.syncSubscriptions()
             } catch (cancelled: CancellationException) {
@@ -417,6 +418,8 @@ init {
                     groups.indexOfFirst { it.id == selectedGroup }.coerceAtLeast(0)
                 val preloadOrder = radialPreloadOrder(groups, selectedIndex)
                 preloadJob = viewModelScope.launch(preloadDispatcher) {
+                    // Grace period: keep the entry window quiet, preload other groups after.
+                    delay(4000L)
                     preloadOrder.forEach { groupId ->
                         ensureActive()
                         delay(32L)
