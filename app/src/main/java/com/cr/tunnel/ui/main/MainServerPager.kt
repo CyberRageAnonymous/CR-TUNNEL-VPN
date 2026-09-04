@@ -41,9 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -63,7 +61,6 @@ import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.ui.compose.ItemDivider
 import com.cr.tunnel.ui.compose.ReorderableGridItem
 import com.cr.tunnel.ui.compose.ReorderableListItem
-import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.colorConfigType
 import com.cr.tunnel.ui.compose.colorPing
 import com.cr.tunnel.ui.compose.colorPingRed
@@ -343,28 +340,14 @@ fun ServerListItem(
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
-    val glassBg = remember(isSelected) {
-        Brush.linearGradient(
-            listOf(
-                if (isSelected) Color(0x6600E5FF).copy(alpha = 0.25f) else Color(0x1400E5FF),
-                if (isSelected) Color(0x66A855F7).copy(alpha = 0.22f) else Color(0x14A855F7)
-            )
-        )
-    }
-    val borderBrush = remember(isSelected) {
-        if (isSelected) {
-            Brush.linearGradient(listOf(Color(0x9900E5FF), Color(0x99A855F7)))
-        } else {
-            Brush.linearGradient(listOf(Color(0x2200E5FF), Color(0x22A855F7)))
-        }
-    }
+    val rowFill = if (isSelected) Color(0x2200E5FF) else Color(0x1400E5FF)
+    val rowBorder = if (isSelected) Color(0x9900E5FF) else Color(0x2200E5FF)
 
     var pressed by remember { mutableStateOf(false) }
     val pressScale by animateFloatAsState(
         targetValue = if (pressed) 0.97f else 1f,
         label = "pressScale"
     )
-    val isDarkTheme = LocalDarkTheme.current
 
     Row(
         modifier = modifier
@@ -372,26 +355,8 @@ fun ServerListItem(
             .padding(horizontal = 12.dp, vertical = 6.dp)
             .scale(pressScale)
             .clip(RoundedCornerShape(20.dp))
-            .background(glassBg)
-            .drawWithCache {
-                val topBrush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = if (isDarkTheme) 0.07f else 0.22f),
-                        Color.Transparent
-                    ),
-                    startY = 0f,
-                    endY = size.height * 0.45f
-                )
-                onDrawBehind {
-                    if (isSelected) {
-                        drawRoundRect(
-                            brush = topBrush,
-                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx(), 20.dp.toPx())
-                        )
-                    }
-                }
-            }
-            .border(1.dp, borderBrush, RoundedCornerShape(20.dp))
+            .background(rowFill)
+            .border(1.dp, rowBorder, RoundedCornerShape(20.dp))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
@@ -456,11 +421,7 @@ fun ServerListItem(
                         Modifier
                             .size(24.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    listOf(Color(0x4400E5FF), Color(0x44A855F7))
-                                )
-                            ),
+                            .background(Color(0x4400E5FF)),
                         Alignment.Center
                     ) {
                         Text(
