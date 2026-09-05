@@ -289,6 +289,8 @@ object MmkvManager {
     @Volatile
     private var subscriptionsCache: List<SubscriptionCache>? = null
 
+    private val subscriptionsCacheLock = Any()
+
     private val subscriptionRemarkCache = ConcurrentHashMap<String, String>()
 
     fun getSubscriptionRemark(subscriptionId: String): String =
@@ -298,18 +300,21 @@ object MmkvManager {
 
     fun decodeSubscriptions(): List<SubscriptionCache> {
         subscriptionsCache?.let { return it }
-        initSubsList()
+        synchronized(subscriptionsCacheLock) {
+            subscriptionsCache?.let { return it }
+            initSubsList()
 
-        val subscriptions = mutableListOf<SubscriptionCache>()
-        decodeSubsList().forEach { key ->
-            val json = subStorage.decodeString(key)
-            if (!json.isNullOrBlank()) {
-                val item = JsonUtil.fromJsonSafe(json, SubscriptionItem::class.java) ?: SubscriptionItem()
-                subscriptions.add(SubscriptionCache(key, item))
+            val subscriptions = mutableListOf<SubscriptionCache>()
+            decodeSubsList().forEach { key ->
+                val json = subStorage.decodeString(key)
+                if (!json.isNullOrBlank()) {
+                    val item = JsonUtil.fromJsonSafe(json, SubscriptionItem::class.java) ?: SubscriptionItem()
+                    subscriptions.add(SubscriptionCache(key, item))
+                }
             }
+            subscriptionsCache = subscriptions
+            return subscriptions
         }
-        subscriptionsCache = subscriptions
-        return subscriptions
     }
 
     fun removeSubscription(subid: String) {
@@ -327,12 +332,14 @@ object MmkvManager {
         subStorage.encode(key, JsonUtil.toJson(subItem))
         subscriptionRemarkCache.remove(key)
 
-        val subsList = decodeSubsList()
-        if (!subsList.contains(key)) {
-            subsList.add(key)
-            encodeSubsList(subsList)
-        } else {
-            subscriptionsCache = null
+        synchronized(subscriptionsCacheLock) {
+            val subsList = decodeSubsList()
+            if (!subsList.contains(key)) {
+                subsList.add(key)
+                encodeSubsList(subsList)
+            } else {
+                subscriptionsCache = null
+            }
         }
     }
 

@@ -350,6 +350,10 @@ fun ServerListItem(
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
+    val bodyLarge = MaterialTheme.typography.bodyLarge
+    val remarksStyle = remember(bodyLarge) {
+        bodyLarge.copy(lineBreak = LineBreak.Paragraph)
+    }
     val glassBg = remember(isSelected) {
         Brush.linearGradient(
             listOf(
@@ -439,7 +443,7 @@ fun ServerListItem(
                 Text(
                     remarks,
                     Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph),
+                    style = remarksStyle,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                     color = if (isSelected) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurface,
