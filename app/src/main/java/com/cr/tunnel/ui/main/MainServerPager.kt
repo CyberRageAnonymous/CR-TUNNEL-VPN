@@ -99,9 +99,7 @@ fun GroupPagerPage(
         if (groupId.isEmpty()) {
             servers.mapNotNull { it.profile.subscriptionId.takeIf { id -> id.isNotEmpty() } }
                 .toSet()
-                .associateWith { id ->
-                    MmkvManager.decodeSubscription(id)?.remarks?.firstOrNull()?.toString().orEmpty()
-                }
+                .associateWith { id -> MmkvManager.getSubscriptionRemark(id) }
         } else {
             emptyMap()
         }

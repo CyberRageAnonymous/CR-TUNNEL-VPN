@@ -23,6 +23,7 @@ import com.cr.tunnel.util.Utils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import java.util.concurrent.ConcurrentHashMap
 
 object MmkvManager {
 
@@ -288,6 +289,13 @@ object MmkvManager {
     @Volatile
     private var subscriptionsCache: List<SubscriptionCache>? = null
 
+    private val subscriptionRemarkCache = ConcurrentHashMap<String, String>()
+
+    fun getSubscriptionRemark(subscriptionId: String): String =
+        subscriptionRemarkCache.getOrPut(subscriptionId) {
+            decodeSubscription(subscriptionId)?.remarks?.firstOrNull()?.toString().orEmpty()
+        }
+
     fun decodeSubscriptions(): List<SubscriptionCache> {
         subscriptionsCache?.let { return it }
         initSubsList()
@@ -306,6 +314,7 @@ object MmkvManager {
 
     fun removeSubscription(subid: String) {
         subStorage.remove(subid)
+        subscriptionRemarkCache.remove(subid)
         val subsList = decodeSubsList()
         subsList.remove(subid)
         encodeSubsList(subsList)
@@ -316,6 +325,7 @@ object MmkvManager {
     fun encodeSubscription(guid: String, subItem: SubscriptionItem) {
         val key = guid.ifBlank { Utils.getUuid() }
         subStorage.encode(key, JsonUtil.toJson(subItem))
+        subscriptionRemarkCache.remove(key)
 
         val subsList = decodeSubsList()
         if (!subsList.contains(key)) {

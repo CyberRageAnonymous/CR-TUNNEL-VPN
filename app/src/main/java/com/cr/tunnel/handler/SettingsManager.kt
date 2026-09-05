@@ -28,6 +28,9 @@ import com.cr.tunnel.handler.MmkvManager.removeSubscription
 import com.cr.tunnel.util.JsonUtil
 import com.cr.tunnel.util.LogUtil
 import com.cr.tunnel.util.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.random.Random
@@ -40,8 +43,10 @@ object SettingsManager {
     fun initApp(context: Context) {
         ensureDefaultSettings()
         initRoutingRulesets(context)
-        migrateServerListToSubscriptions()
-        migrateHysteria2PinSHA256()
+        CoroutineScope(Dispatchers.IO).launch {
+            migrateServerListToSubscriptions()
+            migrateHysteria2PinSHA256()
+        }
     }
 
     private fun initRoutingRulesets(context: Context) {

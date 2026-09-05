@@ -533,9 +533,11 @@ init {
                         if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
                             dataSource.removeAllServer()
                         } else {
-                            val guids = currentServers().map { it.guid }
-                            guids.forEach { dataSource.removeServer(it) }
-                            guids.size
+                            val servers = currentServers()
+                            servers.groupBy { it.profile.subscriptionId }.forEach { (subId, list) ->
+                                dataSource.removeServers(list.map { it.guid }, subId)
+                            }
+                            servers.size
                         }
                     viewModelScope.launch(ioDispatcher) {
                         cacheMutex.withLock { groupDataCache.clear() }
@@ -557,6 +559,7 @@ init {
             withContext(ioDispatcher) {
                 try {
                     val seen = HashSet<ProfileItem>()
+                    val serversByGuid = currentServers().associateBy { it.guid }
                     val duplicates = ArrayList<String>()
                     currentServers().forEach { server ->
                         val profile = server.profile
@@ -565,7 +568,10 @@ init {
                             if (!seen.add(identity)) duplicates += server.guid
                         }
                     }
-                    duplicates.forEach { dataSource.removeServer(it) }
+                    duplicates.groupBy { serversByGuid[it]?.profile?.subscriptionId.orEmpty() }
+                        .forEach { (subId, list) ->
+                            dataSource.removeServers(list, subId)
+                        }
                     setupGroupTab(forceRefresh = true)
                     toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
                 } catch (cancelled: CancellationException) {
