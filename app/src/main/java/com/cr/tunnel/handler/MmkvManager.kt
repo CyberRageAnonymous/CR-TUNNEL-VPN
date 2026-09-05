@@ -285,7 +285,11 @@ object MmkvManager {
         encodeSubsList(subsList)
     }
 
+    @Volatile
+    private var subscriptionsCache: List<SubscriptionCache>? = null
+
     fun decodeSubscriptions(): List<SubscriptionCache> {
+        subscriptionsCache?.let { return it }
         initSubsList()
 
         val subscriptions = mutableListOf<SubscriptionCache>()
@@ -296,6 +300,7 @@ object MmkvManager {
                 subscriptions.add(SubscriptionCache(key, item))
             }
         }
+        subscriptionsCache = subscriptions
         return subscriptions
     }
 
@@ -316,6 +321,8 @@ object MmkvManager {
         if (!subsList.contains(key)) {
             subsList.add(key)
             encodeSubsList(subsList)
+        } else {
+            subscriptionsCache = null
         }
     }
 
@@ -325,6 +332,7 @@ object MmkvManager {
     }
 
     fun encodeSubsList(subsList: MutableList<String>) {
+        subscriptionsCache = null
         mainStorage.encode(KEY_SUB_IDS, JsonUtil.toJson(subsList))
     }
 

@@ -313,18 +313,34 @@ object AngConfigManager {
                     }
                     var count = 0
                     val keyToProfile = mutableMapOf<String, ProfileItem>()
+                    val serverGuids = MmkvManager.decodeServerList(subid)
+                    var guidsChanged = false
+                    var firstKey: String? = null
                     for (srv in serverList.reversed()) {
                         val config = CustomFmt.parse(JsonUtil.toJson(srv)) ?: continue
                         config.subscriptionId = subid
                         config.description = generateDescription(config)
-                        val key = MmkvManager.encodeServerConfig("", config)
+                        val key = Utils.getUuid()
+                        MmkvManager.encodeProfileDirect(key, JsonUtil.toJson(config))
                         MmkvManager.encodeServerRaw(key, JsonUtil.toJsonPretty(srv) ?: "")
+                        if (!serverGuids.contains(key)) {
+                            serverGuids.add(0, key)
+                            guidsChanged = true
+                        }
+                        if (firstKey == null) firstKey = key
                         keyToProfile[key] = config
                         count += 1
                     }
+                    if (guidsChanged) {
+                        MmkvManager.encodeServerList(serverGuids, subid)
+                    }
                     if (count > 0) {
                         val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
-                        matchKey?.let { MmkvManager.setSelectServer(it) }
+                        if (matchKey != null) {
+                            MmkvManager.setSelectServer(matchKey)
+                        } else if (MmkvManager.getSelectServer().isNullOrBlank() && firstKey != null) {
+                            MmkvManager.setSelectServer(firstKey)
+                        }
                     }
                     return count
                 }

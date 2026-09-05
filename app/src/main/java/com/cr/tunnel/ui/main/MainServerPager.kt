@@ -95,12 +95,24 @@ fun GroupPagerPage(
     }
     val servers by serverFlow.collectAsStateWithLifecycle()
     val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+    val subRemarksMap = remember(groupId, servers) {
+        if (groupId.isEmpty()) {
+            servers.mapNotNull { it.profile.subscriptionId.takeIf { id -> id.isNotEmpty() } }
+                .toSet()
+                .associateWith { id ->
+                    MmkvManager.decodeSubscription(id)?.remarks?.firstOrNull()?.toString().orEmpty()
+                }
+        } else {
+            emptyMap()
+        }
+    }
     ServerListPage(
         servers = servers,
         selectedGuid = selectedGuid,
         canReorder = canReorder,
         doubleColumnDisplay = doubleColumnDisplay,
         subscriptionId = groupId,
+        subRemarksMap = subRemarksMap,
         confirmRemove = confirmRemove,
         groupId = groupId,
         lazyListStates = lazyListStates,
@@ -122,6 +134,7 @@ private fun ServerListPage(
     canReorder: Boolean,
     doubleColumnDisplay: Boolean,
     subscriptionId: String,
+    subRemarksMap: Map<String, String>,
     confirmRemove: Boolean,
     groupId: String,
     lazyListStates: MutableMap<String, LazyListState>,
@@ -158,6 +171,7 @@ private fun ServerListPage(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
                         subscriptionId = subscriptionId,
+                        subRemarksMap = subRemarksMap,
                         doubleColumnDisplay = true,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
@@ -212,6 +226,7 @@ private fun ServerListPage(
                                 serverCache = serverCache,
                                 selectedGuid = selectedGuid,
                                 subscriptionId = subscriptionId,
+                                subRemarksMap = subRemarksMap,
                                 onSelectServer = onSelectServer,
                                 onEditServer = onEditServer,
                                 onShareServer = onShareServer,
@@ -226,6 +241,7 @@ private fun ServerListPage(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
                         subscriptionId = subscriptionId,
+                        subRemarksMap = subRemarksMap,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
@@ -244,6 +260,7 @@ private fun ServerItemRow(
     serverCache: ServersCache,
     selectedGuid: String?,
     subscriptionId: String,
+    subRemarksMap: Map<String, String>,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
@@ -251,13 +268,8 @@ private fun ServerItemRow(
     onRemoveServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
-    val subId = profile.subscriptionId
-    val subRemarks = remember(subscriptionId, subId) {
-        if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()
-                ?.toString() ?: ""
-        } else ""
-    }
+    val subRemarks =
+        if (subscriptionId.isEmpty()) subRemarksMap[profile.subscriptionId].orEmpty() else ""
     val statistics = remember(profile) {
         profile.description.nullIfBlank()
             ?: AngConfigManager.generateDescription(profile)
@@ -286,6 +298,7 @@ private fun ServerItemColumn(
     serverCache: ServersCache,
     selectedGuid: String?,
     subscriptionId: String,
+    subRemarksMap: Map<String, String>,
     doubleColumnDisplay: Boolean,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
@@ -294,12 +307,8 @@ private fun ServerItemColumn(
     onRemoveServer: (String) -> Unit
 ) {
     val profile = serverCache.profile
-    val subId = profile.subscriptionId
-    val subRemarks = remember(subscriptionId, subId) {
-        if (subscriptionId.isEmpty()) {
-            MmkvManager.decodeSubscription(subId)?.remarks?.firstOrNull()?.toString() ?: ""
-        } else ""
-    }
+    val subRemarks =
+        if (subscriptionId.isEmpty()) subRemarksMap[profile.subscriptionId].orEmpty() else ""
     val statistics = remember(profile) {
         profile.description.nullIfBlank() ?: AngConfigManager.generateDescription(profile)
     }

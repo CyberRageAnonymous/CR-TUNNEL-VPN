@@ -34,22 +34,18 @@ fun AnimatedHomeBackground(isDarkTheme: Boolean) {
         label = "phaseB"
     )
 
-    val baseTop = if (isDarkTheme) Color(0xFF060C1E) else Color(0xFFF0F8FE)
-    val baseBottom = if (isDarkTheme) Color(0xFF0B1430) else Color(0xFFF8F2FC)
     val orbCyan = if (isDarkTheme) Color(0xFF00E5FF) else Color(0xFF00A8C4)
     val orbPurple = if (isDarkTheme) Color(0xFFA855F7) else Color(0xFFB06EF0)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(baseTop, baseBottom)))
             .drawWithCache {
                 val orbR1 = size.minDimension * 0.28f
                 val orbR2 = size.minDimension * 0.32f
                 onDrawBehind {
                     val w = size.width
                     val h = size.height
-                    // Soft translucent circles, positions from trig (cheap, no allocation)
                     val c1x = w * (0.5f + 0.3f * sin(phaseA).toFloat())
                     val c1y = h * (0.32f + 0.12f * sin(phaseB * 0.7f).toFloat())
                     val c2x = w * (0.5f + 0.32f * sin(phaseB + PI.toFloat()).toFloat())
