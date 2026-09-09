@@ -1,9 +1,14 @@
 package com.cr.tunnel.ui.main
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,8 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.R
@@ -287,12 +294,31 @@ fun MainScreen(
         },
         floatingActionButton = {},
     ) { innerPadding ->
-        Column(
+        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+        AnimatedContent(
+            targetState = selectedTab,
+            transitionSpec = {
+                val forward = targetState.ordinal > initialState.ordinal
+                // Mirror the slide direction in RTL locales so pages always
+                // move toward the reading side of the user.
+                val enterFromEnd = if (isRtl) !forward else forward
+                if (enterFromEnd) {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
+                        fadeIn(tween(280))) togetherWith
+                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
+                            fadeOut(tween(280)))
+                } else {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
+                        fadeIn(tween(280))) togetherWith
+                        (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
+                            fadeOut(tween(280)))
+                }
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            when (selectedTab) {
+        ) { tab ->
+            when (tab) {
                 MainTab.Home -> HomeTab(
                     mainViewModel = mainViewModel,
                     uiState = uiState,
