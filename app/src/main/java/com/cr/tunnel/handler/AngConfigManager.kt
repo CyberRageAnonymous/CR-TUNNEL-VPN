@@ -27,6 +27,7 @@ import com.cr.tunnel.util.JsonUtil
 import com.cr.tunnel.util.LogUtil
 import com.cr.tunnel.util.QRCodeDecoder
 import com.cr.tunnel.util.Utils
+import com.google.gson.JsonParser
 import java.net.URI
 
 object AngConfigManager {
@@ -198,11 +199,15 @@ object AngConfigManager {
 
     private fun parseNpvContent(content: String?, subid: String, append: Boolean): Int {
         if (content.isNullOrBlank()) return 0
+        val trimmed = content.trim()
+        if (trimmed.startsWith("NPVT1")) {
+            val serversJson = NpvtDecoder.decodeServers(trimmed) ?: return 0
+            return parseNpvtServers(serversJson, subid, append)
+        }
         val links = extractNpvLinks(content)
         if (links.isNotEmpty()) {
             return parseBatchConfig(links.joinToString("\n"), subid, append)
         }
-        val trimmed = content.trim()
         if (trimmed.startsWith("{") && trimmed.contains("\"outbounds\"")) {
             try {
                 val config = CustomFmt.parse(trimmed) ?: return 0
@@ -217,6 +222,64 @@ object AngConfigManager {
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to parse npv config JSON", e)
             }
+        }
+        return 0
+    }
+
+    private fun parseNpvtServers(serversJson: String, subid: String, append: Boolean): Int {
+        try {
+            val entries = JsonParser.parseString(serversJson).asJsonArray
+            if (entries.size() == 0) return 0
+
+            val removedSelected = getRemovedSelectedProfile(subid, append)
+            if (!append) {
+                MmkvManager.removeServerViaSubid(subid)
+            }
+
+            val serverGuids = MmkvManager.decodeServerList(subid)
+            val keyToProfile = mutableMapOf<String, ProfileItem>()
+            var guidsChanged = false
+            var firstKey: String? = null
+            var count = 0
+
+            for (i in entries.size() - 1 downTo 0) {
+                val entry = entries.get(i).takeIf { it.isJsonObject }?.asJsonObject ?: continue
+                val profile = entry.get("v2rayProfile")?.takeIf { it.isJsonObject }?.asJsonObject ?: continue
+                val raw = profile.get("v2rayJson")?.takeIf { it.isJsonPrimitive }?.asString.orEmpty()
+                if (raw.isBlank()) continue
+                val config = runCatching { CustomFmt.parse(raw) }.getOrNull() ?: continue
+                if (config.remarks.isBlank()) {
+                    config.remarks = entry.get("name")?.takeIf { it.isJsonPrimitive }?.asString.orEmpty()
+                }
+                config.subscriptionId = subid
+                config.description = generateDescription(config)
+
+                val key = Utils.getUuid()
+                MmkvManager.encodeProfileDirect(key, JsonUtil.toJson(config))
+                MmkvManager.encodeServerRaw(key, raw)
+                if (!serverGuids.contains(key)) {
+                    serverGuids.add(0, key)
+                    guidsChanged = true
+                }
+                if (firstKey == null) firstKey = key
+                keyToProfile[key] = config
+                count += 1
+            }
+
+            if (guidsChanged) {
+                MmkvManager.encodeServerList(serverGuids, subid)
+            }
+            if (count > 0) {
+                val matchKey = findMatchedProfileKey(keyToProfile, removedSelected)
+                if (matchKey != null) {
+                    MmkvManager.setSelectServer(matchKey)
+                } else if (MmkvManager.getSelectServer().isNullOrBlank() && firstKey != null) {
+                    MmkvManager.setSelectServer(firstKey)
+                }
+            }
+            return count
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to import npvt servers", e)
         }
         return 0
     }
