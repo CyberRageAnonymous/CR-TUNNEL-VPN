@@ -215,6 +215,10 @@
                 <data android:pathPattern=".*npvt" />
                 <data android:pathPattern=".*\.npv" />
                 <data android:pathPattern=".*npv" />
+                <data android:pathPattern=".*\.CRT" />
+                <data android:pathPattern=".*CRT" />
+                <data android:pathPattern=".*\.crt" />
+                <data android:pathPattern=".*crt" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -227,6 +231,10 @@
                 <data android:pathPattern=".*npvt" />
                 <data android:pathPattern=".*\.npv" />
                 <data android:pathPattern=".*npv" />
+                <data android:pathPattern=".*\.CRT" />
+                <data android:pathPattern=".*CRT" />
+                <data android:pathPattern=".*\.crt" />
+                <data android:pathPattern=".*crt" />
             </intent-filter>
         </activity>
         <activity
