@@ -157,8 +157,8 @@ class MainActivity : HelperBaseComponentActivity() {
         val remarks = MmkvManager.decodeServerConfig(guid)?.remarks.orEmpty()
             .ifBlank { "CR-TUNNEL" }
             .replace(Regex("[\\\\/:*?\"<>|]"), "_")
-        launchCreateDocument("$remarks.CRT") { uri ->
-            if (uri == null) return@launchCreateDocument
+        launchCreateRawDocument("$remarks.CRT") { uri ->
+            if (uri == null) return@launchCreateRawDocument
             val payload = CrtVault.encrypt(link).toByteArray(Charsets.UTF_8)
             lifecycleScope.launch(Dispatchers.IO) {
                 val ok = runCatching {

@@ -33,6 +33,14 @@ class FileChooserHelper(private val activity: ComponentActivity) {
             documentCreateCallback = null
         }
 
+    private val documentCreateRawLauncher: ActivityResultLauncher<String> =
+        activity.registerForActivityResult(
+            ActivityResultContracts.CreateDocument("application/octet-stream")
+        ) { uri ->
+            documentCreateCallback?.invoke(uri)
+            documentCreateCallback = null
+        }
+
     fun launch(
         mimeType: String = "*/*",
         onResult: (Uri?) -> Unit
@@ -60,9 +68,24 @@ class FileChooserHelper(private val activity: ComponentActivity) {
         fileName: String,
         onResult: (Uri?) -> Unit
     ) {
+        launchDocument(documentCreateLauncher, fileName, onResult)
+    }
+
+    fun createRawDocument(
+        fileName: String,
+        onResult: (Uri?) -> Unit
+    ) {
+        launchDocument(documentCreateRawLauncher, fileName, onResult)
+    }
+
+    private fun launchDocument(
+        launcher: ActivityResultLauncher<String>,
+        fileName: String,
+        onResult: (Uri?) -> Unit
+    ) {
         documentCreateCallback = onResult
         try {
-            documentCreateLauncher.launch(fileName)
+            launcher.launch(fileName)
         } catch (ex: ActivityNotFoundException) {
             LogUtil.e(AppConfig.TAG, "Document creator activity not found", ex)
             activity.toast(R.string.toast_require_file_manager)

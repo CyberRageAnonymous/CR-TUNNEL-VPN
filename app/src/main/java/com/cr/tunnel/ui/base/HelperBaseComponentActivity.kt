@@ -41,6 +41,13 @@ abstract class HelperBaseComponentActivity : BaseComponentActivity() {
         fileChooser.createDocument(fileName, onResult)
     }
 
+    protected fun launchCreateRawDocument(
+        fileName: String,
+        onResult: (Uri?) -> Unit
+    ) {
+        fileChooser.createRawDocument(fileName, onResult)
+    }
+
     protected fun launchQRCodeScanner(
         onResult: (String?) -> Unit
     ) {

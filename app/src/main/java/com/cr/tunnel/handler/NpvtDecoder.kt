@@ -4,15 +4,14 @@ import android.util.Base64
 import com.cr.tunnel.AngApplication
 import com.cr.tunnel.AppConfig
 import com.cr.tunnel.util.LogUtil
-import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.zip.GZIPInputStream
 
 object NpvtDecoder {
 
-    private const val TABLES_ASSET = "npvt_tables.bin.gz"
     private const val MAGIC = "NPVTTBL1"
+    private val TABLES_ASSETS = arrayOf("npvt_tables.bin", "npvt_tables.bin.gz")
     private val PERM = intArrayOf(0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11)
     private val SPLIT = Regex("\\s*,\\s*")
     private val WS = Regex("\\s+")
@@ -33,7 +32,10 @@ object NpvtDecoder {
             val parts = trimmed.substring(5).trim().split(SPLIT)
             if (parts.size != 3) return null
             val version = String(decryptPart(parts[0]), Charsets.UTF_8).trim()
-            if ((version.toIntOrNull() ?: Int.MAX_VALUE) > 1) return null
+            if ((version.toIntOrNull() ?: Int.MAX_VALUE) > 1) {
+                LogUtil.e(AppConfig.TAG, "Unsupported npvt version: $version")
+                return null
+            }
             val servers = String(decryptPart(parts[1]), Charsets.UTF_8).trim()
             if (!servers.startsWith("[")) return null
             servers
@@ -46,7 +48,7 @@ object NpvtDecoder {
     private fun decryptPart(part: String): ByteArray {
         val cleaned = part.replace(WS, "")
         val binary = decodeBase64(cleaned) ?: throw IllegalArgumentException("bad base64")
-        if (binary.size < 32) throw IllegalArgumentException("truncated payload")
+        if (binary.size < 17) throw IllegalArgumentException("truncated payload")
         return decrypt(binary)
     }
 
@@ -61,12 +63,7 @@ object NpvtDecoder {
         if (tablesReady) return
         synchronized(this) {
             if (tablesReady) return
-            val bytes = ByteArrayOutputStream().use { out ->
-                AngApplication.application.assets.open(TABLES_ASSET).use { input ->
-                    GZIPInputStream(input).use { gz -> gz.copyTo(out) }
-                }
-                out.toByteArray()
-            }
+            val bytes = loadTables() ?: return
             val bb = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
             val magic = ByteArray(8)
             bb.get(magic)
@@ -78,6 +75,27 @@ object NpvtDecoder {
             mbl = readBlock(bb)
             tablesReady = true
         }
+    }
+
+    private fun loadTables(): ByteArray? {
+        var lastError: Exception? = null
+        for (name in TABLES_ASSETS) {
+            try {
+                val raw = AngApplication.application.assets.open(name).use { it.readBytes() }
+                if (raw.size < 16) continue
+                return if (raw[0] == 0x1f.toByte() && raw[1] == 0x8b.toByte()) {
+                    GZIPInputStream(raw.inputStream()).use { it.readBytes() }
+                } else {
+                    raw
+                }
+            } catch (e: Exception) {
+                lastError = e
+            }
+        }
+        if (lastError != null) {
+            LogUtil.e(AppConfig.TAG, "Failed to load npvt tables", lastError)
+        }
+        return null
     }
 
     private fun readBlock(bb: ByteBuffer): IntArray {
