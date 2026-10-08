@@ -203,6 +203,31 @@
                 <data android:host="install-config" />
                 <data android:host="install-sub" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+
+                <data android:pathPattern=".*\.npvt" />
+                <data android:pathPattern=".*npvt" />
+                <data android:pathPattern=".*\.npv" />
+                <data android:pathPattern=".*npv" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+
+                <data android:pathPattern=".*\.npvt" />
+                <data android:pathPattern=".*npvt" />
+                <data android:pathPattern=".*\.npv" />
+                <data android:pathPattern=".*npv" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.checkupdate.CheckUpdateActivity"

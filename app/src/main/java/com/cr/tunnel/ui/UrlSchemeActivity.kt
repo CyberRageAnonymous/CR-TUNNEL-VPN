@@ -10,6 +10,8 @@ import com.cr.tunnel.R
 import com.cr.tunnel.extension.toast
 import com.cr.tunnel.extension.toastError
 import com.cr.tunnel.handler.AngConfigManager
+import com.cr.tunnel.handler.MmkvManager
+import com.cr.tunnel.handler.SettingsChangeManager
 import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.main.MainActivity
 import com.cr.tunnel.util.LogUtil
@@ -23,43 +25,82 @@ class UrlSchemeActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
-            intent.apply {
-                if (action == Intent.ACTION_SEND) {
-                    if ("text/plain" == type) {
+            val uri = intent.data
+            val action = intent.action
+            val host = uri?.host
+            when {
+                action == Intent.ACTION_SEND -> {
+                    if ("text/plain" == intent.type) {
                         intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                             parseUri(it, null)
                         }
                     }
-                } else if (action == Intent.ACTION_VIEW) {
-                    when (data?.host) {
-                        "install-config" -> {
-                            val uri: Uri? = intent.data
-                            val shareUrl = uri?.getQueryParameter("url").orEmpty()
-                            parseUri(shareUrl, uri?.fragment)
-                        }
+                    openMain()
+                }
 
-                        "install-sub" -> {
-                            val uri: Uri? = intent.data
-                            val shareUrl = uri?.getQueryParameter("url").orEmpty()
-                            parseUri(shareUrl, uri?.fragment)
-                        }
+                action == Intent.ACTION_VIEW &&
+                    (host == "install-config" || host == "install-sub") -> {
+                    parseUri(uri?.getQueryParameter("url").orEmpty(), uri?.fragment)
+                    openMain()
+                }
 
-                        else -> {
-                            toastError(R.string.toast_failure)
-                        }
-                    }
+                action == Intent.ACTION_VIEW &&
+                    uri != null &&
+                    (uri.scheme == "content" || uri.scheme == "file") -> {
+                    importFile(uri)
+                }
+
+                else -> {
+                    toastError(R.string.toast_failure)
+                    openMain()
                 }
             }
-
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Error processing URL scheme", e)
+            openMain()
         }
     }
 
     @Composable
     override fun ScreenContent() {
+    }
+
+    private fun openMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun importFile(uri: Uri) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val text = runCatching {
+                contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+            }.getOrNull().orEmpty()
+            val groupId = MmkvManager
+                .decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "")
+                .orEmpty()
+            val count = if (text.isBlank()) {
+                0
+            } else {
+                AngConfigManager.importBatchConfig(text, groupId, true).first
+            }
+            withContext(Dispatchers.Main) {
+                when {
+                    count > 0 -> {
+                        SettingsChangeManager.makeSetupGroupTab()
+                        toast(getString(R.string.title_import_config_count, count))
+                    }
+
+                    AngConfigManager.isCrtContent(text) ->
+                        toastError(R.string.toast_crt_invalid)
+
+                    AngConfigManager.isEncryptedNpvConfig(text) ->
+                        toastError(R.string.toast_npv_encrypted)
+
+                    else -> toastError(R.string.toast_failure)
+                }
+                openMain()
+            }
+        }
     }
 
     private fun parseUri(uriString: String?, fragment: String?) {
