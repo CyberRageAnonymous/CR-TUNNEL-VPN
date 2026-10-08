@@ -106,6 +106,8 @@
     <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50)</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
+    <string name="toast_npv_encrypted">Этот конфиг NapsternetV зашифрован и не может быть открыт</string>
+    <string name="toast_crt_invalid">Файл .CRT недействителен или создан другим приложением</string>
     <string name="toast_none_data">Ничего нет</string>
     <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
@@ -463,6 +465,7 @@
     <string name="share_method_qrcode">QR-код</string>
     <string name="share_method_clipboard">Копировать ссылку профиля</string>
     <string name="share_method_full_content">Копировать полную конфигурацию</string>
+    <string name="share_method_crt">Файл CRT (зашифрован)</string>
     <string name="action_edit">Изменить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_close">Закрыть</string>
@@ -485,6 +488,7 @@
         <item>Как в системе</item>
         <item>Светлая</item>
         <item>Тёмная</item>
+        <item>CR Neon</item>
     </string-array>
 
     <string name="routing_preset_china_whitelist">Белый список Китая</string>

@@ -106,6 +106,8 @@
     <string name="server_lab_kcp_tti">mKCP TTI (ঐচ্ছিক, কোর ডিফল্ট 50)</string>
     <string name="toast_success">সফল</string>
     <string name="toast_failure">ব্যর্থ</string>
+    <string name="toast_npv_encrypted">এই NapsternetV কনফিগ এনক্রিপ্ট করা এবং খোলা যায় না</string>
+    <string name="toast_crt_invalid">.CRT ফাইল অবৈধ বা অন্য অ্যাপ দ্বারা তৈরি</string>
     <string name="toast_none_data">কোনও তথ্য নেই</string>
     <string name="toast_incorrect_protocol">ভুল প্রোটোকল</string>
     <string name="toast_decoding_failed">ডিকোডিং ব্যর্থ</string>
@@ -463,6 +465,7 @@
     <string name="share_method_qrcode">QR কোড</string>
     <string name="share_method_clipboard">প্রোফাইল লিংক কপি করুন</string>
     <string name="share_method_full_content">পূর্ণ কনফিগারেশন কপি করুন</string>
+    <string name="share_method_crt">CRT ফাইল (এনক্রিপ্টেড)</string>
     <string name="action_edit">সম্পাদনা</string>
     <string name="action_delete">মুছুন</string>
     <string name="action_close">বন্ধ করুন</string>
@@ -485,6 +488,7 @@
         <item>সিস্টেম অনুসরণ করুন</item>
         <item>লাইট</item>
         <item>ডার্ক</item>
+        <item>CR Neon</item>
     </string-array>
 
     <string name="routing_preset_china_whitelist">চায়না হোয়াইটলিস্ট</string>

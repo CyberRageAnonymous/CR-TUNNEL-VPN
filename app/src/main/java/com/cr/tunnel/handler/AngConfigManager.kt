@@ -115,7 +115,7 @@ object AngConfigManager {
         return 0
     }
 
-    private fun shareConfig(guid: String): String {
+    fun shareConfig(guid: String): String {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
 
@@ -136,23 +136,89 @@ object AngConfigManager {
     }
 
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        val plain = CrtVault.decrypt(server) ?: server
+        var count = parseBatchConfig(Utils.decode(plain), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(plain, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid, append)
+            count = parseCustomConfigServer(plain, subid, append)
+        }
+        if (count <= 0) {
+            count = parseNpvContent(plain, subid, append)
         }
 
-        var countSub = parseBatchSubscription(server)
+        var countSub = parseBatchSubscription(plain)
         if (countSub <= 0) {
-            countSub = parseBatchSubscription(Utils.decode(server))
+            countSub = parseBatchSubscription(Utils.decode(plain))
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
         }
 
         return count to countSub
+    }
+
+    private val npvConfigLinkRegex: Regex by lazy {
+        val schemes = configFmtParsers.keys
+            .map { it.removeSuffix("://").removeSuffix(":") }
+            .distinct()
+            .sortedByDescending { it.length }
+            .joinToString("|") { Regex.escape(it) }
+        Regex("(?i)($schemes)://[^\\s\"'<>\\[\\]{},;)]+")
+    }
+
+    private val npvBase64RunRegex: Regex by lazy { Regex("[A-Za-z0-9+/]{80,}={0,2}") }
+
+    fun isEncryptedNpvConfig(content: String?): Boolean {
+        if (content.isNullOrBlank()) return false
+        val trimmed = content.trim()
+        if (trimmed.startsWith("NPVT1", ignoreCase = true)) return true
+        val sample = trimmed.take(4096)
+        val controlChars = sample.count { it.code < 32 && it != '\n' && it != '\r' && it != '\t' }
+        return controlChars > sample.length / 25
+    }
+
+    private fun extractNpvLinks(content: String): List<String> {
+        val links = linkedSetOf<String>()
+        npvConfigLinkRegex.findAll(content).forEach { links.add(it.value) }
+        if (links.isEmpty() && content.length <= 2_000_000) {
+            npvBase64RunRegex.findAll(content).forEach { match ->
+                val decoded = runCatching {
+                    String(android.util.Base64.decode(match.value, android.util.Base64.DEFAULT), Charsets.UTF_8)
+                }.getOrNull() ?: return@forEach
+                npvConfigLinkRegex.findAll(decoded).forEach { links.add(it.value) }
+                if (links.isNotEmpty()) return@forEach
+            }
+        }
+        return links.toList()
+    }
+
+    fun isCrtContent(content: String?): Boolean = CrtVault.isCrt(content)
+
+    private fun parseNpvContent(content: String?, subid: String, append: Boolean): Int {
+        if (content.isNullOrBlank()) return 0
+        val links = extractNpvLinks(content)
+        if (links.isNotEmpty()) {
+            return parseBatchConfig(links.joinToString("\n"), subid, append)
+        }
+        val trimmed = content.trim()
+        if (trimmed.startsWith("{") && trimmed.contains("\"outbounds\"")) {
+            try {
+                val config = CustomFmt.parse(trimmed) ?: return 0
+                config.subscriptionId = subid
+                config.description = generateDescription(config)
+                if (!append) {
+                    MmkvManager.removeServerViaSubid(subid)
+                }
+                val key = MmkvManager.encodeServerConfig("", config)
+                MmkvManager.encodeServerRaw(key, trimmed)
+                return 1
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to parse npv config JSON", e)
+            }
+        }
+        return 0
     }
 
     private fun parseBatchSubscription(servers: String?): Int {

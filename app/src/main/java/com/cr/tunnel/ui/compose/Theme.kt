@@ -97,6 +97,43 @@ private val DarkColor = darkColorScheme(
     surfaceContainerHighest = Color(0xFF252E55), // Blue Gray
 )
 
+private val NeonColor = darkColorScheme(
+    primary = Color(0xFF00F5FF), // Neon Cyan
+    onPrimary = Color(0xFF002026), // Dark Cyan
+    primaryContainer = Color(0xFF004A56), // Deep Cyan
+    onPrimaryContainer = Color(0xFFB3F9FF), // Light Cyan
+    secondary = Color(0xFFB44BFF), // Neon Purple
+    onSecondary = Color(0xFF220055), // Dark Purple
+    secondaryContainer = Color(0xFF4A1480), // Deep Purple
+    onSecondaryContainer = Color(0xFFF0E1FF), // Light Purple
+    tertiary = Color(0xFF00FFA8), // Neon Green
+    onTertiary = Color(0xFF00382E), // Dark Teal
+    tertiaryContainer = Color(0xFF005143), // Teal
+    onTertiaryContainer = Color(0xFFA0F2D0), // Light Green
+    error = Color(0xFFFF6B8A), // Neon Red
+    errorContainer = Color(0xFF93000A), // Dark Red
+    onError = Color(0xFF690005), // Deep Red
+    onErrorContainer = Color(0xFFFFDAD6), // Light Red
+    background = Color(0xFF000000), // Pure Black (OLED)
+    onBackground = Color(0xFFE9FBFF), // Light Cyan
+    surface = Color(0xFF05070F), // Near Black
+    onSurface = Color(0xFFE9FBFF), // Light Cyan
+    surfaceVariant = Color(0xFF121A33), // Dark Blue
+    onSurfaceVariant = Color(0xFF9FD4E0), // Light Gray Cyan
+    outline = Color(0xFF00F5FF), // Neon Cyan
+    outlineVariant = Color(0xFF1E2A55), // Dark Blue
+    inverseSurface = Color(0xFFE0F7FF), // Light Cyan
+    inverseOnSurface = Color(0xFF05070F), // Near Black
+    inversePrimary = Color(0xFF00A8C4), // Cyan
+    scrim = Color(0xFF000000), // Black
+    surfaceTint = Color(0xFF00F5FF), // Neon Cyan
+    surfaceContainerLowest = Color(0xFF000000), // Black
+    surfaceContainerLow = Color(0xFF05070F), // Near Black
+    surfaceContainer = Color(0xFF0A0E1E), // Deep Black Blue
+    surfaceContainerHigh = Color(0xFF101529), // Black Blue
+    surfaceContainerHighest = Color(0xFF182040), // Dark Blue Gray
+)
+
 // Semantic Colors
 val colorPing = Color(0xFF00D68F) // Mint Green
 val colorPingRed = Color(0xFFFF2D78) // Hot Pink Red
@@ -138,7 +175,7 @@ fun resolveDarkTheme(): Boolean {
     val mode by ThemeManager.themeMode.collectAsState()
     return when (mode) {
         "1" -> false
-        "2" -> true
+        "2", "3" -> true
         else -> isSystemInDarkTheme()
     }
 }
@@ -150,7 +187,13 @@ fun AppTheme(
     darkTheme: Boolean = resolveDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColor else LightColor
+    val themeMode by ThemeManager.themeMode.collectAsState()
+    val neonMode = themeMode == "3"
+    val colorScheme = when {
+        neonMode -> NeonColor
+        darkTheme -> DarkColor
+        else -> LightColor
+    }
     val snackbarController = rememberAppSnackbarController()
 
     val view = LocalView.current

@@ -106,6 +106,8 @@
     <string name="server_lab_kcp_tti">mKCP TTI（可选，核心默认 50）</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
+    <string name="toast_npv_encrypted">该 NapsternetV 配置已加密，无法打开</string>
+    <string name="toast_crt_invalid">.CRT 文件无效或由其他应用创建</string>
     <string name="toast_none_data">没有数据</string>
     <string name="toast_incorrect_protocol">不正确的协议</string>
     <string name="toast_decoding_failed">解码失败</string>
@@ -463,6 +465,7 @@
     <string name="share_method_qrcode">二维码</string>
     <string name="share_method_clipboard">复制配置链接</string>
     <string name="share_method_full_content">复制完整配置</string>
+    <string name="share_method_crt">CRT 文件（加密）</string>
     <string name="action_edit">编辑</string>
     <string name="action_delete">删除</string>
     <string name="action_close">关闭</string>
@@ -485,6 +488,7 @@
         <item>跟随系统</item>
         <item>浅色</item>
         <item>深色</item>
+        <item>CR Neon</item>
     </string-array>
 
     <string name="routing_preset_china_whitelist">绕过大陆 (Whitelist)</string>

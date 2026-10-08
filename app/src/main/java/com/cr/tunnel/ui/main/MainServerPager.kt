@@ -376,6 +376,7 @@ fun ServerListItem(
         label = "pressScale"
     )
     val isDarkTheme = LocalDarkTheme.current
+    val statusColor = remember(testDelayMillis) { serverStatusColor(testDelayMillis) }
 
     Row(
         modifier = modifier
@@ -420,17 +421,25 @@ fun ServerListItem(
                 .width(10.dp)
                 .fillMaxHeight()
         ) {
+            statusColor?.let { color ->
+                Box(
+                    Modifier
+                        .align(Alignment.CenterStart)
+                        .width(3.dp)
+                        .fillMaxHeight()
+                        .padding(vertical = 10.dp)
+                        .background(color)
+                )
+            }
             if (isSelected) {
-                Row {
-                    Spacer(Modifier.width(6.dp))
-                    Box(
-                        Modifier
-                            .width(4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 10.dp)
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                }
+                Box(
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .padding(vertical = 10.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                )
             }
         }
 
@@ -510,6 +519,14 @@ fun ServerListItem(
             }
         }
     }
+}
+
+private fun serverStatusColor(testDelayMillis: Long): Color? = when {
+    testDelayMillis == 0L -> null
+    testDelayMillis < 0L -> colorPingRed
+    testDelayMillis < 300L -> colorPing
+    testDelayMillis < 800L -> Color(0xFFFFB020)
+    else -> colorPingRed
 }
 
 private fun getProtocolDescription(profile: ProfileItem): String {

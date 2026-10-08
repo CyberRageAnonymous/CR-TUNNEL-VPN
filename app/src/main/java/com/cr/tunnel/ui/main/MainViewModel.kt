@@ -16,6 +16,7 @@ import com.cr.tunnel.dto.entities.SubscriptionCache
 import com.cr.tunnel.extension.isComplexType
 import com.cr.tunnel.extension.matchesPattern
 import com.cr.tunnel.extension.moveItem
+import com.cr.tunnel.handler.AngConfigManager
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.UpdateCheckerManager
 import com.cr.tunnel.ui.base.BaseViewModel
@@ -265,7 +266,8 @@ init {
             MainAction.LocateSelectedServer,
             is MainAction.EditServer,
             is MainAction.ShareClipboard,
-            is MainAction.ShareFullContent -> {
+            is MainAction.ShareFullContent,
+            is MainAction.ExportCrtFile -> {
                 // Handled by Activity via its onAction lambda
             }
         }
@@ -452,6 +454,12 @@ init {
                         }
 
                         countSub > 0 -> setupGroupTab(forceRefresh = true)
+                        AngConfigManager.isCrtContent(configText) ->
+                            toastError(R.string.toast_crt_invalid)
+
+                        AngConfigManager.isEncryptedNpvConfig(configText) ->
+                            toastError(R.string.toast_npv_encrypted)
+
                         else -> toastError(R.string.toast_failure)
                     }
                 } catch (cancelled: CancellationException) {

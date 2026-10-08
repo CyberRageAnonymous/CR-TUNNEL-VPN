@@ -22,6 +22,7 @@ import com.cr.tunnel.extension.toast
 import com.cr.tunnel.extension.toastError
 import com.cr.tunnel.extension.toastSuccess
 import com.cr.tunnel.handler.AngConfigManager
+import com.cr.tunnel.handler.CrtVault
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.SettingsChangeManager
 import com.cr.tunnel.handler.SettingsManager
@@ -126,6 +127,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     is MainAction.EditServer -> editServer(action.guid, action.profile)
                     is MainAction.ShareClipboard -> shareToClipboard(action.guid)
                     is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+                    is MainAction.ExportCrtFile -> exportCrtFile(action.guid)
                     else -> mainViewModel.onAction(action)
                 }
             },
@@ -142,6 +144,30 @@ class MainActivity : HelperBaseComponentActivity() {
             withContext(Dispatchers.Main) {
                 if (result == 0) toastSuccess(R.string.toast_success)
                 else toastError(R.string.toast_failure)
+            }
+        }
+    }
+
+    private fun exportCrtFile(guid: String) {
+        val link = AngConfigManager.shareConfig(guid)
+        if (link.isEmpty()) {
+            toastError(R.string.toast_failure)
+            return
+        }
+        val remarks = MmkvManager.decodeServerConfig(guid)?.remarks.orEmpty()
+            .ifBlank { "CR-TUNNEL" }
+            .replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        launchCreateDocument("$remarks.CRT") { uri ->
+            if (uri == null) return@launchCreateDocument
+            val payload = CrtVault.encrypt(link).toByteArray(Charsets.UTF_8)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val ok = runCatching {
+                    contentResolver.openOutputStream(uri)?.use { it.write(payload) }
+                        ?: error("Failed to open output stream")
+                }.isSuccess
+                withContext(Dispatchers.Main) {
+                    if (ok) toastSuccess(R.string.toast_success) else toastError(R.string.toast_failure)
+                }
             }
         }
     }
