@@ -213,8 +213,6 @@
 
                 <data android:pathPattern=".*\.npvt" />
                 <data android:pathPattern=".*npvt" />
-                <data android:pathPattern=".*\.npv" />
-                <data android:pathPattern=".*npv" />
                 <data android:pathPattern=".*\.CRT" />
                 <data android:pathPattern=".*CRT" />
                 <data android:pathPattern=".*\.crt" />
@@ -231,8 +229,6 @@
 
                 <data android:pathPattern=".*\.npvt" />
                 <data android:pathPattern=".*npvt" />
-                <data android:pathPattern=".*\.npv" />
-                <data android:pathPattern=".*npv" />
                 <data android:pathPattern=".*\.CRT" />
                 <data android:pathPattern=".*CRT" />
                 <data android:pathPattern=".*\.crt" />
