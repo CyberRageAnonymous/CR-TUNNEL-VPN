@@ -310,6 +310,12 @@
     <string name="title_source_code">সোর্স কোড</string>
     <string name="title_oss_license">ওপেন সোর্স লাইসেন্স</string>
     <string name="title_tg_channel">টেলিগ্রাম চ্যানেল</string>
+    <string name="title_website">ওয়েবসাইট</string>
+    <string name="title_x_account">এক্স (টুইটার)</string>
+    <string name="tg_banner_title">আমাদের টেলিগ্রাম চ্যানেলে যোগ দিন</string>
+    <string name="tg_banner_message">সর্বশেষ খবর ও আপডেট পেতে অনুগ্রহ করে আমাদের অফিসিয়াল টেলিগ্রাম চ্যানেলে যোগ দিন।</string>
+    <string name="action_join">যোগ দিন</string>
+    <string name="action_later">পরে</string>
 
     <string name="title_pref_promotion">প্রচার</string>
 

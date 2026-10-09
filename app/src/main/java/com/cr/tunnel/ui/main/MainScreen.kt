@@ -60,8 +60,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.cr.tunnel.AppConfig
 import com.cr.tunnel.R
 import com.cr.tunnel.dto.entities.ProfileItem
+import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.QRCodeDialog
@@ -99,6 +101,9 @@ fun MainScreen(
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
+    var showTgBanner by remember {
+        mutableStateOf(!MmkvManager.decodeSettingsBool(AppConfig.PREF_TG_BANNER_DISMISSED, false))
+    }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
     val removeServer: (String) -> Unit = remember(confirmRemove) { { guid ->
@@ -242,6 +247,38 @@ fun MainScreen(
             dismissButton = {
                 TextButton(onClick = { mainViewModel.dismissUpdatePrompt() }) {
                     Text(stringResource(R.string.action_cancel))
+                }
+            },
+            containerColor = glassDialogColor()
+        )
+    }
+
+    if (showTgBanner) {
+        val context = LocalContext.current
+        AlertDialog(
+            onDismissRequest = { showTgBanner = false },
+            title = { Text(stringResource(R.string.tg_banner_title)) },
+            text = { Text(stringResource(R.string.tg_banner_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showTgBanner = false
+                    MmkvManager.encodeSettings(AppConfig.PREF_TG_BANNER_DISMISSED, true)
+                    Utils.openUri(context, AppConfig.TG_CHANNEL_URL)
+                }) {
+                    Text(stringResource(R.string.action_join))
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = { showTgBanner = false }) {
+                        Text(stringResource(R.string.action_later))
+                    }
+                    TextButton(onClick = {
+                        showTgBanner = false
+                        MmkvManager.encodeSettings(AppConfig.PREF_TG_BANNER_DISMISSED, true)
+                    }) {
+                        Text(stringResource(R.string.action_close))
+                    }
                 }
             },
             containerColor = glassDialogColor()

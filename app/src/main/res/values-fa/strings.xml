@@ -310,6 +310,12 @@
     <string name="title_source_code">کد منبع</string>
     <string name="title_oss_license">مجوز های منبع باز</string>
     <string name="title_tg_channel">کانال تلگرام</string>
+    <string name="title_website">وب‌سایت</string>
+    <string name="title_x_account">اکس (توییتر)</string>
+    <string name="tg_banner_title">به کانال تلگرام ما بپیوندید</string>
+    <string name="tg_banner_message">لطفاً برای دریافت آخرین اخبار و به‌روزرسانی‌ها به کانال رسمی تلگرام ما بپیوندید.</string>
+    <string name="action_join">جوین شدن</string>
+    <string name="action_later">بعداً</string>
 
     <string name="title_pref_promotion">تبلیغات</string>
 

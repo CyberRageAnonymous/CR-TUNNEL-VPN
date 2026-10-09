@@ -310,6 +310,12 @@
     <string name="title_source_code">Mã nguồn</string>
     <string name="title_oss_license">Giấy phép mã nguồn mở</string>
     <string name="title_tg_channel">Kênh Telegram</string>
+    <string name="title_website">Trang web</string>
+    <string name="title_x_account">X (Twitter)</string>
+    <string name="tg_banner_title">Tham gia Kênh Telegram của chúng tôi</string>
+    <string name="tg_banner_message">Vui lòng tham gia kênh Telegram chính thức của chúng tôi để nhận tin tức và cập nhật mới nhất.</string>
+    <string name="action_join">Tham gia</string>
+    <string name="action_later">Để sau</string>
 
     <string name="title_pref_promotion">Ưu đãi</string>
 

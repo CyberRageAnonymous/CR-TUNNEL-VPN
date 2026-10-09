@@ -310,6 +310,12 @@
     <string name="title_source_code">原始碼</string>
     <string name="title_oss_license">開放原始碼授權</string>
     <string name="title_tg_channel">Telegram 頻道</string>
+    <string name="title_website">網站</string>
+    <string name="title_x_account">X（推特）</string>
+    <string name="tg_banner_title">加入我們的 Telegram 頻道</string>
+    <string name="tg_banner_message">請加入我們的官方 Telegram 頻道，以獲取最新消息和更新。</string>
+    <string name="action_join">加入</string>
+    <string name="action_later">稍後</string>
 
     <string name="title_pref_promotion">推廣</string>
 

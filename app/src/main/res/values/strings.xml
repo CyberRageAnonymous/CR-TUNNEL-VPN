@@ -310,6 +310,12 @@
     <string name="title_source_code">Source code</string>
     <string name="title_oss_license">Open-source licenses</string>
     <string name="title_tg_channel">Telegram channel</string>
+    <string name="title_website">Website</string>
+    <string name="title_x_account">X (Twitter)</string>
+    <string name="tg_banner_title">Join Our Telegram Channel</string>
+    <string name="tg_banner_message">Please join our official Telegram channel to stay updated with the latest news and releases.</string>
+    <string name="action_join">Join</string>
+    <string name="action_later">Later</string>
 
     <string name="title_pref_promotion">Promotion</string>
 

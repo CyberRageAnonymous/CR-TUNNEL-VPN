@@ -94,6 +94,16 @@ fun AboutScreen(onBackClick: () -> Unit) {
                 onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
             )
             SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_website_24dp),
+                title = stringResource(R.string.title_website),
+                onClick = { Utils.openUri(context, AppConfig.APP_WEBSITE_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_x_24dp),
+                title = stringResource(R.string.title_x_account),
+                onClick = { Utils.openUri(context, AppConfig.APP_X_URL) }
+            )
+            SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_privacy_24dp),
                 title = stringResource(R.string.title_privacy_policy),
                 onClick = { Utils.openUri(context, AppConfig.APP_PRIVACY_POLICY) }
