@@ -64,9 +64,11 @@ import com.cr.tunnel.ui.compose.ItemDivider
 import com.cr.tunnel.ui.compose.ReorderableGridItem
 import com.cr.tunnel.ui.compose.ReorderableListItem
 import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.colorConfigType
 import com.cr.tunnel.ui.compose.colorPing
 import com.cr.tunnel.ui.compose.colorPingRed
+import com.cr.tunnel.ui.compose.neonRowGlow
 import com.cr.tunnel.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -354,17 +356,24 @@ fun ServerListItem(
     val remarksStyle = remember(bodyLarge) {
         bodyLarge.copy(lineBreak = LineBreak.Paragraph)
     }
-    val glassBg = remember(isSelected) {
+    val isNeon = LocalNeonTheme.current
+    val glassBg = remember(isSelected, isNeon) {
         Brush.linearGradient(
             listOf(
-                if (isSelected) Color(0x6600E5FF).copy(alpha = 0.25f) else Color(0x1400E5FF),
-                if (isSelected) Color(0x66A855F7).copy(alpha = 0.22f) else Color(0x14A855F7)
+                if (isSelected) Color(0x6600E5FF).copy(alpha = if (isNeon) 0.32f else 0.25f)
+                else Color(0x1400E5FF),
+                if (isSelected) Color(0x66A855F7).copy(alpha = if (isNeon) 0.30f else 0.22f)
+                else Color(0x14A855F7)
             )
         )
     }
-    val borderBrush = remember(isSelected) {
+    val borderBrush = remember(isSelected, isNeon) {
         if (isSelected) {
-            Brush.linearGradient(listOf(Color(0x9900E5FF), Color(0x99A855F7)))
+            if (isNeon) {
+                Brush.linearGradient(listOf(Color(0xCC00F5FF), Color(0xCCB44BFF)))
+            } else {
+                Brush.linearGradient(listOf(Color(0x9900E5FF), Color(0x99A855F7)))
+            }
         } else {
             Brush.linearGradient(listOf(Color(0x2200E5FF), Color(0x22A855F7)))
         }
@@ -383,6 +392,9 @@ fun ServerListItem(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 6.dp)
             .scale(pressScale)
+            .then(
+                if (isNeon && isSelected) Modifier.neonRowGlow(0.95f) else Modifier
+            )
             .clip(RoundedCornerShape(20.dp))
             .background(glassBg)
             .drawWithCache {

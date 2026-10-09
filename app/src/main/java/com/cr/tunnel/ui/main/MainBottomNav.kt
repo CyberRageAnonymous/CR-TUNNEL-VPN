@@ -1,5 +1,10 @@
 package com.cr.tunnel.ui.main
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,8 +49,14 @@ import androidx.compose.ui.unit.sp
 import com.cr.tunnel.R
 import com.cr.tunnel.handler.StatsManager
 import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.LocalNeonTheme
+import com.cr.tunnel.ui.compose.NeonHairline
 import com.cr.tunnel.ui.compose.glassDialogColor
 import com.cr.tunnel.ui.compose.glassSurface
+import com.cr.tunnel.ui.compose.neonCyan
+import com.cr.tunnel.ui.compose.neonPurple
+import kotlin.math.PI
+import kotlin.math.sin
 
 enum class MainTab(@androidx.annotation.DrawableRes val iconRes: Int, @androidx.annotation.StringRes val labelRes: Int) {
     Home(R.drawable.ic_home_24dp, R.string.nav_home),
@@ -59,37 +74,88 @@ fun MainBottomBar(
     onTabSelected: (MainTab) -> Unit
 ) {
     val isDarkTheme = LocalDarkTheme.current
-    NavigationBar(
-        containerColor = if (isDarkTheme) Color(0xF00F1530) else Color(0xF5FFFFFF),
-        tonalElevation = 0.dp
-    ) {
-        MainTab.entries.forEach { tab ->
-            val selected = tab == selectedTab
-            NavigationBarItem(
-                selected = selected,
-                onClick = { onTabSelected(tab) },
-                icon = {
-                    Icon(
-                        painter = painterResource(tab.iconRes),
-                        contentDescription = stringResource(tab.labelRes),
-                        tint = if (selected) NeonCyan else MaterialTheme.colorScheme.onSurfaceVariant
+    val isNeon = LocalNeonTheme.current
+
+    val transition = rememberInfiniteTransition(label = "neonNav")
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(4000, easing = LinearEasing)),
+        label = "navPhase"
+    )
+    val shift = (sin(phase * 2 * PI).toFloat() + 1f) / 2f
+    val selectedColor = if (isNeon) lerp(neonCyan, neonPurple, shift) else NeonCyan
+
+    Column {
+        if (isNeon) {
+            NeonHairline()
+        }
+        NavigationBar(
+            containerColor = if (isNeon) {
+                Color(0xF2000000)
+            } else if (isDarkTheme) Color(0xF00F1530) else Color(0xF5FFFFFF),
+            tonalElevation = 0.dp
+        ) {
+            MainTab.entries.forEach { tab ->
+                val selected = tab == selectedTab
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onTabSelected(tab) },
+                    icon = {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (isNeon && selected) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(46.dp)
+                                        .drawWithCache {
+                                            val center =
+                                                Offset(size.width / 2f, size.height / 2f)
+                                            onDrawBehind {
+                                                drawCircle(
+                                                    brush = Brush.radialGradient(
+                                                        colors = listOf(
+                                                            selectedColor.copy(alpha = 0.40f),
+                                                            selectedColor.copy(alpha = 0.12f),
+                                                            Color.Transparent
+                                                        ),
+                                                        center = center,
+                                                        radius = size.minDimension / 2f
+                                                    ),
+                                                    radius = size.minDimension / 2f,
+                                                    center = center
+                                                )
+                                            }
+                                        }
+                                )
+                            }
+                            Icon(
+                                painter = painterResource(tab.iconRes),
+                                contentDescription = stringResource(tab.labelRes),
+                                tint = if (selected) selectedColor
+                                else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(tab.labelRes),
+                            fontSize = 11.sp,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selected) selectedColor
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = selectedColor,
+                        selectedTextColor = selectedColor,
+                        indicatorColor = if (isNeon) {
+                            selectedColor.copy(alpha = 0.18f)
+                        } else if (isDarkTheme) Color(0x2200E5FF) else Color(0x1F00A8C4),
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                },
-                label = {
-                    Text(
-                        text = stringResource(tab.labelRes),
-                        fontSize = 11.sp,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NeonCyan,
-                    selectedTextColor = NeonCyan,
-                    indicatorColor = if (isDarkTheme) Color(0x2200E5FF) else Color(0x1F00A8C4),
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            )
+            }
         }
     }
 }

@@ -52,9 +52,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cr.tunnel.R
+import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.colorPing
 import com.cr.tunnel.ui.compose.glassCyan
 import com.cr.tunnel.ui.compose.glassSurface
+import com.cr.tunnel.ui.compose.neonCyan
+import com.cr.tunnel.ui.compose.neonPink
+import com.cr.tunnel.ui.compose.neonPurple
+import com.cr.tunnel.ui.compose.neonRingGlow
 import kotlinx.coroutines.delay
 
 private val NeonCyan = Color(0xFF00E5FF)
@@ -277,9 +282,10 @@ private fun ConnectionCircle(
     elapsedSeconds: Long,
     onClick: () -> Unit
 ) {
+    val isNeon = LocalNeonTheme.current
     val glowColor = when {
         isRunning || isConnecting -> colorPing
-        else -> NeonCyan
+        else -> if (isNeon) neonCyan else NeonCyan
     }
     val ringColors = when {
         isRunning || isConnecting -> listOf(colorPing, NeonCyan, colorPing)
@@ -291,7 +297,9 @@ private fun ConnectionCircle(
     val rotation by transition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = 6000, easing = LinearEasing)),
+        animationSpec = infiniteRepeatable(
+            tween(durationMillis = if (isNeon) 3000 else 6000, easing = LinearEasing)
+        ),
         label = "rotation"
     )
     val pulse by transition.animateFloat(
@@ -313,6 +321,9 @@ private fun ConnectionCircle(
     Box(
         modifier = Modifier
             .size(190.dp)
+            .then(
+                if (isNeon) Modifier.neonRingGlow(glowColor, 90.dp) else Modifier
+            )
             .clip(CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -378,6 +389,42 @@ private fun ConnectionCircle(
                 }
         )
 
+        // Counter-rotating neon comet ring
+        if (isNeon) {
+            Box(
+                modifier = Modifier
+                    .size(190.dp)
+                    .graphicsLayer { rotationZ = -rotation * 1.35f }
+                    .drawWithCache {
+                        val stroke = 2.dp.toPx()
+                        val inset = 6.dp.toPx()
+                        val arcSize = Size(size.width - inset * 2, size.height - inset * 2)
+                        val arcTopLeft = Offset(inset, inset)
+                        val centerOffset = Offset(size.width / 2f, size.height / 2f)
+                        val brush = Brush.sweepGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                neonPink.copy(alpha = 0.75f),
+                                neonPurple.copy(alpha = 0.55f),
+                                Color.Transparent
+                            ),
+                            center = centerOffset
+                        )
+                        onDrawBehind {
+                            drawArc(
+                                brush = brush,
+                                startAngle = 0f,
+                                sweepAngle = 180f,
+                                useCenter = false,
+                                topLeft = arcTopLeft,
+                                size = arcSize,
+                                style = Stroke(width = stroke, cap = StrokeCap.Round)
+                            )
+                        }
+                    }
+            )
+        }
+
         // Expanding pulse rings while running
         if (isRunning) {
             Box(
@@ -402,6 +449,19 @@ private fun ConnectionCircle(
                     }
                     .border(1.5.dp, NeonPurple.copy(alpha = 0.5f), CircleShape)
             )
+            if (isNeon) {
+                Box(
+                    modifier = Modifier
+                        .size(190.dp)
+                        .graphicsLayer {
+                            val p = pulse
+                            scaleX = 1f + p * 0.55f + 0.30f
+                            scaleY = 1f + p * 0.55f + 0.30f
+                            alpha = (1f - p) * 0.35f * 0.4f
+                        }
+                        .border(1.dp, neonPink.copy(alpha = 0.55f), CircleShape)
+                )
+            }
         }
 
         // Main glass body
@@ -462,7 +522,10 @@ private fun ConnectionCircle(
                 .border(
                     1.dp,
                     Brush.linearGradient(
-                        listOf(glowColor.copy(alpha = if (isRunning || isConnecting) 0.8f else 0.4f), NeonPurple.copy(alpha = 0.3f))
+                        listOf(
+                            glowColor.copy(alpha = if (isRunning || isConnecting) 0.8f else if (isNeon) 0.75f else 0.4f),
+                            if (isNeon) neonPink.copy(alpha = 0.45f) else NeonPurple.copy(alpha = 0.3f)
+                        )
                     ),
                     CircleShape
                 ),

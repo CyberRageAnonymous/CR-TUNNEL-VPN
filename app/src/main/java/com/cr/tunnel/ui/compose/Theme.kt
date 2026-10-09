@@ -181,6 +181,7 @@ fun resolveDarkTheme(): Boolean {
 }
 
 val LocalDarkTheme = compositionLocalOf { false }
+val LocalNeonTheme = compositionLocalOf { false }
 
 @Composable
 fun AppTheme(
@@ -210,16 +211,25 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
+        LocalNeonTheme provides neonMode,
         LocalAppSnackbar provides snackbarController
     ) {
         MaterialTheme(
             colorScheme = colorScheme
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                GlassBackground(darkTheme = darkTheme) {
-                    AppSnackbarBridge(controller = snackbarController)
-                    content()
-                    AppSnackbarHost(hostState = snackbarController.hostState)
+                if (neonMode) {
+                    NeonAuroraBackground(darkTheme = true) {
+                        AppSnackbarBridge(controller = snackbarController)
+                        content()
+                        AppSnackbarHost(hostState = snackbarController.hostState)
+                    }
+                } else {
+                    GlassBackground(darkTheme = darkTheme) {
+                        AppSnackbarBridge(controller = snackbarController)
+                        content()
+                        AppSnackbarHost(hostState = snackbarController.hostState)
+                    }
                 }
             }
         }

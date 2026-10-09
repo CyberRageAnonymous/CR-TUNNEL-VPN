@@ -108,6 +108,7 @@
     <string name="toast_failure">شکست!</string>
     <string name="toast_npv_encrypted">این کانفیگ NapsternetV رمزنگاری شده و قابل بازگشایی نیست</string>
     <string name="toast_crt_invalid">این فایل .CRT نامعتبر است یا توسط برنامه دیگری ساخته شده</string>
+    <string name="toast_nm_invalid">این کانفیگ NetMod نامعتبر است یا قابل بازگشایی نیست</string>
     <string name="toast_none_data">داده‌ای یافت نشد</string>
     <string name="toast_incorrect_protocol">پروتکل نادرست</string>
     <string name="toast_decoding_failed">رمزگشایی انجام نشد</string>

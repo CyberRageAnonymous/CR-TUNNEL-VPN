@@ -108,6 +108,7 @@
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_npv_encrypted">Cấu hình NapsternetV này bị mã hóa và không thể mở</string>
     <string name="toast_crt_invalid">Tệp .CRT không hợp lệ hoặc do ứng dụng khác tạo</string>
+    <string name="toast_nm_invalid">Cấu hình NetMod này không hợp lệ hoặc không thể mở</string>
     <string name="toast_none_data">Không có gì ở đây!</string>
     <string name="toast_incorrect_protocol">Giao thức không hợp lệ.</string>
     <string name="toast_decoding_failed">Không thể giải mã!</string>

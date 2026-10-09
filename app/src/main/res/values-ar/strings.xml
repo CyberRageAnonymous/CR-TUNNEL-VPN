@@ -108,6 +108,7 @@
     <string name="toast_failure">فشل</string>
     <string name="toast_npv_encrypted">هذا الإعداد مشفّر من NapsternetV ولا يمكن فتحه</string>
     <string name="toast_crt_invalid">ملف ‎.CRT‎ غير صالح أو أنشأه تطبيق آخر</string>
+    <string name="toast_nm_invalid">هذا الإعداد من NetMod غير صالح أو لا يمكن فتحه</string>
     <string name="toast_none_data">لا يوجد شيء</string>
     <string name="toast_incorrect_protocol">بروتوكول غير صحيح</string>
     <string name="toast_decoding_failed">فشل فك التشفير</string>

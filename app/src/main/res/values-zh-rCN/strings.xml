@@ -108,6 +108,7 @@
     <string name="toast_failure">失败</string>
     <string name="toast_npv_encrypted">该 NapsternetV 配置已加密，无法打开</string>
     <string name="toast_crt_invalid">.CRT 文件无效或由其他应用创建</string>
+    <string name="toast_nm_invalid">该 NetMod 配置无效或无法打开</string>
     <string name="toast_none_data">没有数据</string>
     <string name="toast_incorrect_protocol">不正确的协议</string>
     <string name="toast_decoding_failed">解码失败</string>

@@ -11,6 +11,7 @@ import com.cr.tunnel.extension.toast
 import com.cr.tunnel.extension.toastError
 import com.cr.tunnel.handler.AngConfigManager
 import com.cr.tunnel.handler.MmkvManager
+import com.cr.tunnel.handler.NetModVault
 import com.cr.tunnel.handler.SettingsChangeManager
 import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.main.MainActivity
@@ -89,6 +90,9 @@ class UrlSchemeActivity : BaseComponentActivity() {
                         SettingsChangeManager.makeSetupGroupTab()
                         toast(getString(R.string.title_import_config_count, count))
                     }
+
+                    NetModVault.isNmContent(text) ->
+                        toastError(R.string.toast_nm_invalid)
 
                     AngConfigManager.isCrtContent(text) ->
                         toastError(R.string.toast_crt_invalid)

@@ -148,6 +148,9 @@ object AngConfigManager {
         if (count <= 0) {
             count = parseNpvContent(plain, subid, append)
         }
+        if (count <= 0) {
+            count = parseNmContent(plain, subid, append)
+        }
 
         var countSub = parseBatchSubscription(plain)
         if (countSub <= 0) {
@@ -224,6 +227,16 @@ object AngConfigManager {
             }
         }
         return 0
+    }
+
+    private fun parseNmContent(content: String?, subid: String, append: Boolean): Int {
+        if (content.isNullOrBlank()) return 0
+        val links = NetModVault.toStandardLinks(content).toMutableList()
+        if (links.isEmpty()) {
+            NetModVault.decryptBlobLink(content)?.let { links.add(it) }
+        }
+        if (links.isEmpty()) return 0
+        return parseBatchConfig(links.joinToString("\n"), subid, append)
     }
 
     private fun parseNpvtServers(serversJson: String, subid: String, append: Boolean): Int {

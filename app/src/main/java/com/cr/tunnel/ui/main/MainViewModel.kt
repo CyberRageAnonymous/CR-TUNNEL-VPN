@@ -18,6 +18,7 @@ import com.cr.tunnel.extension.matchesPattern
 import com.cr.tunnel.extension.moveItem
 import com.cr.tunnel.handler.AngConfigManager
 import com.cr.tunnel.handler.MmkvManager
+import com.cr.tunnel.handler.NetModVault
 import com.cr.tunnel.handler.UpdateCheckerManager
 import com.cr.tunnel.ui.base.BaseViewModel
 import com.cr.tunnel.util.LogUtil
@@ -454,6 +455,9 @@ init {
                         }
 
                         countSub > 0 -> setupGroupTab(forceRefresh = true)
+                        NetModVault.isNmContent(configText) ->
+                            toastError(R.string.toast_nm_invalid)
+
                         AngConfigManager.isCrtContent(configText) ->
                             toastError(R.string.toast_crt_invalid)
 

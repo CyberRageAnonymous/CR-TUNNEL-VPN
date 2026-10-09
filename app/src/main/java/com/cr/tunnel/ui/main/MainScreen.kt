@@ -3,6 +3,7 @@ package com.cr.tunnel.ui.main
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,6 +63,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.R
 import com.cr.tunnel.dto.entities.ProfileItem
 import com.cr.tunnel.ui.compose.LocalDarkTheme
+import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.QRCodeDialog
 import com.cr.tunnel.ui.compose.glassDialogColor
 import kotlinx.coroutines.CoroutineScope
@@ -295,6 +297,7 @@ fun MainScreen(
         floatingActionButton = {},
     ) { innerPadding ->
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+        val isNeon = LocalNeonTheme.current
         AnimatedContent(
             targetState = selectedTab,
             transitionSpec = {
@@ -302,7 +305,24 @@ fun MainScreen(
                 // Mirror the slide direction in RTL locales so pages always
                 // move toward the reading side of the user.
                 val enterFromEnd = if (isRtl) !forward else forward
-                if (enterFromEnd) {
+                if (isNeon) {
+                    val neonSlide =
+                        spring<androidx.compose.ui.unit.IntOffset>(
+                            dampingRatio = 0.78f,
+                            stiffness = 340f
+                        )
+                    if (enterFromEnd) {
+                        (slideInHorizontally(neonSlide) { it / 2 } +
+                            fadeIn(tween(340, easing = FastOutSlowInEasing))) togetherWith
+                            (slideOutHorizontally(neonSlide) { -it / 2 } +
+                                fadeOut(tween(220)))
+                    } else {
+                        (slideInHorizontally(neonSlide) { -it / 2 } +
+                            fadeIn(tween(340, easing = FastOutSlowInEasing))) togetherWith
+                            (slideOutHorizontally(neonSlide) { it / 2 } +
+                                fadeOut(tween(220)))
+                    }
+                } else if (enterFromEnd) {
                     (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 4 } +
                         fadeIn(tween(280))) togetherWith
                         (slideOutHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 4 } +
@@ -364,11 +384,14 @@ private fun HomeTab(
     onAction: (MainAction) -> Unit
 ) {
     val trafficState by mainViewModel.trafficState.collectAsStateWithLifecycle()
+    val isNeon = LocalNeonTheme.current
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AnimatedHomeBackground(isDarkTheme = isDarkTheme)
+        if (!isNeon) {
+            AnimatedHomeBackground(isDarkTheme = isDarkTheme)
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize(),

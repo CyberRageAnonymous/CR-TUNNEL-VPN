@@ -108,6 +108,7 @@
     <string name="toast_failure">ব্যর্থ</string>
     <string name="toast_npv_encrypted">এই NapsternetV কনফিগ এনক্রিপ্ট করা এবং খোলা যায় না</string>
     <string name="toast_crt_invalid">.CRT ফাইল অবৈধ বা অন্য অ্যাপ দ্বারা তৈরি</string>
+    <string name="toast_nm_invalid">এই NetMod কনফিগ অবৈধ বা খোলা যায় না</string>
     <string name="toast_none_data">কোনও তথ্য নেই</string>
     <string name="toast_incorrect_protocol">ভুল প্রোটোকল</string>
     <string name="toast_decoding_failed">ডিকোডিং ব্যর্থ</string>

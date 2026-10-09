@@ -219,6 +219,8 @@
                 <data android:pathPattern=".*CRT" />
                 <data android:pathPattern=".*\.crt" />
                 <data android:pathPattern=".*crt" />
+                <data android:pathPattern=".*\.nm" />
+                <data android:pathPattern=".*nm" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -235,6 +237,8 @@
                 <data android:pathPattern=".*CRT" />
                 <data android:pathPattern=".*\.crt" />
                 <data android:pathPattern=".*crt" />
+                <data android:pathPattern=".*\.nm" />
+                <data android:pathPattern=".*nm" />
             </intent-filter>
         </activity>
         <activity

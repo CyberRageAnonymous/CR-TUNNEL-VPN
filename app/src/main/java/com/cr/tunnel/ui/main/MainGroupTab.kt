@@ -1,6 +1,11 @@
 package com.cr.tunnel.ui.main
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,15 +19,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cr.tunnel.dto.GroupMapItem
 import com.cr.tunnel.dto.entities.ServersCache
+import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.colorFabActive
 import com.cr.tunnel.ui.compose.glassDialogColor
+import com.cr.tunnel.ui.compose.neonCyan
+import com.cr.tunnel.ui.compose.neonPurple
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.PI
+import kotlin.math.sin
 
 @Composable
 fun GroupTabBar(
@@ -32,6 +43,17 @@ fun GroupTabBar(
     onTabClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isNeon = LocalNeonTheme.current
+    val transition = rememberInfiniteTransition(label = "neonTab")
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(4500, easing = LinearEasing)),
+        label = "tabPhase"
+    )
+    val shift = (sin(phase * 2 * PI).toFloat() + 1f) / 2f
+    val activeColor = if (isNeon) lerp(neonCyan, neonPurple, shift) else colorFabActive
+
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
         modifier = modifier
@@ -50,7 +72,7 @@ fun GroupTabBar(
                     )
                     .clip(RoundedCornerShape(10.dp)),
                 width = Dp.Unspecified,
-                color = colorFabActive
+                color = activeColor
             )
         },
         divider = {}
@@ -59,6 +81,7 @@ fun GroupTabBar(
             GroupTabItem(
                 group = group,
                 selected = index == selectedTabIndex,
+                activeColor = activeColor,
                 serverFlowProvider = { mainViewModel.serversForGroup(group.id) },
                 onClick = { onTabClick(index) }
             )
@@ -70,13 +93,14 @@ fun GroupTabBar(
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
+    activeColor: androidx.compose.ui.graphics.Color,
     serverFlowProvider: () -> StateFlow<List<ServersCache>>,
     onClick: () -> Unit
 ) {
     val serverFlow = remember(group.id) { serverFlowProvider() }
     val servers by serverFlow.collectAsStateWithLifecycle()
     val textColor by animateColorAsState(
-        targetValue = if (selected) colorFabActive else MaterialTheme.colorScheme.onSurface,
+        targetValue = if (selected) activeColor else MaterialTheme.colorScheme.onSurface,
         label = "tabTextColor"
     )
     Tab(

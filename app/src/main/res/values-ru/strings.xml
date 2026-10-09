@@ -108,6 +108,7 @@
     <string name="toast_failure">Ошибка</string>
     <string name="toast_npv_encrypted">Этот конфиг NapsternetV зашифрован и не может быть открыт</string>
     <string name="toast_crt_invalid">Файл .CRT недействителен или создан другим приложением</string>
+    <string name="toast_nm_invalid">Этот конфиг NetMod недействителен или не может быть открыт</string>
     <string name="toast_none_data">Ничего нет</string>
     <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
