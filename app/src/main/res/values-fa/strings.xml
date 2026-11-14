@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">کپی لینک کانفیگ</string>
     <string name="share_method_full_content">کپی کانفیگ کامل</string>
     <string name="share_method_crt">فایل CRT (رمزنگاری‌شده)</string>
+    <string name="share_method_wireguard">فایل کانفیگ WireGuard</string>
     <string name="action_edit">ویرایش</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">بستن</string>
@@ -657,4 +658,41 @@
     <string name="community_like">پسندیدن</string>
     <string name="community_cannot_self_like">نمیتوانید کانفیگ خودتان را پسند کنید</string>
     <string name="community_like_failed">بروزرسانی پسندیدن ناموفق بود</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">کانفیگ WireGuard</string>
+    <string name="title_generate_wireguard">تولید کانفیگ WireGuard</string>
+    <string name="title_export_wireguard">خروجی کانفیگ WireGuard</string>
+    <string name="summary_generate_wireguard">ساخت کانفیگ WireGuard از سرور فعلی</string>
+    <string name="summary_export_wireguard">خروجی کانفیگ WireGuard به فایل یا کلیپ‌بورد</string>
+    <string name="wireguard_generated">کانفیگ WireGuard تولید شد</string>
+    <string name="wireguard_copied">کانفیگ WireGuard در کلیپ‌بورد کپی شد</string>
+    <string name="wireguard_exported">کانفیگ WireGuard خروجی داده شد</string>
+    <string name="wireguard_no_server">سرور WireGuard انتخاب نشده</string>
+    <string name="wireguard_config_copied">کانفیگ کپی شد</string>
+
+    <string name="title_theme_scheduler">زمان‌بندی تم</string>
+    <string name="summary_theme_scheduler">تغییر خودکار تم بر اساس زمان</string>
+    <string name="title_theme_scheduler_enabled">فعال‌سازی زمان‌بندی</string>
+    <string name="summary_theme_scheduler_enabled">تغییر خودکار بین تم روشن/تیره</string>
+    <string name="title_theme_scheduler_start">شروع تم تیره در</string>
+    <string name="title_theme_scheduler_end">پایان تم تیره در</string>
+    <string name="theme_scheduler_enabled">زمان‌بندی تم فعال شد</string>
+    <string name="theme_scheduler_disabled">زمان‌بندی تم غیرفعال شد</string>
+
+    <string name="title_latency_graph">نمودار تاخیر</string>
+    <string name="summary_latency_graph">مشاهده تاریخچه تاخیر سرور</string>
+    <string name="latency_graph_title">تاریخچه تاخیر سرور</string>
+    <string name="latency_graph_no_data">داده تاخیر موجود نیست</string>
+    <string name="latency_graph_last_hour">ساعت گذشته</string>
+    <string name="latency_graph_last_day">۲۴ ساعت گذشته</string>
+    <string name="latency_graph_last_week">۷ روز گذشته</string>
+    <string name="latency_graph_ms">میلی‌ثانیه</string>
+
+    <string name="title_widget_settings">تنظیمات ویجت</string>
+    <string name="summary_widget_settings">پیکربندی ویجت صفحه اصلی</string>
+    <string name="widget_enabled">ویجت فعال شد</string>
+    <string name="widget_disabled">ویجت غیرفعال شد</string>
+    <string name="title_pref_widget_enabled">فعال‌سازی ویجت</string>
+    <string name="summary_pref_widget_enabled">نمایش ویجت وضعیت VPN در صفحه اصلی</string>
 </resources>

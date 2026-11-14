@@ -136,6 +136,19 @@ object AngConfigManager {
         }
     }
 
+    fun generateWireguardConfig(guid: String): String {
+        try {
+            val config = MmkvManager.decodeServerConfig(guid) ?: return ""
+            if (config.configType != EConfigType.WIREGUARD) {
+                return ""
+            }
+            return WireguardFmt.toConf(config)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to generate WireGuard config for GUID: $guid", e)
+            return ""
+        }
+    }
+
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
         val plain = CrtVault.decrypt(server) ?: server
         var count = parseBatchConfig(Utils.decode(plain), subid, append)

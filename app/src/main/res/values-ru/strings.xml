@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">Копировать ссылку профиля</string>
     <string name="share_method_full_content">Копировать полную конфигурацию</string>
     <string name="share_method_crt">Файл CRT (зашифрован)</string>
+    <string name="share_method_wireguard">Файл конфигурации WireGuard</string>
     <string name="action_edit">Изменить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_close">Закрыть</string>
@@ -657,4 +658,41 @@
     <string name="community_like">Нравится</string>
     <string name="community_cannot_self_like">Нельзя оценить собственный конфиг</string>
     <string name="community_like_failed">Не удалось обновить оценку</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">Настройка WireGuard</string>
+    <string name="title_generate_wireguard">Создать конфиг WireGuard</string>
+    <string name="title_export_wireguard">Экспорт конфига WireGuard</string>
+    <string name="summary_generate_wireguard">Создать конфиг WireGuard из текущего сервера</string>
+    <string name="summary_export_wireguard">Экспорт конфига WireGuard в файл или буфер обмена</string>
+    <string name="wireguard_generated">Конфиг WireGuard создан</string>
+    <string name="wireguard_copied">Конфиг WireGuard скопирован в буфер обмена</string>
+    <string name="wireguard_exported">Конфиг WireGuard экспортирован</string>
+    <string name="wireguard_no_server">Сервер WireGuard не выбран</string>
+    <string name="wireguard_config_copied">Конфиг скопирован</string>
+
+    <string name="title_theme_scheduler">Расписание темы</string>
+    <string name="summary_theme_scheduler">Автоматически переключать тему по времени</string>
+    <string name="title_theme_scheduler_enabled">Включить расписание</string>
+    <string name="summary_theme_scheduler_enabled">Авто переключение светлой/темной темы</string>
+    <string name="title_theme_scheduler_start">Темная тема начинается в</string>
+    <string name="title_theme_scheduler_end">Темная тема заканчивается в</string>
+    <string name="theme_scheduler_enabled">Расписание темы включено</string>
+    <string name="theme_scheduler_disabled">Расписание темы выключено</string>
+
+    <string name="title_latency_graph">График задержки</string>
+    <string name="summary_latency_graph">Просмотр истории задержки сервера</string>
+    <string name="latency_graph_title">История задержки сервера</string>
+    <string name="latency_graph_no_data">Нет данных задержки</string>
+    <string name="latency_graph_last_hour">Последний час</string>
+    <string name="latency_graph_last_day">Последние 24 часа</string>
+    <string name="latency_graph_last_week">Последние 7 дней</string>
+    <string name="latency_graph_ms">мс</string>
+
+    <string name="title_widget_settings">Настройки виджета</string>
+    <string name="summary_widget_settings">Настройка виджета на главном экране</string>
+    <string name="widget_enabled">Виджет включен</string>
+    <string name="widget_disabled">Виджет выключен</string>
+    <string name="title_pref_widget_enabled">Включить виджет</string>
+    <string name="summary_pref_widget_enabled">Показать виджет статуса VPN на главном экране</string>
 </resources>

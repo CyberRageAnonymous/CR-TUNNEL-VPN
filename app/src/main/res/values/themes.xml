@@ -3,6 +3,7 @@
     <color name="window_background_dark">#FF05080F</color>
     <color name="neon_cyan">#FF00E5FF</color>
     <color name="neon_purple">#FFA855F7</color>
+    <color name="widget_bg">#FF0A0E27</color>
 
     <style name="AppThemeBase" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>

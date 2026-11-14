@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">প্রোফাইল লিংক কপি করুন</string>
     <string name="share_method_full_content">পূর্ণ কনফিগারেশন কপি করুন</string>
     <string name="share_method_crt">CRT ফাইল (এনক্রিপ্টেড)</string>
+    <string name="share_method_wireguard">WireGuard কনফিগ ফাইল</string>
     <string name="action_edit">সম্পাদনা</string>
     <string name="action_delete">মুছুন</string>
     <string name="action_close">বন্ধ করুন</string>
@@ -657,4 +658,41 @@
     <string name="community_like">পছন্দ</string>
     <string name="community_cannot_self_like">আপনি নিজের কনফিগ পছন্দ করতে পারবেন না</string>
     <string name="community_like_failed">পছন্দ আপডেট করা যায়নি</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">WireGuard কনফিগ</string>
+    <string name="title_generate_wireguard">WireGuard কনফিগ জেনারেট করুন</string>
+    <string name="title_export_wireguard">WireGuard কনফিগ এক্সপোর্ট করুন</string>
+    <string name="summary_generate_wireguard">বর্তমান সার্ভার থেকে WireGuard কনফিগ তৈরি করুন</string>
+    <string name="summary_export_wireguard">WireGuard কনফিগ ফাইল বা ক্লিপবোর্ডে এক্সপোর্ট করুন</string>
+    <string name="wireguard_generated">WireGuard কনফিগ জেনারেট হয়েছে</string>
+    <string name="wireguard_copied">WireGuard কনফিগ ক্লিপবোর্ডে কপি হয়েছে</string>
+    <string name="wireguard_exported">WireGuard কনফিগ এক্সপোর্ট হয়েছে</string>
+    <string name="wireguard_no_server">কোন WireGuard সার্ভার নির্বাচিত নেই</string>
+    <string name="wireguard_config_copied">কনফিগ কপি হয়েছে</string>
+
+    <string name="title_theme_scheduler">থিম শিডিউলার</string>
+    <string name="summary_theme_scheduler">সময়ের ভিত্তিতে থিম অটোমেটিক্যালি স্যুইচ করুন</string>
+    <string name="title_theme_scheduler_enabled">শিডিউলার সক্রিয় করুন</string>
+    <string name="summary_theme_scheduler_enabled">লাইট/ডার্ক থিমের মধ্যে অটো স্যুইচ</string>
+    <string name="title_theme_scheduler_start">ডার্ক থিম শুরু</string>
+    <string name="title_theme_scheduler_end">ডার্ক থিম শেষ</string>
+    <string name="theme_scheduler_enabled">থিম শিডিউলার সক্রিয়</string>
+    <string name="theme_scheduler_disabled">থিম শিডিউলার নিষ্ক্রিয়</string>
+
+    <string name="title_latency_graph">লেটেন্সি গ্রাফ</string>
+    <string name="summary_latency_graph">সার্ভার লেটেন্সি ইতিহাস দেখুন</string>
+    <string name="latency_graph_title">সার্ভার লেটেন্সি ইতিহাস</string>
+    <string name="latency_graph_no_data">লেটেন্সি ডেটা উপলব্ধ নেই</string>
+    <string name="latency_graph_last_hour">গত ঘন্টার</string>
+    <string name="latency_graph_last_day">গত ২৪ ঘন্টার</string>
+    <string name="latency_graph_last_week">গত ৭ দিনের</string>
+    <string name="latency_graph_ms">মিলিসেকেন্ড</string>
+
+    <string name="title_widget_settings">উইজেট সেটিংস</string>
+    <string name="summary_widget_settings">হোম স্ক্রিন উইজেট কনফিগার করুন</string>
+    <string name="widget_enabled">উইজেট সক্রিয়</string>
+    <string name="widget_disabled">উইজেট নিষ্ক্রিয়</string>
+    <string name="title_pref_widget_enabled">উইজেট সক্ষম করুন</string>
+    <string name="summary_pref_widget_enabled">হোম স্ক্রিনে VPN স্ট্যাটাস উইজেট দেখান</string>
 </resources>

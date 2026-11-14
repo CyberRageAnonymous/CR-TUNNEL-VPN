@@ -66,6 +66,13 @@ object AppConfig {
     const val PREF_LANGUAGE = "pref_language"
     const val PREF_APP_LOCALE_MIGRATED = "pref_app_locale_migrated"
     const val PREF_UI_MODE_NIGHT = "pref_ui_mode_night"
+
+    // v1.1.5 new features
+    const val PREF_THEME_SCHEDULER_ENABLED = "pref_theme_scheduler_enabled"
+    const val PREF_THEME_SCHEDULER_START = "pref_theme_scheduler_start"
+    const val PREF_THEME_SCHEDULER_END = "pref_theme_scheduler_end"
+    const val PREF_WIDGET_ENABLED = "pref_widget_enabled"
+    const val PREF_LATENCY_HISTORY = "pref_latency_history"
     const val PREF_IPV6_ENABLED = "pref_ipv6_enabled"
     const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
     const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"

@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">Sao chép liên kết cấu hình</string>
     <string name="share_method_full_content">Sao chép toàn bộ cấu hình</string>
     <string name="share_method_crt">Tệp CRT (mã hóa)</string>
+    <string name="share_method_wireguard">Tệp cấu hình WireGuard</string>
     <string name="action_edit">Chỉnh sửa</string>
     <string name="action_delete">Xoá</string>
     <string name="action_close">Đóng</string>
@@ -657,4 +658,41 @@
     <string name="community_like">Thích</string>
     <string name="community_cannot_self_like">Bạn không thể thích cấu hình của chính mình</string>
     <string name="community_like_failed">Không cập nhật được lượt thích</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">Cấu hình WireGuard</string>
+    <string name="title_generate_wireguard">Tạo cấu hình WireGuard</string>
+    <string name="title_export_wireguard">Xuất cấu hình WireGuard</string>
+    <string name="summary_generate_wireguard">Tạo cấu hình WireGuard từ máy chủ hiện tại</string>
+    <string name="summary_export_wireguard">Xuất cấu hình WireGuard ra tệp hoặc bộ nhớ tạm</string>
+    <string name="wireguard_generated">Đã tạo cấu hình WireGuard</string>
+    <string name="wireguard_copied">Đã sao chép cấu hình WireGuard vào bộ nhớ tạm</string>
+    <string name="wireguard_exported">Đã xuất cấu hình WireGuard</string>
+    <string name="wireguard_no_server">Chưa chọn máy chủ WireGuard</string>
+    <string name="wireguard_config_copied">Đã sao chép cấu hình</string>
+
+    <string name="title_theme_scheduler">Lập lịch giao diện</string>
+    <string name="summary_theme_scheduler">Tự động chuyển giao diện dựa trên thời gian</string>
+    <string name="title_theme_scheduler_enabled">Bật lịch</string>
+    <string name="summary_theme_scheduler_enabled">Tự động chuyển giữa giao diện sáng/tối</string>
+    <string name="title_theme_scheduler_start">Giao diện tối bắt đầu lúc</string>
+    <string name="title_theme_scheduler_end">Giao diện tối kết thúc lúc</string>
+    <string name="theme_scheduler_enabled">Đã bật lịch giao diện</string>
+    <string name="theme_scheduler_disabled">Đã tắt lịch giao diện</string>
+
+    <string name="title_latency_graph">Biểu đồ độ trễ</string>
+    <string name="summary_latency_graph">Xem lịch sử độ trễ máy chủ</string>
+    <string name="latency_graph_title">Lịch sử độ trễ máy chủ</string>
+    <string name="latency_graph_no_data">Không có dữ liệu độ trễ</string>
+    <string name="latency_graph_last_hour">Giờ vừa qua</string>
+    <string name="latency_graph_last_day">24 giờ qua</string>
+    <string name="latency_graph_last_week">7 ngày qua</string>
+    <string name="latency_graph_ms">ms</string>
+
+    <string name="title_widget_settings">Cài đặt Widget</string>
+    <string name="summary_widget_settings">Cấu hình widget màn hình chính</string>
+    <string name="widget_enabled">Đã bật widget</string>
+    <string name="widget_disabled">Đã tắt widget</string>
+    <string name="title_pref_widget_enabled">Bật widget</string>
+    <string name="summary_pref_widget_enabled">Hiển thị widget trạng thái VPN trên màn hình chính</string>
 </resources>

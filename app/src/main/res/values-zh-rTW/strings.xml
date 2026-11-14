@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">複製設定連結</string>
     <string name="share_method_full_content">複製完整設定</string>
     <string name="share_method_crt">CRT 檔案（加密）</string>
+    <string name="share_method_wireguard">WireGuard 設定檔</string>
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
     <string name="action_close">關閉</string>
@@ -657,4 +658,41 @@
     <string name="community_like">讚</string>
     <string name="community_cannot_self_like">不能對自己的設定按讚</string>
     <string name="community_like_failed">更新按讚失敗</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">WireGuard 設定</string>
+    <string name="title_generate_wireguard">產生 WireGuard 設定</string>
+    <string name="title_export_wireguard">匯出 WireGuard 設定</string>
+    <string name="summary_generate_wireguard">從目前伺服器產生 WireGuard 設定</string>
+    <string name="summary_export_wireguard">將 WireGuard 設定匯出到檔案或剪貼簿</string>
+    <string name="wireguard_generated">WireGuard 設定已產生</string>
+    <string name="wireguard_copied">WireGuard 設定已複製到剪貼簿</string>
+    <string name="wireguard_exported">WireGuard 設定已匯出</string>
+    <string name="wireguard_no_server">未選擇 WireGuard 伺服器</string>
+    <string name="wireguard_config_copied">設定已複製</string>
+
+    <string name="title_theme_scheduler">主題排程器</string>
+    <string name="summary_theme_scheduler">根據時間自動切換主題</string>
+    <string name="title_theme_scheduler_enabled">啟用排程</string>
+    <string name="summary_theme_scheduler_enabled">自動在淺色/深色主題間切換</string>
+    <string name="title_theme_scheduler_start">深色主題開始於</string>
+    <string name="title_theme_scheduler_end">深色主題結束於</string>
+    <string name="theme_scheduler_enabled">主題排程已啟用</string>
+    <string name="theme_scheduler_disabled">主題排程已停用</string>
+
+    <string name="title_latency_graph">延遲圖表</string>
+    <string name="summary_latency_graph">查看伺服器延遲歷史</string>
+    <string name="latency_graph_title">伺服器延遲歷史</string>
+    <string name="latency_graph_no_data">無延遲資料</string>
+    <string name="latency_graph_last_hour">過去一小時</string>
+    <string name="latency_graph_last_day">過去 24 小時</string>
+    <string name="latency_graph_last_week">過去 7 天</string>
+    <string name="latency_graph_ms">毫秒</string>
+
+    <string name="title_widget_settings">小工具設定</string>
+    <string name="summary_widget_settings">設定主畫面小工具</string>
+    <string name="widget_enabled">小工具已啟用</string>
+    <string name="widget_disabled">小工具已停用</string>
+    <string name="title_pref_widget_enabled">啟用小工具</string>
+    <string name="summary_pref_widget_enabled">在主畫面上顯示 VPN 狀態小工具</string>
 </resources>

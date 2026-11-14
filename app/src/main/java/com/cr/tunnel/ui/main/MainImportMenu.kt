@@ -48,6 +48,8 @@ internal enum class ServerMenuAction(
     ShareClipboard(R.string.share_method_clipboard, isShareAction = true, supportsComplexProfiles = false),
     ShareFullContent(R.string.share_method_full_content, isShareAction = true, supportsComplexProfiles = true),
     ShareCrtFile(R.string.share_method_crt, isShareAction = true, supportsComplexProfiles = false),
+    ShareWireguardFile(R.string.share_method_wireguard, isShareAction = true, supportsComplexProfiles = false),
+    ViewLatencyGraph(R.string.title_latency_graph, isShareAction = false, supportsComplexProfiles = true),
     Edit(R.string.action_edit, isShareAction = false, supportsComplexProfiles = true),
     Delete(R.string.action_delete, isShareAction = false, supportsComplexProfiles = true),
 }
@@ -82,6 +84,8 @@ fun ShareMethodDialog(
                 ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
                 ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))
                 ServerMenuAction.ShareCrtFile -> onAction(MainAction.ExportCrtFile(guid))
+                ServerMenuAction.ShareWireguardFile -> onAction(MainAction.ExportWireguardFile(guid))
+                ServerMenuAction.ViewLatencyGraph -> onAction(MainAction.ShowLatencyGraph(guid))
                 ServerMenuAction.Edit -> onAction(MainAction.EditServer(guid, profile))
                 ServerMenuAction.Delete -> onRemove(guid)
             }

@@ -33,6 +33,7 @@ import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.MmkvManager.rememberMmkvBool
 import com.cr.tunnel.handler.MmkvManager.rememberMmkvString
 import com.cr.tunnel.handler.SettingsChangeManager
+import com.cr.tunnel.handler.ThemeSchedulerManager
 import com.cr.tunnel.root.RootManager
 import com.cr.tunnel.ui.base.BaseComponentActivity
 import com.cr.tunnel.ui.compose.AppTopBar
@@ -81,6 +82,8 @@ fun SettingsScreen(
     var fragmentSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var observatorySettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var advancedSettingsExpanded by rememberSaveable { mutableStateOf(true) }
+    var themeSchedulerExpanded by rememberSaveable { mutableStateOf(false) }
+    var widgetSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var modeSettingsExpanded by rememberSaveable { mutableStateOf(true) }
 
     var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
@@ -135,6 +138,12 @@ fun SettingsScreen(
     }
     var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, "0")
 
+    // v1.1.5 new settings
+    var themeSchedulerEnabled by rememberMmkvBool(AppConfig.PREF_THEME_SCHEDULER_ENABLED, false)
+    var themeSchedulerStart by rememberMmkvString(AppConfig.PREF_THEME_SCHEDULER_START, "20")
+    var themeSchedulerEnd by rememberMmkvString(AppConfig.PREF_THEME_SCHEDULER_END, "7")
+    var widgetEnabled by rememberMmkvBool(AppConfig.PREF_WIDGET_ENABLED, false)
+
     var ipv6Enabled by rememberMmkvBool(AppConfig.PREF_IPV6_ENABLED, false)
     var preferIpv6 by rememberMmkvBool(AppConfig.PREF_PREFER_IPV6, false)
     var sniffingEnabled by rememberMmkvBool(AppConfig.PREF_SNIFFING_ENABLED, true)
@@ -175,6 +184,8 @@ fun SettingsScreen(
     val observatoryLeastLoadMethodValues = stringArrayResource(R.array.observatory_least_load_method).toList()
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
+    val themeHourEntries = stringArrayResource(R.array.theme_scheduler_hour).toList()
+    val themeHourValues = stringArrayResource(R.array.theme_scheduler_hour_value).toList()
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -605,6 +616,50 @@ fun SettingsScreen(
                     title = stringResource(R.string.title_pref_ip_api_url),
                     value = ipApiUrl,
                     onValueChanged = { ipApiUrl = it }
+                )
+            }
+
+            CollapsiblePreferenceGroupHeader(
+                title = stringResource(R.string.title_theme_scheduler),
+                expanded = themeSchedulerExpanded,
+                onExpandedChange = { themeSchedulerExpanded = it }
+            )
+            if (themeSchedulerExpanded) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_theme_scheduler_enabled),
+                    summary = stringResource(R.string.summary_theme_scheduler_enabled),
+                    checked = themeSchedulerEnabled,
+                    onCheckedChange = { themeSchedulerEnabled = it }
+                )
+                SettingsListItem(
+                    title = stringResource(R.string.title_theme_scheduler_start),
+                    entries = themeHourEntries,
+                    values = themeHourValues,
+                    selectedValue = themeSchedulerStart,
+                    enabled = themeSchedulerEnabled,
+                    onSelected = { themeSchedulerStart = it }
+                )
+                SettingsListItem(
+                    title = stringResource(R.string.title_theme_scheduler_end),
+                    entries = themeHourEntries,
+                    values = themeHourValues,
+                    selectedValue = themeSchedulerEnd,
+                    enabled = themeSchedulerEnabled,
+                    onSelected = { themeSchedulerEnd = it }
+                )
+            }
+
+            CollapsiblePreferenceGroupHeader(
+                title = stringResource(R.string.title_widget_settings),
+                expanded = widgetSettingsExpanded,
+                onExpandedChange = { widgetSettingsExpanded = it }
+            )
+            if (widgetSettingsExpanded) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_pref_widget_enabled),
+                    summary = stringResource(R.string.summary_pref_widget_enabled),
+                    checked = widgetEnabled,
+                    onCheckedChange = { widgetEnabled = it }
                 )
             }
 

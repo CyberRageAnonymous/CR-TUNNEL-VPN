@@ -135,6 +135,8 @@ class MainActivity : HelperBaseComponentActivity() {
                     is MainAction.ShareClipboard -> shareToClipboard(action.guid)
                     is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
                     is MainAction.ExportCrtFile -> exportCrtFile(action.guid)
+                    is MainAction.ExportWireguardFile -> exportWireguardFile(action.guid)
+                    is MainAction.ShowLatencyGraph -> showLatencyGraph(action.guid)
                     else -> mainViewModel.onAction(action)
                 }
             },
@@ -177,6 +179,39 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun exportWireguardFile(guid: String) {
+        val config = AngConfigManager.generateWireguardConfig(guid)
+        if (config.isEmpty()) {
+            toastError(R.string.wireguard_no_server)
+            return
+        }
+        val remarks = MmkvManager.decodeServerConfig(guid)?.remarks.orEmpty()
+            .ifBlank { "CR-TUNNEL" }
+            .replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        launchCreateRawDocument("$remarks.conf") { uri ->
+            if (uri == null) return@launchCreateRawDocument
+            val payload = config.toByteArray(Charsets.UTF_8)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val ok = runCatching {
+                    contentResolver.openOutputStream(uri)?.use { it.write(payload) }
+                        ?: error("Failed to open output stream")
+                }.isSuccess
+                withContext(Dispatchers.Main) {
+                    if (ok) toastSuccess(R.string.wireguard_exported) else toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    private fun showLatencyGraph(guid: String) {
+        val config = MmkvManager.decodeServerConfig(guid)
+        val serverName = config?.remarks ?: "Server"
+        val intent = android.content.Intent(this, LatencyGraphActivity::class.java)
+            .putExtra("guid", guid)
+            .putExtra("server_name", serverName)
+        startActivity(intent)
     }
 
     private fun navigateTo(destination: MainDestination) {

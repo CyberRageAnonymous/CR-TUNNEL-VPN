@@ -104,4 +104,34 @@ object WireguardFmt : FmtBase() {
 
         return toUri(config, config.secretKey, dicQuery)
     }
+
+    fun toConf(config: ProfileItem): String {
+        val sb = StringBuilder()
+        sb.appendLine("[Interface]")
+        sb.appendLine("PrivateKey = ${config.secretKey}")
+        sb.appendLine("Address = ${config.localAddress}")
+        if (config.mtu != null) {
+            sb.appendLine("MTU = ${config.mtu}")
+        }
+        // Use default DNS since ProfileItem doesn't have a dns field
+        sb.appendLine("DNS = 1.1.1.1, 8.8.8.8")
+        sb.appendLine()
+
+        sb.appendLine("[Peer]")
+        sb.appendLine("PublicKey = ${config.publicKey}")
+        val psKey = config.preSharedKey
+        if (psKey != null && psKey.isNotBlank()) {
+            sb.appendLine("PresharedKey = $psKey")
+        }
+        val endpoint = "${config.server}:${config.serverPort}"
+        sb.appendLine("Endpoint = $endpoint")
+        sb.appendLine("AllowedIPs = 0.0.0.0/0, ::/0")
+        val res = config.reserved
+        if (res != null && res.isNotBlank()) {
+            sb.appendLine("Reserved = ${res.removeWhiteSpace()}")
+        }
+        sb.appendLine("PersistentKeepalive = 25")
+
+        return sb.toString()
+    }
 }

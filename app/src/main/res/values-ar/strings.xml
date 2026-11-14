@@ -473,6 +473,7 @@
     <string name="share_method_clipboard">نسخ رابط التكوين</string>
     <string name="share_method_full_content">نسخ التكوين الكامل</string>
     <string name="share_method_crt">ملف CRT (مشفّر)</string>
+    <string name="share_method_wireguard">ملف إعداد WireGuard</string>
     <string name="action_edit">تعديل</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">إغلاق</string>
@@ -657,4 +658,41 @@
     <string name="community_like">إعجاب</string>
     <string name="community_cannot_self_like">لا يمكنك الإعجاب بكونفيغك الخاص</string>
     <string name="community_like_failed">فشل تحديث الإعجاب</string>
+
+    <!-- v1.1.5 new features -->
+    <string name="title_wireguard_config">إعداد WireGuard</string>
+    <string name="title_generate_wireguard">إنشاء إعداد WireGuard</string>
+    <string name="title_export_wireguard">تصدير إعداد WireGuard</string>
+    <string name="summary_generate_wireguard">إنشاء إعداد WireGuard من الخادم الحالي</string>
+    <string name="summary_export_wireguard">تصدير إعداد WireGuard إلى ملف أو الحافظة</string>
+    <string name="wireguard_generated">تم إنشاء إعداد WireGuard</string>
+    <string name="wireguard_copied">تم نسخ إعداد WireGuard إلى الحافظة</string>
+    <string name="wireguard_exported">تم تصدير إعداد WireGuard</string>
+    <string name="wireguard_no_server">لم يتم تحديد خادم WireGuard</string>
+    <string name="wireguard_config_copied">تم نسخ الإعداد</string>
+
+    <string name="title_theme_scheduler">جدول السمات</string>
+    <string name="summary_theme_scheduler">تبديل السمة تلقائيًا بناءً على الوقت</string>
+    <string name="title_theme_scheduler_enabled">تفعيل الجدول</string>
+    <string name="summary_theme_scheduler_enabled">التبديل التلقائي بين السمة الفاتحة/الداكنة</string>
+    <string name="title_theme_scheduler_start">بدء السمة الداكنة في</string>
+    <string name="title_theme_scheduler_end">انتهاء السمة الداكنة في</string>
+    <string name="theme_scheduler_enabled">تم تفعيل جدول السمة</string>
+    <string name="theme_scheduler_disabled">تم تعطيل جدول السمة</string>
+
+    <string name="title_latency_graph">مخطط التأخير</string>
+    <string name="summary_latency_graph">عرض سجل تأخير الخادم</string>
+    <string name="latency_graph_title">سجل تأخير الخادم</string>
+    <string name="latency_graph_no_data">لا توجد بيانات تأخير</string>
+    <string name="latency_graph_last_hour">الساعة الأخيرة</string>
+    <string name="latency_graph_last_day">آخر 24 ساعة</string>
+    <string name="latency_graph_last_week">آخر 7 أيام</string>
+    <string name="latency_graph_ms">مللي ثانية</string>
+
+    <string name="title_widget_settings">إعدادات الويدجت</string>
+    <string name="summary_widget_settings">تكوين الويدجت على الشاشة الرئيسية</string>
+    <string name="widget_enabled">تم تفعيل الويدجت</string>
+    <string name="widget_disabled">تم تعطيل الويدجت</string>
+    <string name="title_pref_widget_enabled">تفعيل الويدجت</string>
+    <string name="summary_pref_widget_enabled">إظهار ويدجت حالة VPN على الشاشة الرئيسية</string>
 </resources>

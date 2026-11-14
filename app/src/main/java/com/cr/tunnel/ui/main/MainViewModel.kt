@@ -17,6 +17,7 @@ import com.cr.tunnel.extension.isComplexType
 import com.cr.tunnel.extension.matchesPattern
 import com.cr.tunnel.extension.moveItem
 import com.cr.tunnel.handler.AngConfigManager
+import com.cr.tunnel.handler.LatencyHistoryManager
 import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.handler.NetModVault
 import com.cr.tunnel.handler.UpdateCheckerManager
@@ -168,6 +169,14 @@ init {
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelaySuccess -> {
                 _uiState.update { it.copy(statusText = event.content) }
+                // Record latency history
+                val selectedGuid = uiState.value.selectedGuid
+                if (selectedGuid != null) {
+                    val latencyMs = parseLatencyFromContent(event.content)
+                    if (latencyMs > 0) {
+                        LatencyHistoryManager.addLatencyPoint(selectedGuid, latencyMs)
+                    }
+                }
             }
 
             MainServiceEvent.MeasureConfigSuccess -> {
@@ -268,7 +277,9 @@ init {
             is MainAction.EditServer,
             is MainAction.ShareClipboard,
             is MainAction.ShareFullContent,
-            is MainAction.ExportCrtFile -> {
+            is MainAction.ExportCrtFile,
+            is MainAction.ExportWireguardFile,
+            is MainAction.ShowLatencyGraph -> {
                 // Handled by Activity via its onAction lambda
             }
         }
@@ -981,6 +992,13 @@ init {
         cancelAllPing()
         dataSource.close()
         super.onCleared()
+    }
+
+    private fun parseLatencyFromContent(content: String): Int {
+        // Content format: "Success: Connection took 45ms" or similar
+        val regex = """(\d+)ms""".toRegex()
+        val match = regex.find(content)
+        return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
     }
 
     // ---------- Factory ----------
