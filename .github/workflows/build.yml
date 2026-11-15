@@ -14,6 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Verify file contents
+        run: |
+          echo "=== ThemeSchedulerManager.kt ==="
+          head -20 app/src/main/java/com/cr/tunnel/handler/ThemeSchedulerManager.kt
+          echo ""
+          echo "=== LatencyGraphScreen.kt ==="
+          head -50 app/src/main/java/com/cr/tunnel/ui/main/LatencyGraphScreen.kt
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
