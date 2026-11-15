@@ -48,6 +48,11 @@ jobs:
           mkdir -p app/signing
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/signing/crtunnel-release.keystore
 
+      - name: Clear Gradle cache
+        run: |
+          rm -rf ~/.gradle/caches
+          ./gradlew clean --no-daemon
+
       - name: Build Release APKs
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
