@@ -252,4 +252,4 @@ CR TUNNEL ابزاری برای حفظ حریم خصوصی در سمت کارب�
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:39FF14,100:0D1117&height=120&section=footer&animation=fadeIn&reversal=true" width="100%"/>
 
-</div>
+</div># Force rebuild Sun Nov 15 01:14:45 PM +0330 2026
