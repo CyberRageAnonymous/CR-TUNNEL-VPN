@@ -53,6 +53,9 @@ jobs:
           rm -rf ~/.gradle/caches
           ./gradlew clean --no-daemon
 
+      - name: Print Kotlin version
+        run: ./gradlew -q :app:dependencies --configuration releaseCompileClasspath 2>&1 | grep -i kotlin | head -20
+
       - name: Build Release APKs
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
