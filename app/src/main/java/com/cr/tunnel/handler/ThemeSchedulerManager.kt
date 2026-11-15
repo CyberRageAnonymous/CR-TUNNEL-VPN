@@ -6,7 +6,6 @@ import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.Result
 import java.util.concurrent.TimeUnit
 import com.cr.tunnel.AppConfig
 import kotlinx.coroutines.Dispatchers
@@ -102,13 +101,13 @@ object ThemeSchedulerManager {
 
 class ThemeCheckWorker(
     context: Context,
-    params: WorkerParameters
+    params: androidx.work.WorkerParameters
 ) : CoroutineWorker(context, params) {
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): androidx.work.Result {
         withContext(Dispatchers.IO) {
             ThemeSchedulerManager.applyThemeIfNeeded(applicationContext)
         }
-        return Result.success()
+        return androidx.work.Result.success()
     }
 }
