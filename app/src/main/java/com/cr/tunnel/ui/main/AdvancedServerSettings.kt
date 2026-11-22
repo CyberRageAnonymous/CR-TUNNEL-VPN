@@ -77,7 +77,7 @@ fun AdvancedServerSettings(onDismiss: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        fun settingRow(title: String, desc: String? = null, value: @Composable () -> Unit) {
+        @Composable fun settingRow(title: String, desc: String? = null, value: @Composable () -> Unit) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

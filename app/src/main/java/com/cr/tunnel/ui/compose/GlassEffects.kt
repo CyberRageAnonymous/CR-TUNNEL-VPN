@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.animation.animateFloatAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
@@ -168,7 +169,7 @@ fun GlassButton(
     )
     Box(
         modifier = modifier
-            .scale(scaleAnim)
+            .scale(scaleAnim.value)
             .clip(RoundedCornerShape(cornerRadius))
             .background(
                 if (darkTheme) {
