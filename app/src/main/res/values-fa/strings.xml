@@ -695,4 +695,5 @@
     <string name="widget_disabled">ویجت غیرفعال شد</string>
     <string name="title_pref_widget_enabled">فعال‌سازی ویجت</string>
     <string name="summary_pref_widget_enabled">نمایش ویجت وضعیت VPN در صفحه اصلی</string>
+    <string name="traffic_history_title">تاریخچه ترافیک</string>
 </resources>

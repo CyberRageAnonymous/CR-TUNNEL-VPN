@@ -694,4 +694,5 @@
     <string name="widget_disabled">Widget disabled</string>
     <string name="title_pref_widget_enabled">Enable widget</string>
     <string name="summary_pref_widget_enabled">Show VPN status widget on home screen</string>
+    <string name="traffic_history_title">Traffic History</string>
 </resources>

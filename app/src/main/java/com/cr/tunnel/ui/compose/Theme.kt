@@ -134,6 +134,43 @@ private val NeonColor = darkColorScheme(
     surfaceContainerHighest = Color(0xFF182040), // Dark Blue Gray
 )
 
+private val PremiumColor = darkColorScheme(
+    primary = Color(0xFFE5C07B), // Amber Gold
+    onPrimary = Color(0xFF11111A), // Deep Space
+    primaryContainer = Color(0xFF3A3239), // Dark Gold-Gray
+    onPrimaryContainer = Color(0xFFF1E9D6), // Cream
+    secondary = Color(0xFF9AA7FF), // Slate Blue
+    onSecondary = Color(0xFF13131E),
+    secondaryContainer = Color(0xFF2C3560),
+    onSecondaryContainer = Color(0xFFD1D8FF),
+    tertiary = Color(0xFF70E5C4), // Mint Cyan
+    onTertiary = Color(0xFF002017),
+    tertiaryContainer = Color(0xFF1B4A3F),
+    onTertiaryContainer = Color(0xFFC1DEE1),
+    error = Color(0xFFD73A2E),
+    errorContainer = Color(0xFF5A1E1A),
+    onError = Color(0xFFFDF2E0),
+    onErrorContainer = Color(0xFFF2C4C0),
+    background = Color(0xFF0B0B11), // Deep Space Black
+    onBackground = Color(0xFFEEF0F4),
+    surface = Color(0xFF0F1119), // Charcoal
+    onSurface = Color(0xFFEEF0F4),
+    surfaceVariant = Color(0xFF1E2433),
+    onSurfaceVariant = Color(0xFF9CA3B4),
+    outline = Color(0xFFD49C4B), // Gold Outline
+    outlineVariant = Color(0xFF3A3F50),
+    inverseSurface = Color(0xFFEEF0F4),
+    inverseOnSurface = Color(0xFF0B0B11),
+    inversePrimary = Color(0xFF3A3239),
+    scrim = Color(0x80000000),
+    surfaceTint = Color(0xFFE5C07B),
+    surfaceContainerLowest = Color(0xFF08090D),
+    surfaceContainerLow = Color(0xFF0B0B11),
+    surfaceContainer = Color(0xFF0F1119),
+    surfaceContainerHigh = Color(0xFF161A26),
+    surfaceContainerHighest = Color(0xFF1F2537),
+)
+
 // Semantic Colors
 val colorPing = Color(0xFF00D68F) // Mint Green
 val colorPingRed = Color(0xFFFF2D78) // Hot Pink Red
@@ -175,7 +212,7 @@ fun resolveDarkTheme(): Boolean {
     val mode by ThemeManager.themeMode.collectAsState()
     return when (mode) {
         "1" -> false
-        "2", "3" -> true
+        "2", "3", "4" -> true
         else -> isSystemInDarkTheme()
     }
 }
@@ -189,8 +226,10 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val themeMode by ThemeManager.themeMode.collectAsState()
+    val premiumMode = themeMode == "4"
     val neonMode = themeMode == "3"
     val colorScheme = when {
+        premiumMode -> PremiumColor
         neonMode -> NeonColor
         darkTheme -> DarkColor
         else -> LightColor

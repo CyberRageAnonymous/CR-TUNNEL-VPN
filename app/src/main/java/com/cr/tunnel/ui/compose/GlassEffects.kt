@@ -10,10 +10,16 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.animateFloatAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -150,8 +156,19 @@ fun GlassButton(
     onClick: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scaleAnim = animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1f,
+        animationSpec = tween(120, easing = FastOutSlowInEasing)
+    )
+    val glowAnim = animateFloatAsState(
+        targetValue = if (glow) 1f else 0f,
+        animationSpec = tween(220)
+    )
     Box(
         modifier = modifier
+            .scale(scaleAnim)
             .clip(RoundedCornerShape(cornerRadius))
             .background(
                 if (darkTheme) {
@@ -184,15 +201,30 @@ fun GlassButton(
                         brush = topBrush,
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
                     )
+                    val pulse = 1.0f + 0.15f * (1f - glowAnim.value)
+                    if (glowAnim.value > 0f) {
+                        drawRoundRect(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    glassCyan.copy(alpha = 0.4f * glowAnim.value),
+                                    glassCyan.copy(alpha = 0.2f * glowAnim.value),
+                                    Color.Transparent
+                                ),
+                                radius = size.maxDimension * 0.9f * pulse
+                            ),
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
+                        )
+                    }
                 }
             }
             .border(
                 1.dp,
                 if (glow) {
+                    val intensity = 0.55f + 0.45f * glowAnim.value
                     Brush.linearGradient(
                         listOf(
-                            glassCyan.copy(alpha = 0.9f),
-                            glassPurple.copy(alpha = 0.9f)
+                            glassCyan.copy(alpha = intensity),
+                            glassPurple.copy(alpha = intensity * 0.85f)
                         )
                     )
                 } else {
@@ -202,7 +234,11 @@ fun GlassButton(
                 },
                 RoundedCornerShape(cornerRadius)
             )
-            .clickable(onClick = onClick)
+            .clickable(
+                onClick = onClick,
+                interactionSource = interactionSource,
+                indication = null
+            )
     ) {
         content()
     }

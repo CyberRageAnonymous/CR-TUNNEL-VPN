@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -52,7 +53,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -67,7 +71,10 @@ import com.cr.tunnel.handler.MmkvManager
 import com.cr.tunnel.ui.compose.LocalDarkTheme
 import com.cr.tunnel.ui.compose.LocalNeonTheme
 import com.cr.tunnel.ui.compose.QRCodeDialog
+import com.cr.tunnel.ui.compose.GlassCard
+import com.cr.tunnel.ui.compose.glassCyan
 import com.cr.tunnel.ui.compose.glassDialogColor
+import com.cr.tunnel.ui.compose.glassGreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -458,6 +465,11 @@ private fun HomeTab(
             onAutoOptimize = { onAction(MainAction.AutoOptimize) },
             onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) }
         )
+        TrafficHistoryCard(
+            uplinkSpeed = trafficState.uplinkSpeed.toFloat(),
+            downlinkSpeed = trafficState.downlinkSpeed.toFloat(),
+            isDarkTheme = isDarkTheme
+        )
         }
     }
 }
@@ -574,6 +586,78 @@ fun OptimizeBanner(onCancel: () -> Unit) {
                 .clickable(onClick = onCancel)
                 .padding(5.dp)
         )
+    }
+}
+
+@Composable
+private fun TrafficHistoryCard(
+    uplinkSpeed: Float,
+    downlinkSpeed: Float,
+    isDarkTheme: Boolean
+) {
+    val upHistory = remember { mutableListOf<Float>() }
+    val downHistory = remember { mutableListOf<Float>() }
+    val upRef = rememberUpdatedState(uplinkSpeed)
+    val downRef = rememberUpdatedState(downlinkSpeed)
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(200)
+            upHistory.add(upRef.value)
+            downHistory.add(downRef.value)
+            if (upHistory.size > 60) upHistory.removeAt(0)
+            if (downHistory.size > 60) downHistory.removeAt(0)
+        }
+    }
+
+    GlassCard(
+        darkTheme = isDarkTheme,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        cornerRadius = 16.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.traffic_history_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp),
+                onDraw = {
+                    val maxUp = upHistory.maxOrNull() ?: 0f
+                    val maxDown = downHistory.maxOrNull() ?: 0f
+                    val max = maxOf(maxUp, maxDown, 1f)
+                    val span = upHistory.size.coerceAtLeast(1) - 1f
+                    val xStep = if (span > 0f) size.width / span else 0f
+
+                    fun drawHistory(history: List<Float>, color: Color) {
+                        if (history.size > 1) {
+                            val path = Path().apply {
+                                history.forEachIndexed { i, v ->
+                                    val x = i * xStep
+                                    val y = size.height - (v / max) * size.height * 0.8f - 6f
+                                    if (i == 0) moveTo(x, y) else lineTo(x, y)
+                                }
+                            }
+                            drawPath(path, color, style = Stroke(width = 2f), alpha = 0.95f)
+                            drawPath(path, color.copy(alpha = 0.15f))
+                        }
+                    }
+
+                    drawHistory(upHistory, glassCyan)
+                    drawHistory(downHistory, glassGreen)
+                }
+            )
+        }
     }
 }
 
