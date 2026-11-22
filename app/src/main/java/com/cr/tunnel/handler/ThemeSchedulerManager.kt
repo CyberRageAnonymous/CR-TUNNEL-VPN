@@ -104,10 +104,10 @@ class ThemeCheckWorker(
     params: androidx.work.WorkerParameters
 ) : CoroutineWorker(context, params) {
 
-    override suspend fun doWork(): androidx.work.Result {
+    override suspend fun doWork(): androidx.work.ListenableWorker.Result {
         withContext(Dispatchers.IO) {
             ThemeSchedulerManager.applyThemeIfNeeded(applicationContext)
         }
-        return androidx.work.Result.success()
+        return androidx.work.ListenableWorker.Result.success()
     }
 }

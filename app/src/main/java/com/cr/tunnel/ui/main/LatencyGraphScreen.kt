@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextAlign
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +41,6 @@ import com.cr.tunnel.handler.LatencyHistoryManager
 import com.cr.tunnel.ui.compose.AppTopBar
 import com.cr.tunnel.ui.compose.glassDialogColor
 import kotlin.math.max
-import kotlin.math.maxOf
 
 @Composable
 fun LatencyGraphScreen(
@@ -127,7 +126,7 @@ fun LatencyGraphScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            androidx.compose.material.Icon(
+                            androidx.compose.material3.Icon(
                                 painter = painterResource(R.drawable.ic_stats_24dp),
                                 contentDescription = null,
                                 modifier = Modifier.size(48.dp),
@@ -161,6 +160,9 @@ fun LatencyGraphCanvas(
     val effectiveRange = if (latencyRange > 0) latencyRange else 100
     val minDisplay = max(0, minLatency - effectiveRange / 4)
     val maxDisplay = maxLatency + effectiveRange / 4
+    val primaryColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+    val gridColor = androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
+    val areaColor = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
 
     Canvas(
         modifier = modifier
@@ -173,7 +175,7 @@ fun LatencyGraphCanvas(
         val graphHeight = height - 2 * padding
 
         // Draw grid lines
-        val gridColor = androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
+
         
         // Horizontal grid lines (latency values)
         for (i in 0..4) {
@@ -213,14 +215,14 @@ fun LatencyGraphCanvas(
         
         drawPath(
             path = areaPath,
-            color = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+            color = areaColor,
             style = androidx.compose.ui.graphics.drawscope.Fill
         )
 
         // Draw line
         drawPath(
             path = path, 
-            color = androidx.compose.material3.MaterialTheme.colorScheme.primary, 
+            color = primaryColor, 
             style = Stroke(width = 2.5f)
         )
 
@@ -231,7 +233,7 @@ fun LatencyGraphCanvas(
             val y = padding + graphHeight - normalizedLatency * graphHeight
             
             drawCircle(
-                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                color = primaryColor,
                 center = Offset(x, y),
                 radius = 4f
             )
