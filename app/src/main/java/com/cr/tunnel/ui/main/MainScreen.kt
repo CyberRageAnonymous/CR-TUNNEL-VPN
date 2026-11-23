@@ -603,8 +603,8 @@ private fun TrafficHistoryCard(
         upStr.value = uplinkSpeed
         downStr.value = downlinkSpeed
     }
-    val upRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(upStr.value ?: "")?.toFloatOrNull() ?: 0f)
-    val downRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(downStr.value ?: "")?.toFloatOrNull() ?: 0f)
+    val upRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(upStr.value ?: "")?.value?.toFloatOrNull() ?: 0f)
+    val downRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(downStr.value ?: "")?.value?.toFloatOrNull() ?: 0f)
     LaunchedEffect(Unit) {
         while (true) {
             delay(250)
