@@ -135,7 +135,7 @@ private val NeonColor = darkColorScheme(
 )
 
 private val PremiumColor = darkColorScheme(
-    primary = Color(0xFF9D77FF), // Deep Violet
+    primary = Color(0xFFE5C07B), // Gold
     onPrimary = Color(0xFF0A0B12), // Near-Black
     primaryContainer = Color(0xFF3A3239), // Dark Gold-Gray
     onPrimaryContainer = Color(0xFFF1E9D6), // Cream
