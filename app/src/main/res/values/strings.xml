@@ -511,6 +511,8 @@
         <item>Light</item>
         <item>Dark</item>
         <item>CR Neon</item>
+    
+        <item>Premium</item>
     </string-array>
 
     <string name="routing_preset_china_whitelist">China Whitelist</string>
