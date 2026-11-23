@@ -466,8 +466,8 @@ private fun HomeTab(
             onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) }
         )
         TrafficHistoryCard(
-            uplinkSpeed = trafficState.uplinkSpeed.toFloatOrNull() ?: 0f,
-            downlinkSpeed = trafficState.downlinkSpeed.toFloatOrNull() ?: 0f,
+            uplinkSpeed = trafficState.uplinkSpeed ?: "",
+            downlinkSpeed = trafficState.downlinkSpeed ?: "",
             isDarkTheme = isDarkTheme
         )
         }
@@ -591,17 +591,23 @@ fun OptimizeBanner(onCancel: () -> Unit) {
 
 @Composable
 private fun TrafficHistoryCard(
-    uplinkSpeed: Float,
-    downlinkSpeed: Float,
+    uplinkSpeed: String,
+    downlinkSpeed: String,
     isDarkTheme: Boolean
 ) {
     val upHistory = remember { mutableListOf<Float>() }
     val downHistory = remember { mutableListOf<Float>() }
-    val upRef = rememberUpdatedState(uplinkSpeed)
-    val downRef = rememberUpdatedState(downlinkSpeed)
+    val upStr = remember { mutableStateOf(uplinkSpeed) }
+    val downStr = remember { mutableStateOf(downlinkSpeed) }
+    LaunchedEffect(uplinkSpeed, downlinkSpeed) {
+        upStr.value = uplinkSpeed
+        downStr.value = downlinkSpeed
+    }
+    val upRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(upStr.value ?: "")?.toFloatOrNull() ?: 0f)
+    val downRef = rememberUpdatedState(Regex("\\d+(?:\\.\\d+)?").find(downStr.value ?: "")?.toFloatOrNull() ?: 0f)
     LaunchedEffect(Unit) {
         while (true) {
-            delay(200)
+            delay(250)
             upHistory.add(upRef.value)
             downHistory.add(downRef.value)
             if (upHistory.size > 60) upHistory.removeAt(0)
@@ -627,6 +633,11 @@ private fun TrafficHistoryCard(
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold
             )
+            Text(
+                text = "Up: ${upStr.value.orEmpty()}   Down: ${downStr.value.orEmpty()}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(modifier = Modifier.height(10.dp))
             Canvas(
                 modifier = Modifier
@@ -635,7 +646,7 @@ private fun TrafficHistoryCard(
                 onDraw = {
                     val maxUp = upHistory.maxOrNull() ?: 0f
                     val maxDown = downHistory.maxOrNull() ?: 0f
-                    val max = maxOf(maxUp, maxDown, 1f)
+                    val max = maxOf(maxUp, maxDown, 0.01f)
                     val span = upHistory.size.coerceAtLeast(1) - 1f
                     val xStep = if (span > 0f) size.width / span else 0f
 
@@ -649,10 +660,8 @@ private fun TrafficHistoryCard(
                                 }
                             }
                             drawPath(path, color, style = Stroke(width = 2f), alpha = 0.95f)
-                            drawPath(path, color.copy(alpha = 0.15f))
                         }
                     }
-
                     drawHistory(upHistory, glassCyan)
                     drawHistory(downHistory, glassGreen)
                 }

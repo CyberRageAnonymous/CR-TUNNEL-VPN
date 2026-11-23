@@ -65,7 +65,7 @@ private val DarkColor = darkColorScheme(
     onPrimary = Color(0xFF00262C), // Dark Cyan
     primaryContainer = Color(0xFF0B3A45), // Deep Cyan
     onPrimaryContainer = Color(0xFFB3F5FF), // Light Cyan
-    secondary = Color(0xFFA855F7), // Purple
+    secondary = Color(0xFFE5C07B), // Amber Gold
     onSecondary = Color(0xFF1E0055), // Dark Purple
     secondaryContainer = Color(0xFF3D1B66), // Deep Purple
     onSecondaryContainer = Color(0xFFEDE1FF), // Light Purple
@@ -135,8 +135,8 @@ private val NeonColor = darkColorScheme(
 )
 
 private val PremiumColor = darkColorScheme(
-    primary = Color(0xFFE5C07B), // Amber Gold
-    onPrimary = Color(0xFF11111A), // Deep Space
+    primary = Color(0xFF9D77FF), // Deep Violet
+    onPrimary = Color(0xFF0A0B12), // Near-Black
     primaryContainer = Color(0xFF3A3239), // Dark Gold-Gray
     onPrimaryContainer = Color(0xFFF1E9D6), // Cream
     secondary = Color(0xFF9AA7FF), // Slate Blue
