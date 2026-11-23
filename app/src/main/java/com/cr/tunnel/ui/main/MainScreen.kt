@@ -466,8 +466,8 @@ private fun HomeTab(
             onCancelAutoOptimize = { onAction(MainAction.CancelAutoOptimize) }
         )
         TrafficHistoryCard(
-            uplinkSpeed = trafficState.uplinkSpeed.toFloat(),
-            downlinkSpeed = trafficState.downlinkSpeed.toFloat(),
+            uplinkSpeed = trafficState.uplinkSpeed.toFloatOrNull() ?: 0f,
+            downlinkSpeed = trafficState.downlinkSpeed.toFloatOrNull() ?: 0f,
             isDarkTheme = isDarkTheme
         )
         }
