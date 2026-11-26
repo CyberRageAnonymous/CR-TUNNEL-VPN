@@ -122,7 +122,6 @@ GPL-3.0. See [LICENSE](LICENSE).
 
 Developed by Cyber-Rage.
 
-- Telegram: [t.me/R4G3_2024](https://t.me/R4G3_2024)
 - Issues and PRs: [GitHub Issues](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues)
 
 ## Disclaimer
@@ -237,7 +236,6 @@ GPL-3.0. فایل [LICENSE](LICENSE) را ببینید.
 
 توسعه توسط Cyber-Rage.
 
-- تلگرام: [t.me/R4G3_2024](https://t.me/R4G3_2024)
 - ایشو و پولریکوئست: [GitHub Issues](https://github.com/CyberRageAnonymous/CR-TUNNEL-VPN/issues)
 
 ## سلب مسئولیت
